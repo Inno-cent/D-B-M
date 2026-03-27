@@ -1,10 +1,12 @@
 <template>
-  <div class="bg-white dark:bg-black text-gray-900 dark:text-white min-h-screen">
+  <div class="bg-cream text-earth-900 min-h-screen">
     <div class="page-hero">
       <div class="max-w-7xl mx-auto">
         <span class="section-label">Insights</span>
-        <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-4">Market Insights</h1>
-        <p class="text-gray-600 dark:text-gray-400 text-lg max-w-xl mb-8">
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-4 text-earth-900">
+          Market Insights
+        </h1>
+        <p class="text-earth-600 text-lg max-w-xl mb-8">
           Analysis on Nigerian commodity exports, trade education, and wholesale market dynamics.
         </p>
         <div class="flex flex-wrap gap-3">
@@ -15,8 +17,8 @@
             :class="[
               'px-5 py-2.5 rounded-xl text-sm font-semibold border-2 transition-all duration-200',
               activeCategory === cat.value
-                ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
-                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400'
+                ? 'bg-forest-700 text-white border-forest-700'
+                : 'border-earth-300 text-earth-700 hover:border-forest-400 bg-white'
             ]"
           >
             {{ cat.label }}
@@ -27,30 +29,34 @@
 
     <div class="max-w-7xl mx-auto px-6 md:px-10 py-16">
       <!-- Featured -->
-      <div class="border-2 border-gray-200 dark:border-gray-800 rounded-3xl p-8 md:p-12 mb-10
-                  hover:border-black dark:hover:border-white hover:shadow-2xl
-                  transition-all duration-300" data-reveal>
+      <div
+        class="border-2 border-earth-200 rounded-3xl p-8 md:p-12 mb-10 bg-white
+               hover:border-forest-400 hover:shadow-xl transition-all duration-300"
+        data-reveal
+      >
         <div class="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <span class="text-xs px-3 py-1 rounded-full font-semibold mb-4 inline-block
-                         bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                         bg-forest-50 text-forest-700 border border-forest-200">
               Export Insights
             </span>
-            <h2 class="text-3xl font-bold mb-4 leading-tight">
+            <h2 class="text-3xl font-bold mb-4 leading-tight text-earth-900">
               How to import sesame seeds from Nigeria: A complete buyer's guide
             </h2>
-            <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-              Everything international buyers need to know about sourcing, grading, and shipping sesame seeds from verified Nigerian suppliers.
+            <p class="text-earth-600 leading-relaxed mb-6">
+              Everything international buyers need to know about sourcing, grading, and
+              shipping sesame seeds from verified Nigerian suppliers.
             </p>
             <RouterLink
               to="/blog/importing-sesame-seeds-nigeria"
-              class="inline-flex items-center gap-2 font-semibold text-sm hover:gap-3 transition-all"
+              class="inline-flex items-center gap-2 font-semibold text-sm
+                     text-forest-700 hover:text-forest-600 hover:gap-3 transition-all"
             >
               Read article <span>→</span>
             </RouterLink>
           </div>
-          <div class="border-2 border-gray-200 dark:border-gray-800 rounded-2xl h-48
-                      flex items-center justify-center text-8xl bg-gray-50 dark:bg-gray-900">
+          <div class="border-2 border-earth-200 rounded-2xl h-48 flex items-center
+                      justify-center text-8xl bg-parchment">
             🌿
           </div>
         </div>
@@ -64,28 +70,26 @@
           :to="`/blog/${post.slug}`"
           data-reveal
           :data-reveal-delay="String((i % 3) + 1)"
-          class="group border-2 border-gray-200 dark:border-gray-800 rounded-2xl p-7
-                 bg-white dark:bg-gray-900 hover:border-black dark:hover:border-white
-                 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+          class="group border-2 border-earth-200 rounded-2xl p-7 bg-white
+                 hover:border-forest-400 hover:shadow-xl hover:-translate-y-1
+                 transition-all duration-300 flex flex-col"
         >
           <span
             class="text-xs px-3 py-1 rounded-full font-semibold mb-5 w-fit"
             :class="{
-              'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400': post.category === 'export',
-              'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400': post.category === 'local',
-              'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400': post.category === 'trade',
+              'bg-forest-50 text-forest-700 border border-forest-200': post.category === 'export',
+              'bg-earth-100 text-earth-700 border border-earth-200': post.category === 'local',
+              'bg-amber-50 text-amber-700 border border-amber-200': post.category === 'trade',
             }"
           >
             {{ post.categoryLabel }}
           </span>
-          <h3 class="font-bold text-base mb-3 leading-snug flex-1
-                     group-hover:underline underline-offset-4">
+          <h3 class="font-bold text-base mb-3 leading-snug flex-1 text-earth-900
+                     group-hover:text-forest-700 transition-colors">
             {{ post.title }}
           </h3>
-          <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-5">
-            {{ post.excerpt }}
-          </p>
-          <span class="inline-flex items-center gap-1 text-sm font-semibold
+          <p class="text-earth-500 text-sm leading-relaxed mb-5">{{ post.excerpt }}</p>
+          <span class="inline-flex items-center gap-1 text-sm font-semibold text-forest-700
                        group-hover:gap-2 transition-all duration-200">
             Read more <span>→</span>
           </span>
@@ -105,10 +109,10 @@ onMounted(() => observe())
 const activeCategory = ref('all')
 
 const categories = [
-  { label: 'All Articles',   value: 'all' },
-  { label: 'Export Insights',value: 'export' },
-  { label: 'Nigerian Market',value: 'local' },
-  { label: 'Trade Education',value: 'trade' },
+  { label: 'All Articles',    value: 'all' },
+  { label: 'Export Insights', value: 'export' },
+  { label: 'Nigerian Market', value: 'local' },
+  { label: 'Trade Education', value: 'trade' },
 ]
 
 const posts = [
@@ -122,7 +126,7 @@ const posts = [
     excerpt: 'A plain-English explanation of the two most common shipping incoterms used in Nigerian export contracts.',
     category: 'trade', categoryLabel: 'Trade Education' },
   { slug: 'ginger-supply-season', title: 'Nigerian ginger supply season explained',
-    excerpt: 'When to buy, when prices peak, and how seasonal cycles affect availability of Nigerian ginger year-round.',
+    excerpt: 'When to buy, when prices peak, and how seasonal cycles affect the availability of Nigerian ginger.',
     category: 'export', categoryLabel: 'Export Insights' },
   { slug: 'export-documentation', title: 'Export documentation for Nigerian commodities',
     excerpt: 'A breakdown of the key documents required to legally export agricultural commodities from Nigeria.',
