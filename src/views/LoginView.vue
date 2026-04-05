@@ -141,34 +141,3 @@
 
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
-
-const auth    = useAuthStore()
-const router  = useRouter()
-const loading = ref(false)
-const error   = ref('')
-const showPassword = ref(false)
-
-const form = reactive({
-  email: '',
-  password: '',
-  remember: false,
-})
-
-const handleLogin = async () => {
-  loading.value = true
-  error.value   = ''
-  try {
-    await auth.signIn(form.email, form.password)
-    router.push('/dashboard')
-  } catch (e: any) {
-    error.value = e.message || 'Invalid email or password. Please try again.'
-  } finally {
-    loading.value = false
-  }
-}
-</script>
