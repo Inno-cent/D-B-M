@@ -27,22 +27,57 @@
           :key="link.path"
           :to="link.path"
           class="text-sm px-4 py-2 rounded-lg text-forest-200
-                 hover:text-white hover:bg-white/10
-                 transition-all duration-200"
+                 hover:text-white hover:bg-white/10 transition-all duration-200"
           active-class="text-white bg-white/10 font-medium"
         >
           {{ link.label }}
         </RouterLink>
       </nav>
 
+      <!-- Right side -->
       <div class="flex items-center gap-3">
-        <RouterLink
-          to="/request-quote"
-          class="hidden sm:inline-flex btn-harvest text-xs py-2.5 px-5"
-        >
-          Request a Quote
-        </RouterLink>
 
+        <!-- Logged in -->
+        <template v-if="isLoggedIn">
+          <RouterLink
+            to="/dashboard"
+            class="hidden sm:inline-flex items-center gap-2 border-2 border-white/20
+                   text-white text-xs py-2.5 px-4 rounded-xl font-semibold
+                   hover:bg-white/10 hover:border-white/40 transition-all duration-200"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            {{ user?.fullName?.split(' ')[0] || 'Dashboard' }}
+          </RouterLink>
+          <button
+            @click="handleSignOut"
+            class="hidden sm:inline-flex text-forest-300 text-xs py-2.5 px-3 rounded-xl
+                   hover:text-white hover:bg-white/10 transition-all duration-200 font-medium"
+          >
+            Sign Out
+          </button>
+        </template>
+
+        <!-- Logged out -->
+        <template v-else>
+          <RouterLink
+            to="/login"
+            class="hidden sm:inline-flex text-forest-200 text-xs py-2.5 px-4 rounded-xl
+                   hover:text-white hover:bg-white/10 transition-all duration-200 font-medium"
+          >
+            Sign In
+          </RouterLink>
+          <RouterLink
+            to="/request-quote"
+            class="hidden sm:inline-flex btn-harvest text-xs py-2.5 px-5"
+          >
+            Request a Quote
+          </RouterLink>
+        </template>
+
+        <!-- Mobile hamburger -->
         <button
           @click="mobileOpen = !mobileOpen"
           class="lg:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5
@@ -59,6 +94,7 @@
       </div>
     </div>
 
+    <!-- Mobile menu -->
     <Transition name="mobile-menu">
       <div
         v-if="mobileOpen"
@@ -77,36 +113,70 @@
             {{ link.label }}
           </RouterLink>
         </nav>
-        <RouterLink
-          to="/request-quote"
-          class="btn-harvest w-full justify-center py-3 block text-center"
-          @click="mobileOpen = false"
-        >
-          Request a Quote
-        </RouterLink>
+        <div class="flex flex-col gap-3">
+          <RouterLink
+            v-if="isLoggedIn"
+            to="/dashboard"
+            class="btn-outline border-white/20 text-white text-center justify-center
+                   hover:bg-white/10 hover:border-white/40 hover:text-white py-3"
+            @click="mobileOpen = false"
+          >
+            Dashboard
+          </RouterLink>
+          <template v-else>
+            <RouterLink
+              to="/login"
+              class="text-center py-3 border-2 border-white/20 rounded-xl text-white
+                     font-semibold text-sm hover:bg-white/10 transition-all"
+              @click="mobileOpen = false"
+            >
+              Sign In
+            </RouterLink>
+            <RouterLink
+              to="/request-quote"
+              class="btn-harvest w-full justify-center py-3 text-center block"
+              @click="mobileOpen = false"
+            >
+              Request a Quote
+            </RouterLink>
+          </template>
+        </div>
       </div>
     </Transition>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../../stores/auth'
 
-const scrolled    = ref(false)
-const mobileOpen  = ref(false)
+const authStore  = useAuthStore()
+const router     = useRouter()
+const isLoggedIn = computed(() => authStore.isLoggedIn)
+const user       = computed(() => authStore.user)
+
+const scrolled   = ref(false)
+const mobileOpen = ref(false)
 
 const handler = () => { scrolled.value = window.scrollY > 20 }
 onMounted(()   => window.addEventListener('scroll', handler, { passive: true }))
 onUnmounted(() => window.removeEventListener('scroll', handler))
 
+const handleSignOut = () => {
+  authStore.signOut()
+  router.push('/')
+  mobileOpen.value = false
+}
+
 const navLinks = [
-  { label: 'Home',          path: '/' },
-  { label: 'Products',      path: '/products' },
-  { label: 'How It Works',  path: '/how-it-works' },
-  { label: 'Suppliers',     path: '/supplier-network' },
-  { label: 'Blog',          path: '/blog' },
-  { label: 'About',         path: '/about' },
-  { label: 'Contact',       path: '/contact' },
+  { label: 'Home',         path: '/' },
+  { label: 'Products',     path: '/products' },
+  { label: 'How It Works', path: '/how-it-works' },
+  { label: 'Suppliers',    path: '/supplier-network' },
+  { label: 'Blog',         path: '/blog' },
+  { label: 'About',        path: '/about' },
+  { label: 'Contact',      path: '/contact' },
 ]
 </script>
 
