@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { watch } from 'vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
@@ -37,24 +38,45 @@ const router = createRouter({
     },
     { path: '/about', name: 'about', component: () => import('../views/AboutView.vue') },
     { path: '/contact', name: 'contact', component: () => import('../views/ContactView.vue') },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('../views/LoginView.vue'),
-      meta: { layout: 'auth' },
-    },
+
+    // Auth routes
     {
       path: '/signup',
       name: 'signup',
       component: () => import('../views/SignupView.vue'),
-      meta: { layout: 'auth' },
+      meta: { guestOnly: true },
     },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/LoginView.vue'),
+      meta: { guestOnly: true },
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('../views/ForgotPasswordView.vue'),
+      meta: { guestOnly: true },
+    },
+    {
+      path: '/auth/reset-password',
+      name: 'reset-password',
+      component: () => import('../views/ResetPasswordView.vue'),
+    },
+    {
+      path: '/auth/callback',
+      name: 'auth-callback',
+      component: () => import('../views/AuthCallbackView.vue'),
+    },
+
+    // Protected
     {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
       meta: { requiresAuth: true },
     },
+
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
@@ -63,12 +85,30 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore()
-  if (to.meta.requiresAuth && !auth.isLoggedIn) {
-    return { name: 'login' }
+
+  // Wait for auth to finish initialising
+  if (auth.loading) {
+    await new Promise<void>((resolve) => {
+      const stop = watch(
+        () => auth.loading,
+        (val) => {
+          if (!val) {
+            stop()
+            resolve()
+          }
+        },
+        { immediate: true },
+      )
+    })
   }
-  if ((to.name === 'login' || to.name === 'signup') && auth.isLoggedIn) {
+
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+    return { name: 'login', query: { redirect: to.fullPath } }
+  }
+
+  if (to.meta.guestOnly && auth.isLoggedIn) {
     return { name: 'dashboard' }
   }
 })
