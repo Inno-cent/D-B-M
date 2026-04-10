@@ -188,15 +188,42 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { ref, reactive } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
+const auth    = useAuthStore()
+const router  = useRouter()
+const route   = useRoute()
+const loading = ref(false)
+const error   = ref('')
+const showPassword = ref(false)
 
 const form = reactive({
-  email: "",
-  password: "",
+  email:    '',
+  password: '',
   remember: false,
-});
+})
 
-const loading = ref(false);
-const error = ref(null);
-const showPassword = ref(false);
+const handleLogin = async () => {
+  loading.value = true
+  error.value   = ''
+  try {
+    await auth.signIn(form.email, form.password)
+    const redirect = route.query.redirect as string
+    router.push(redirect || '/dashboard')
+  } catch (e: any) {
+    error.value = e.message?.includes('Invalid login credentials')
+      ? 'Incorrect email or password. Please try again.'
+      : e.message || 'Something went wrong. Please try again.'
+  } finally {
+    loading.value = false
+  }
+}
+
+const sideStats = [
+  { value: '50+', label: 'Suppliers' },
+  { value: '18',  label: 'Countries' },
+  { value: '24h', label: 'Response' },
+]
 </script>

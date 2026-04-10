@@ -151,10 +151,10 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 
-const authStore  = useAuthStore()
+const auth       = useAuthStore()
 const router     = useRouter()
-const isLoggedIn = computed(() => authStore.isLoggedIn)
-const user       = computed(() => authStore.user)
+const isLoggedIn = computed(() => auth.isLoggedIn)
+const firstName  = computed(() => auth.firstName)
 
 const scrolled   = ref(false)
 const mobileOpen = ref(false)
@@ -163,10 +163,14 @@ const handler = () => { scrolled.value = window.scrollY > 20 }
 onMounted(()   => window.addEventListener('scroll', handler, { passive: true }))
 onUnmounted(() => window.removeEventListener('scroll', handler))
 
-const handleSignOut = () => {
-  authStore.signOut()
-  router.push('/')
-  mobileOpen.value = false
+const handleSignOut = async () => {
+  try {
+    await auth.signOut()
+    router.push('/')
+    mobileOpen.value = false
+  } catch (e) {
+    console.error('Sign out failed:', e)
+  }
 }
 
 const navLinks = [
