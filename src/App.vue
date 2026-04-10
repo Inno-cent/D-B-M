@@ -3,7 +3,7 @@
 
     <!-- Auth loading screen -->
     <Transition name="fade">
-      <div v-if="authLoading"
+      <div v-if="authLoading "
         class="fixed inset-0 bg-cream flex items-center justify-center z-[100]">
         <div class="text-center">
           <div class="w-12 h-12 border-4 border-earth-200 border-t-forest-600
@@ -14,7 +14,7 @@
     </Transition>
 
     <template v-if="!authLoading">
-      <AppHeader />
+      <AppHeader v-if="isAuthPage" />
       <main class="flex-1">
         <RouterView v-slot="{ Component }">
           <Transition name="page" mode="out-in">
@@ -22,13 +22,13 @@
           </Transition>
         </RouterView>
       </main>
-      <AppFooter />
+      <AppFooter v-if="isAuthPage"/>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed,onMounted  } from 'vue'
 import { useRoute } from 'vue-router'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
@@ -39,6 +39,10 @@ const route = useRoute()
 const auth        = useAuthStore()
 const authLoading = computed(() => auth.loading)
 const isAuthPage = computed(() => route.meta.layout === 'auth')
+
+onMounted(() => {
+  auth.init()
+})
 
 </script>
 
