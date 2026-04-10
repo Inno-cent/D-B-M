@@ -79,12 +79,12 @@
           <div>
             <div class="flex items-center justify-between mb-2">
               <label class="text-sm font-semibold text-earth-800">Password</label>
-              <a
-                href="#"
-                class="text-xs text-forest-600 font-semibold hover:text-forest-700"
+              <RouterLink
+                to="/forgot-password"
+                class="text-xs text-forest-600 font-semibold hover:text-forest-700 transition-colors"
               >
                 Forgot password?
-              </a>
+              </RouterLink>
             </div>
             <div class="relative">
               <input
@@ -188,42 +188,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { ref, reactive } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "../stores/auth";
 
-const auth    = useAuthStore()
-const router  = useRouter()
-const route   = useRoute()
-const loading = ref(false)
-const error   = ref('')
-const showPassword = ref(false)
+const auth = useAuthStore();
+const router = useRouter();
+const route = useRoute();
+const loading = ref(false);
+const error = ref("");
+const showPassword = ref(false);
 
 const form = reactive({
-  email:    '',
-  password: '',
+  email: "",
+  password: "",
   remember: false,
-})
+});
 
 const handleLogin = async () => {
-  loading.value = true
-  error.value   = ''
+  loading.value = true;
+  error.value = "";
   try {
-    await auth.signIn(form.email, form.password)
-    const redirect = route.query.redirect as string
-    router.push(redirect || '/dashboard')
+    await auth.signIn(form.email, form.password);
+    const redirect = route.query.redirect as string;
+    router.push(redirect || "/dashboard");
   } catch (e: any) {
-    error.value = e.message?.includes('Invalid login credentials')
-      ? 'Incorrect email or password. Please try again.'
-      : e.message || 'Something went wrong. Please try again.'
+    error.value = e.message?.includes("Invalid login credentials")
+      ? "Incorrect email or password. Please try again."
+      : e.message || "Something went wrong. Please try again.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const sideStats = [
-  { value: '50+', label: 'Suppliers' },
-  { value: '18',  label: 'Countries' },
-  { value: '24h', label: 'Response' },
-]
+  { value: "50+", label: "Suppliers" },
+  { value: "18", label: "Countries" },
+  { value: "24h", label: "Response" },
+];
 </script>
