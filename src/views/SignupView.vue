@@ -367,51 +367,46 @@ const form = reactive({
   companyName: "",
   email: "",
   country: "",
+  phone: "",
   password: "",
   confirmPassword: "",
   agreed: false,
 });
 
-// Password strength
 const passwordStrength = computed(() => {
   const p = form.password;
   if (!p) return 0;
-  let score = 0;
-  if (p.length >= 8) score++;
-  if (/[A-Z]/.test(p)) score++;
-  if (/[0-9]/.test(p)) score++;
-  if (/[^A-Za-z0-9]/.test(p)) score++;
-  return score;
+  let s = 0;
+  if (p.length >= 8) s++;
+  if (/[A-Z]/.test(p)) s++;
+  if (/[0-9]/.test(p)) s++;
+  if (/[^A-Za-z0-9]/.test(p)) s++;
+  return s;
 });
 
 const strengthColor = computed(
   () =>
-    ({
-      1: "bg-red-400",
-      2: "bg-amber-400",
-      3: "bg-yellow-400",
-      4: "bg-forest-500",
-    }[passwordStrength.value] || "bg-earth-200")
+    ["", "bg-red-400", "bg-amber-400", "bg-yellow-400", "bg-forest-500"][
+      passwordStrength.value
+    ]
 );
 
 const strengthTextColor = computed(
   () =>
-    ({
-      1: "text-red-500",
-      2: "text-amber-600",
-      3: "text-yellow-600",
-      4: "text-forest-600",
-    }[passwordStrength.value] || "")
+    ["", "text-red-500", "text-amber-600", "text-yellow-600", "text-forest-600"][
+      passwordStrength.value
+    ]
 );
 
 const strengthLabel = computed(
   () =>
-    ({
-      1: "Weak — add uppercase letters, numbers, or symbols",
-      2: "Fair — getting better",
-      3: "Good password",
-      4: "Strong password ✓",
-    }[passwordStrength.value] || "")
+    [
+      "",
+      "Weak — add uppercase, numbers or symbols",
+      "Fair — getting better",
+      "Good password",
+      "Strong password ✓",
+    ][passwordStrength.value]
 );
 
 const canSubmit = computed(
@@ -428,21 +423,22 @@ const handleSignup = async () => {
   if (!canSubmit.value) return;
   loading.value = true;
   error.value = "";
-
-  // Simulate a brief loading state
-  await new Promise((r) => setTimeout(r, 800));
-
   try {
-    auth.signUp({
-      id: crypto.randomUUID(),
-      fullName: form.fullName,
-      companyName: form.companyName,
-      email: form.email,
-      country: form.country,
-    });
+    await auth.signUp(
+      form.email,
+      form.password,
+      form.fullName,
+      form.companyName,
+      form.country,
+      form.phone
+    );
     success.value = true;
   } catch (e: any) {
-    error.value = "Something went wrong. Please try again.";
+    if (e.message?.includes("already registered")) {
+      error.value = "An account with this email already exists. Please sign in.";
+    } else {
+      error.value = e.message || "Something went wrong. Please try again.";
+    }
   } finally {
     loading.value = false;
   }
