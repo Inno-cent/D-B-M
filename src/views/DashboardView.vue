@@ -1,6 +1,5 @@
 <template>
   <div class="bg-cream min-h-screen text-earth-900">
-
     <!-- Dashboard header -->
     <div class="bg-forest-800 pt-24 pb-12 px-6 md:px-10">
       <div class="max-w-7xl mx-auto">
@@ -8,12 +7,12 @@
           <div>
             <p class="text-forest-300 text-sm mb-1">Welcome back 👋</p>
             <h1 class="text-3xl font-bold text-white">
-              {{ user?.fullName }}
+              {{ profile?.full_name || user?.email }}
             </h1>
             <p class="text-forest-300 text-sm mt-1 flex items-center gap-2">
-              <span>{{ user?.companyName || 'Buyer Account' }}</span>
-              <span class="w-1 h-1 bg-forest-400 rounded-full" />
-              <span>{{ user?.country }}</span>
+              <span>{{ profile?.company_name || "Buyer Account" }}</span>
+              <span v-if="profile?.country" class="w-1 h-1 bg-forest-400 rounded-full" />
+              <span>{{ profile?.country }}</span>
             </p>
           </div>
           <div class="flex items-center gap-3 flex-wrap">
@@ -22,19 +21,26 @@
               class="btn-harvest inline-flex items-center gap-2"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               New Quote Request
             </RouterLink>
             <button
               @click="handleSignOut"
-              class="inline-flex items-center gap-2 border-2 border-white/20 text-white
-                     text-sm py-2.5 px-4 rounded-xl font-semibold
-                     hover:bg-white/10 hover:border-white/40 transition-all duration-200"
+              class="inline-flex items-center gap-2 border-2 border-white/20 text-white text-sm py-2.5 px-4 rounded-xl font-semibold hover:bg-white/10 hover:border-white/40 transition-all duration-200"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
               </svg>
               Sign Out
             </button>
@@ -44,14 +50,12 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-6 md:px-10 py-12">
-
       <!-- Stats -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-12">
         <div
           v-for="stat in stats"
           :key="stat.label"
-          class="border-2 border-earth-200 rounded-2xl p-6 bg-white
-                 hover:border-forest-300 hover:shadow-lg transition-all duration-300"
+          class="border-2 border-earth-200 rounded-2xl p-6 bg-white hover:border-forest-300 hover:shadow-lg transition-all duration-300"
         >
           <div class="text-2xl mb-3">{{ stat.icon }}</div>
           <div class="text-2xl font-bold text-forest-700">{{ stat.value }}</div>
@@ -59,28 +63,26 @@
         </div>
       </div>
 
-      <!-- Recent quote requests -->
+      <!-- Quote requests -->
       <div class="mb-12">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-2xl font-bold text-earth-900">Your Quote Requests</h2>
           <RouterLink
             to="/request-quote"
-            class="text-sm font-semibold text-forest-600 hover:text-forest-700
-                   transition-colors flex items-center gap-1"
+            class="text-sm font-semibold text-forest-600 hover:text-forest-700 transition-colors flex items-center gap-1"
           >
             + New Request
           </RouterLink>
         </div>
 
-        <!-- Empty state -->
         <div
-          class="border-2 border-dashed border-earth-300 rounded-3xl p-16
-                 text-center bg-white"
+          class="border-2 border-dashed border-earth-300 rounded-3xl p-16 text-center bg-white"
         >
           <p class="text-6xl mb-5">🌾</p>
           <h3 class="text-xl font-bold text-earth-900 mb-3">No quote requests yet</h3>
           <p class="text-earth-500 mb-8 max-w-sm mx-auto leading-relaxed">
-            Submit your first quote request and we will source the best Nigerian commodity for you within 24 hours.
+            Submit your first quote request and we will source the best Nigerian commodity
+            for you within 24 hours.
           </p>
           <RouterLink to="/request-quote" class="btn-primary px-8 py-4">
             Request Your First Quote →
@@ -90,19 +92,138 @@
 
       <!-- Account details -->
       <div class="mb-12">
-        <h2 class="text-2xl font-bold text-earth-900 mb-6">Account Details</h2>
-        <div class="border-2 border-earth-200 rounded-2xl overflow-hidden bg-white">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-earth-900">Account Details</h2>
+          <button
+            @click="editMode = !editMode"
+            class="text-sm font-semibold text-forest-600 hover:text-forest-700 transition-colors"
+          >
+            {{ editMode ? "Cancel" : "Edit Profile" }}
+          </button>
+        </div>
+
+        <!-- View mode -->
+        <div
+          v-if="!editMode"
+          class="border-2 border-earth-200 rounded-2xl overflow-hidden bg-white"
+        >
           <div
             v-for="(field, i) in accountFields"
             :key="field.label"
             :class="[
-              'flex items-center justify-between px-6 py-4 text-sm border-b-2 last:border-b-0 border-earth-100',
-              i % 2 === 0 ? 'bg-white' : 'bg-parchment/40'
+              'flex items-center justify-between px-6 py-4 text-sm',
+              'border-b-2 last:border-b-0 border-earth-100',
+              i % 2 === 0 ? 'bg-white' : 'bg-parchment/40',
             ]"
           >
-            <span class="text-earth-500 font-medium w-40">{{ field.label }}</span>
-            <span class="font-semibold text-earth-900 text-right">{{ field.value || '—' }}</span>
+            <span class="text-earth-500 font-medium w-40 flex-shrink-0">
+              {{ field.label }}
+            </span>
+            <span class="font-semibold text-earth-900 text-right">
+              {{ field.value || "—" }}
+            </span>
           </div>
+        </div>
+
+        <!-- Edit mode -->
+        <div v-else class="border-2 border-earth-200 rounded-2xl p-8 bg-white space-y-5">
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold mb-2 text-earth-800">
+                Full Name
+              </label>
+              <input
+                v-model="editForm.full_name"
+                type="text"
+                class="input-field"
+                placeholder="Your full name"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-2 text-earth-800">
+                Company Name
+              </label>
+              <input
+                v-model="editForm.company_name"
+                type="text"
+                class="input-field"
+                placeholder="Your company"
+              />
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold mb-2 text-earth-800">
+                Country
+              </label>
+              <input
+                v-model="editForm.country"
+                type="text"
+                class="input-field"
+                placeholder="Your country"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-2 text-earth-800">
+                Phone
+              </label>
+              <input
+                v-model="editForm.phone"
+                type="tel"
+                class="input-field"
+                placeholder="+1 234 567 8900"
+              />
+            </div>
+          </div>
+          <div class="flex items-center gap-3 pt-2">
+            <button
+              @click="saveProfile"
+              :disabled="savingProfile"
+              class="btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              <svg
+                v-if="savingProfile"
+                class="animate-spin w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+              {{ savingProfile ? "Saving..." : "Save Changes" }}
+            </button>
+            <button @click="editMode = false" class="btn-outline">Cancel</button>
+          </div>
+
+          <!-- Save success -->
+          <Transition name="fade-slide">
+            <div
+              v-if="saveSuccess"
+              class="flex items-center gap-3 p-4 bg-forest-50 border-2 border-forest-200 rounded-xl text-forest-700 text-sm"
+            >
+              <svg
+                class="w-5 h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              Profile updated successfully
+            </div>
+          </Transition>
         </div>
       </div>
 
@@ -114,15 +235,17 @@
             v-for="action in quickActions"
             :key="action.path"
             :to="action.path"
-            class="group border-2 border-earth-200 rounded-2xl p-6 bg-white
-                   hover:border-forest-400 hover:shadow-lg hover:-translate-y-1
-                   transition-all duration-300 flex items-start gap-4"
+            class="group border-2 border-earth-200 rounded-2xl p-6 bg-white hover:border-forest-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex items-start gap-4"
           >
-            <div class="text-3xl group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+            <div
+              class="text-3xl group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+            >
               {{ action.icon }}
             </div>
             <div>
-              <h3 class="font-bold text-earth-900 mb-1 group-hover:text-forest-700 transition-colors">
+              <h3
+                class="font-bold text-earth-900 mb-1 group-hover:text-forest-700 transition-colors"
+              >
                 {{ action.title }}
               </h3>
               <p class="text-sm text-earth-500 leading-relaxed">{{ action.desc }}</p>
@@ -135,47 +258,150 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { ref, computed, reactive, watch } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "../stores/auth";
 
-const auth   = useAuthStore()
-const router = useRouter()
-const user   = computed(() => auth.user)
+const auth = useAuthStore();
+const router = useRouter();
 
-const handleSignOut = () => {
-  auth.signOut()
-  router.push('/')
-}
+const profile = computed(() => auth.profile);
+const user = computed(() => auth.user);
+
+// Edit profile state
+const editMode = ref(false);
+const savingProfile = ref(false);
+const saveSuccess = ref(false);
+
+const editForm = reactive({
+  full_name: "",
+  company_name: "",
+  country: "",
+  phone: "",
+});
+
+// Populate edit form whenever profile loads or changes
+watch(
+  profile,
+  (p) => {
+    if (p) {
+      editForm.full_name = p.full_name || "";
+      editForm.company_name = p.company_name || "";
+      editForm.country = p.country || "";
+      editForm.phone = p.phone || "";
+    }
+  },
+  { immediate: true }
+);
+
+const saveProfile = async () => {
+  savingProfile.value = true;
+  saveSuccess.value = false;
+  try {
+    await auth.updateProfile({
+      full_name: editForm.full_name,
+      company_name: editForm.company_name,
+      country: editForm.country,
+      phone: editForm.phone,
+    });
+    saveSuccess.value = true;
+    setTimeout(() => {
+      saveSuccess.value = false;
+      editMode.value = false;
+    }, 2000);
+  } catch (e) {
+    console.error("Profile update failed:", e);
+  } finally {
+    savingProfile.value = false;
+  }
+};
+
+const handleSignOut = async () => {
+  await auth.signOut();
+  router.push("/");
+};
 
 const stats = [
-  { icon: '📋', value: '0', label: 'Total Requests' },
-  { icon: '⏳', value: '0', label: 'Pending' },
-  { icon: '🔍', value: '0', label: 'Being Sourced' },
-  { icon: '✅', value: '0', label: 'Completed' },
-]
+  { icon: "📋", value: "0", label: "Total Requests" },
+  { icon: "⏳", value: "0", label: "Pending" },
+  { icon: "🔍", value: "0", label: "Being Sourced" },
+  { icon: "✅", value: "0", label: "Completed" },
+];
 
 const accountFields = computed(() => [
-  { label: 'Full Name',    value: user.value?.fullName },
-  { label: 'Email',        value: user.value?.email },
-  { label: 'Company',      value: user.value?.companyName },
-  { label: 'Country',      value: user.value?.country },
-  { label: 'Account Type', value: 'Buyer' },
-  { label: 'Member Since', value: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) },
-])
+  { label: "Full Name", value: profile.value?.full_name },
+  { label: "Email", value: user.value?.email },
+  { label: "Company", value: profile.value?.company_name },
+  { label: "Country", value: profile.value?.country },
+  { label: "Phone", value: profile.value?.phone },
+  { label: "Account Type", value: "Buyer" },
+  {
+    label: "Member Since",
+    value: profile.value?.created_at
+      ? new Date(profile.value.created_at).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }),
+  },
+]);
 
 const quickActions = [
-  { icon: '📋', title: 'Request a Quote',   path: '/request-quote',
-    desc: 'Submit a new commodity sourcing request' },
-  { icon: '🌿', title: 'Browse Products',   path: '/products',
-    desc: 'Explore our full commodity catalogue' },
-  { icon: '🤝', title: 'How It Works',      path: '/how-it-works',
-    desc: 'Understand our end-to-end sourcing process' },
-  { icon: '🌍', title: 'Supplier Network',  path: '/supplier-network',
-    desc: 'Learn about our verified supplier partners' },
-  { icon: '📧', title: 'Contact Us',        path: '/contact',
-    desc: 'Get in touch with our sourcing team' },
-  { icon: '📰', title: 'Market Insights',   path: '/blog',
-    desc: 'Stay updated on Nigerian commodity markets' },
-]
+  {
+    icon: "📋",
+    title: "Request a Quote",
+    path: "/request-quote",
+    desc: "Submit a new commodity sourcing request",
+  },
+  {
+    icon: "🌿",
+    title: "Browse Products",
+    path: "/products",
+    desc: "Explore our full commodity catalogue",
+  },
+  {
+    icon: "🤝",
+    title: "How It Works",
+    path: "/how-it-works",
+    desc: "Understand our end-to-end sourcing process",
+  },
+  {
+    icon: "🌍",
+    title: "Supplier Network",
+    path: "/supplier-network",
+    desc: "Learn about our verified supplier partners",
+  },
+  {
+    icon: "📧",
+    title: "Contact Us",
+    path: "/contact",
+    desc: "Get in touch with our sourcing team",
+  },
+  {
+    icon: "📰",
+    title: "Market Insights",
+    path: "/blog",
+    desc: "Stay updated on Nigerian commodity markets",
+  },
+];
 </script>
+
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
+}
+</style>
