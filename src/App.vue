@@ -14,7 +14,7 @@
     </Transition>
 
     <template v-if="!authLoading">
-      <AppHeader v-if="isAuthPage" />
+      <AppHeader v-if="!isAuthPage" />
       <main class="flex-1">
         <RouterView v-slot="{ Component }">
           <Transition name="page" mode="out-in">
@@ -22,7 +22,7 @@
           </Transition>
         </RouterView>
       </main>
-      <AppFooter v-if="isAuthPage"/>
+      <AppFooter v-if="!isAuthPage"/>
     </template>
   </div>
 </template>

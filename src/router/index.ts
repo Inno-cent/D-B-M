@@ -44,19 +44,19 @@ const router = createRouter({
       path: '/signup',
       name: 'signup',
       component: () => import('../views/SignupView.vue'),
-      meta: { guestOnly: true },
+      meta: { guestOnly: true, layout: 'auth' },
     },
     {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),
-      meta: { guestOnly: true },
+      meta: { guestOnly: true, layout: 'auth'  },
     },
     {
       path: '/forgot-password',
       name: 'forgot-password',
       component: () => import('../views/ForgotPasswordView.vue'),
-      meta: { guestOnly: true },
+      meta: { guestOnly: true},
     },
     {
       path: '/auth/reset-password',
