@@ -29,6 +29,7 @@ const router = createRouter({
       path: '/request-quote',
       name: 'quote',
       component: () => import('../views/RequestQuoteView.vue'),
+      meta: { requiresAuth: true },
     },
     { path: '/blog', name: 'blog', component: () => import('../views/BlogView.vue') },
     {
@@ -50,13 +51,13 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),
-      meta: { guestOnly: true, layout: 'auth'  },
+      meta: { guestOnly: true, layout: 'auth' },
     },
     {
       path: '/forgot-password',
       name: 'forgot-password',
       component: () => import('../views/ForgotPasswordView.vue'),
-      meta: { guestOnly: true},
+      meta: { guestOnly: true },
     },
     {
       path: '/auth/reset-password',
