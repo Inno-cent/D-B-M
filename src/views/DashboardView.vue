@@ -7,7 +7,7 @@
           <div>
             <p class="text-forest-300 text-sm mb-1">Welcome back 👋</p>
             <h1 class="text-3xl font-bold text-white">
-              {{ profile?.full_name || user?.email }}
+              {{ profile && profile.full_name ? profile.full_name : user && user.email }}
             </h1>
             <p class="text-forest-300 text-sm mt-1 flex items-center gap-2">
               <span>{{ profile?.company_name || "Buyer Account" }}</span>
@@ -63,19 +63,210 @@
         </div>
       </div>
 
-      <!-- Quote requests -->
+      <!-- Quote history with tracking -->
       <div class="mb-12">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-earth-900">Your Quote Requests</h2>
+          <h2 class="text-2xl font-bold text-earth-900">Quote Requests & Tracking</h2>
           <RouterLink
             to="/request-quote"
-            class="text-sm font-semibold text-forest-600 hover:text-forest-700 transition-colors flex items-center gap-1"
+            class="text-sm font-semibold text-forest-600 hover:text-forest-700 transition-colors"
           >
             + New Request
           </RouterLink>
         </div>
 
+        <!-- Quote cards -->
+        <div class="space-y-5">
+          <div
+            v-for="quote in dummyQuotes"
+            :key="quote.id"
+            class="border-2 border-earth-200 rounded-2xl bg-white overflow-hidden hover:border-forest-300 hover:shadow-lg transition-all duration-300"
+          >
+            <!-- Quote header -->
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 border-b-2 border-earth-100"
+            >
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-12 h-12 bg-forest-50 border-2 border-forest-200 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                >
+                  {{ quote.icon }}
+                </div>
+                <div>
+                  <h3 class="font-bold text-earth-900 text-base">{{ quote.product }}</h3>
+                  <p class="text-earth-500 text-sm mt-0.5">
+                    {{ quote.quantity }} · {{ quote.destination }}
+                  </p>
+                  <p class="text-earth-400 text-xs mt-0.5">Submitted {{ quote.date }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 sm:flex-shrink-0">
+                <span
+                  :class="[
+                    'text-xs px-3 py-1.5 rounded-full font-semibold border',
+                    statusStyles[quote.status],
+                  ]"
+                >
+                  {{ statusLabels[quote.status] }}
+                </span>
+                <button
+                  @click="toggleTracking(quote.id)"
+                  class="text-xs font-semibold text-forest-600 hover:text-forest-700 border-2 border-forest-200 hover:border-forest-400 px-3 py-1.5 rounded-xl transition-all duration-200"
+                >
+                  {{ expandedQuotes.includes(quote.id) ? "Hide" : "Track" }} →
+                </button>
+              </div>
+            </div>
+
+            <!-- Tracking timeline -->
+            <Transition name="tracking">
+              <div
+                v-if="expandedQuotes.includes(quote.id)"
+                class="px-6 py-6 bg-parchment/40"
+              >
+                <p
+                  class="text-xs font-semibold text-earth-500 uppercase tracking-widest mb-5"
+                >
+                  Shipment Tracking
+                </p>
+                <div class="relative">
+                  <!-- Vertical line -->
+                  <div class="absolute left-4 top-4 bottom-4 w-0.5 bg-earth-200" />
+
+                  <div class="space-y-0">
+                    <div
+                      v-for="(step, i) in quote.tracking"
+                      :key="step.label"
+                      class="relative flex gap-5 pb-6 last:pb-0"
+                    >
+                      <!-- Step indicator -->
+                      <div
+                        :class="[
+                          'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
+                          'border-2 z-10 relative',
+                          step.completed
+                            ? 'bg-forest-600 border-forest-600'
+                            : step.active
+                            ? 'bg-white border-forest-600 shadow-md shadow-forest-200'
+                            : 'bg-white border-earth-300',
+                        ]"
+                      >
+                        <!-- Completed checkmark -->
+                        <svg
+                          v-if="step.completed"
+                          class="w-4 h-4 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="3"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        <!-- Active pulse -->
+                        <div
+                          v-else-if="step.active"
+                          class="w-3 h-3 bg-forest-600 rounded-full animate-pulse"
+                        />
+                        <!-- Pending dot -->
+                        <div v-else class="w-2.5 h-2.5 bg-earth-300 rounded-full" />
+                      </div>
+
+                      <!-- Step content -->
+                      <div class="flex-1 pt-0.5">
+                        <div class="flex items-start justify-between gap-4">
+                          <div>
+                            <p
+                              :class="[
+                                'font-semibold text-sm',
+                                step.completed || step.active
+                                  ? 'text-earth-900'
+                                  : 'text-earth-400',
+                              ]"
+                            >
+                              {{ step.label }}
+                            </p>
+                            <p
+                              :class="[
+                                'text-xs mt-0.5 leading-relaxed',
+                                step.completed || step.active
+                                  ? 'text-earth-500'
+                                  : 'text-earth-300',
+                              ]"
+                            >
+                              {{ step.desc }}
+                            </p>
+                          </div>
+                          <div class="flex-shrink-0 text-right">
+                            <span
+                              v-if="step.date"
+                              class="text-xs text-earth-500 font-medium"
+                            >
+                              {{ step.date }}
+                            </span>
+                            <span
+                              v-else-if="step.active"
+                              class="text-xs text-forest-600 font-semibold bg-forest-50 px-2 py-0.5 rounded-full border border-forest-200"
+                            >
+                              In Progress
+                            </span>
+                            <span v-else class="text-xs text-earth-300">Pending</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Quote details summary -->
+                <div
+                  class="mt-6 pt-5 border-t-2 border-earth-200 grid sm:grid-cols-3 gap-4"
+                >
+                  <div>
+                    <p
+                      class="text-xs text-earth-400 uppercase tracking-wide font-medium mb-1"
+                    >
+                      Reference
+                    </p>
+                    <p class="text-sm font-bold text-earth-900 font-mono">
+                      {{ quote.ref }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs text-earth-400 uppercase tracking-wide font-medium mb-1"
+                    >
+                      Estimated Delivery
+                    </p>
+                    <p class="text-sm font-bold text-earth-900">
+                      {{ quote.eta || "TBC" }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs text-earth-400 uppercase tracking-wide font-medium mb-1"
+                    >
+                      Contact
+                    </p>
+                    <a
+                      href="mailto:hello@dualmarket.com"
+                      class="text-sm font-bold text-forest-600 hover:text-forest-700 transition-colors"
+                    >
+                      hello@dualmarket.com
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </Transition>
+          </div>
+        </div>
+
+        <!-- Empty state (shown when no quotes) -->
         <div
+          v-if="dummyQuotes.length === 0"
           class="border-2 border-dashed border-earth-300 rounded-3xl p-16 text-center bg-white"
         >
           <p class="text-6xl mb-5">🌾</p>
@@ -116,12 +307,12 @@
               i % 2 === 0 ? 'bg-white' : 'bg-parchment/40',
             ]"
           >
-            <span class="text-earth-500 font-medium w-40 flex-shrink-0">
-              {{ field.label }}
-            </span>
-            <span class="font-semibold text-earth-900 text-right">
-              {{ field.value || "—" }}
-            </span>
+            <span class="text-earth-500 font-medium w-40 flex-shrink-0">{{
+              field.label
+            }}</span>
+            <span class="font-semibold text-earth-900 text-right">{{
+              field.value || "—"
+            }}</span>
           </div>
         </div>
 
@@ -129,9 +320,9 @@
         <div v-else class="border-2 border-earth-200 rounded-2xl p-8 bg-white space-y-5">
           <div class="grid sm:grid-cols-2 gap-5">
             <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800">
-                Full Name
-              </label>
+              <label class="block text-sm font-semibold mb-2 text-earth-800"
+                >Full Name</label
+              >
               <input
                 v-model="editForm.full_name"
                 type="text"
@@ -140,9 +331,9 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800">
-                Company Name
-              </label>
+              <label class="block text-sm font-semibold mb-2 text-earth-800"
+                >Company Name</label
+              >
               <input
                 v-model="editForm.company_name"
                 type="text"
@@ -153,9 +344,9 @@
           </div>
           <div class="grid sm:grid-cols-2 gap-5">
             <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800">
-                Country
-              </label>
+              <label class="block text-sm font-semibold mb-2 text-earth-800"
+                >Country</label
+              >
               <input
                 v-model="editForm.country"
                 type="text"
@@ -164,9 +355,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800">
-                Phone
-              </label>
+              <label class="block text-sm font-semibold mb-2 text-earth-800">Phone</label>
               <input
                 v-model="editForm.phone"
                 type="tel"
@@ -201,8 +390,6 @@
             </button>
             <button @click="editMode = false" class="btn-outline">Cancel</button>
           </div>
-
-          <!-- Save success -->
           <Transition name="fade-slide">
             <div
               v-if="saveSuccess"
@@ -268,7 +455,257 @@ const router = useRouter();
 const profile = computed(() => auth.profile);
 const user = computed(() => auth.user);
 
-// Edit profile state
+// ── Tracking expansion ─────────────────────────────────────────
+const expandedQuotes = ref<string[]>([]);
+
+const toggleTracking = (id: string) => {
+  const idx = expandedQuotes.value.indexOf(id);
+  if (idx === -1) {
+    expandedQuotes.value.push(id);
+  } else {
+    expandedQuotes.value.splice(idx, 1);
+  }
+};
+
+// ── Status styles ──────────────────────────────────────────────
+const statusStyles: Record<string, string> = {
+  pending: "bg-amber-50  text-amber-700  border-amber-200",
+  reviewing: "bg-blue-50   text-blue-700   border-blue-200",
+  sourcing: "bg-violet-50 text-violet-700 border-violet-200",
+  transit: "bg-orange-50 text-orange-700 border-orange-200",
+  delivered: "bg-forest-50 text-forest-700 border-forest-200",
+  completed: "bg-green-50  text-green-700  border-green-200",
+  cancelled: "bg-red-50    text-red-700    border-red-200",
+};
+
+const statusLabels: Record<string, string> = {
+  pending: "Quote Received",
+  reviewing: "Under Review",
+  sourcing: "Sourcing Product",
+  transit: "In Transit",
+  delivered: "Out for Delivery",
+  completed: "Delivered",
+  cancelled: "Cancelled",
+};
+
+// ── Dummy quote data ───────────────────────────────────────────
+const dummyQuotes = [
+  {
+    id: "q1",
+    ref: "DM-2025-001",
+    product: "Sesame Seeds",
+    icon: "🌿",
+    quantity: "25 MT",
+    destination: "Hamburg, Germany",
+    date: "12 Jan 2025",
+    eta: "28 Feb 2025",
+    status: "transit",
+    tracking: [
+      {
+        label: "Quote Received",
+        desc: "Your quote request was received and logged in our system.",
+        completed: true,
+        active: false,
+        date: "12 Jan 2025, 09:14",
+      },
+      {
+        label: "Under Review",
+        desc: "Our sourcing team reviewed your requirements and confirmed availability.",
+        completed: true,
+        active: false,
+        date: "13 Jan 2025, 11:30",
+      },
+      {
+        label: "Supplier Confirmed",
+        desc: "A verified supplier in Jigawa was matched and terms were agreed.",
+        completed: true,
+        active: false,
+        date: "15 Jan 2025, 14:05",
+      },
+      {
+        label: "Parcel in Store",
+        desc: "Product has been collected, graded, and is at our processing facility.",
+        completed: true,
+        active: false,
+        date: "20 Jan 2025, 08:50",
+      },
+      {
+        label: "In Transit",
+        desc: "Shipment has departed Nigeria and is currently in transit to destination.",
+        completed: false,
+        active: true,
+        date: null,
+      },
+      {
+        label: "Out for Delivery",
+        desc:
+          "Shipment has arrived at destination port and is being processed for delivery.",
+        completed: false,
+        active: false,
+        date: null,
+      },
+      {
+        label: "Delivered",
+        desc: "Parcel successfully delivered to the agreed delivery address.",
+        completed: false,
+        active: false,
+        date: null,
+      },
+    ],
+  },
+  {
+    id: "q2",
+    ref: "DM-2025-002",
+    product: "Hibiscus Flower",
+    icon: "🌺",
+    quantity: "5 MT",
+    destination: "Rotterdam, Netherlands",
+    date: "18 Jan 2025",
+    eta: "TBC",
+    status: "sourcing",
+    tracking: [
+      {
+        label: "Quote Received",
+        desc: "Your quote request was received and logged in our system.",
+        completed: true,
+        active: false,
+        date: "18 Jan 2025, 15:22",
+      },
+      {
+        label: "Under Review",
+        desc: "Our sourcing team reviewed your requirements and confirmed availability.",
+        completed: true,
+        active: false,
+        date: "19 Jan 2025, 10:00",
+      },
+      {
+        label: "Supplier Confirmed",
+        desc: "A verified supplier in Kano was matched and terms were agreed.",
+        completed: false,
+        active: true,
+        date: null,
+      },
+      {
+        label: "Parcel in Store",
+        desc: "Product has been collected, graded, and is at our processing facility.",
+        completed: false,
+        active: false,
+        date: null,
+      },
+      {
+        label: "In Transit",
+        desc: "Shipment has departed Nigeria and is in transit to destination.",
+        completed: false,
+        active: false,
+        date: null,
+      },
+      {
+        label: "Out for Delivery",
+        desc: "Shipment has arrived at destination port and is being cleared.",
+        completed: false,
+        active: false,
+        date: null,
+      },
+      {
+        label: "Delivered",
+        desc: "Parcel successfully delivered to the agreed delivery address.",
+        completed: false,
+        active: false,
+        date: null,
+      },
+    ],
+  },
+  {
+    id: "q3",
+    ref: "DM-2024-089",
+    product: "Cashew Nuts",
+    icon: "🥜",
+    quantity: "20 MT",
+    destination: "Mumbai, India",
+    date: "05 Nov 2024",
+    eta: "10 Dec 2024",
+    status: "completed",
+    tracking: [
+      {
+        label: "Quote Received",
+        desc: "Your quote request was received and logged in our system.",
+        completed: true,
+        active: false,
+        date: "05 Nov 2024",
+      },
+      {
+        label: "Under Review",
+        desc: "Our sourcing team reviewed your requirements.",
+        completed: true,
+        active: false,
+        date: "06 Nov 2024",
+      },
+      {
+        label: "Supplier Confirmed",
+        desc: "Verified supplier in Oyo confirmed and terms agreed.",
+        completed: true,
+        active: false,
+        date: "08 Nov 2024",
+      },
+      {
+        label: "Parcel in Store",
+        desc: "Product collected, graded and at processing facility.",
+        completed: true,
+        active: false,
+        date: "14 Nov 2024",
+      },
+      {
+        label: "In Transit",
+        desc: "Shipment departed Nigeria.",
+        completed: true,
+        active: false,
+        date: "18 Nov 2024",
+      },
+      {
+        label: "Out for Delivery",
+        desc: "Arrived at Mumbai port, cleared customs.",
+        completed: true,
+        active: false,
+        date: "08 Dec 2024",
+      },
+      {
+        label: "Delivered",
+        desc: "Parcel successfully delivered.",
+        completed: true,
+        active: false,
+        date: "10 Dec 2024",
+      },
+    ],
+  },
+];
+
+// ── Stats derived from dummy data ──────────────────────────────
+const stats = computed(() => [
+  {
+    icon: "📋",
+    value: dummyQuotes.length,
+    label: "Total Requests",
+  },
+  {
+    icon: "⏳",
+    value: dummyQuotes.filter((q) =>
+      ["pending", "reviewing", "sourcing"].includes(q.status)
+    ).length,
+    label: "In Progress",
+  },
+  {
+    icon: "🚢",
+    value: dummyQuotes.filter((q) => ["transit", "delivered"].includes(q.status)).length,
+    label: "In Transit",
+  },
+  {
+    icon: "✅",
+    value: dummyQuotes.filter((q) => q.status === "completed").length,
+    label: "Completed",
+  },
+]);
+
+// ── Edit profile ───────────────────────────────────────────────
 const editMode = ref(false);
 const savingProfile = ref(false);
 const saveSuccess = ref(false);
@@ -280,7 +717,6 @@ const editForm = reactive({
   phone: "",
 });
 
-// Populate edit form whenever profile loads or changes
 watch(
   profile,
   (p) => {
@@ -320,13 +756,6 @@ const handleSignOut = async () => {
   await auth.signOut();
   router.push("/");
 };
-
-const stats = [
-  { icon: "📋", value: "0", label: "Total Requests" },
-  { icon: "⏳", value: "0", label: "Pending" },
-  { icon: "🔍", value: "0", label: "Being Sourced" },
-  { icon: "✅", value: "0", label: "Completed" },
-];
 
 const accountFields = computed(() => [
   { label: "Full Name", value: profile.value?.full_name },
@@ -403,5 +832,21 @@ const quickActions = [
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(6px);
+}
+
+.tracking-enter-active {
+  transition: opacity 0.35s ease, max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 800px;
+  overflow: hidden;
+}
+.tracking-leave-active {
+  transition: opacity 0.2s ease, max-height 0.3s ease;
+  max-height: 800px;
+  overflow: hidden;
+}
+.tracking-enter-from,
+.tracking-leave-to {
+  opacity: 0;
+  max-height: 0;
 }
 </style>
