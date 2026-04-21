@@ -10,9 +10,17 @@
               {{ profile && profile.full_name ? profile.full_name : user && user.email }}
             </h1>
             <p class="text-forest-300 text-sm mt-1 flex items-center gap-2">
-              <span>{{ profile?.company_name || "Buyer Account" }}</span>
-              <span v-if="profile?.country" class="w-1 h-1 bg-forest-400 rounded-full" />
-              <span>{{ profile?.country }}</span>
+              <span>
+                {{
+                  profile && profile.company_name ? profile.company_name : "Buyer Account"
+                }}</span
+              >
+              <span
+                v-if="profile && profile.country"
+                class="w-1 h-1 bg-forest-400 rounded-full"
+              ></span>
+
+              <span>{{ profile && profile.country }}</span>
             </p>
           </div>
           <div class="flex items-center gap-3 flex-wrap">
