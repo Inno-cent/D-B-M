@@ -1,4 +1,6 @@
 import palmOilImg from '@/assets/PO600.png'
+import GingerImg from '@/assets/GR600.png'
+
 
 export interface Product {
   name:         string
@@ -56,7 +58,7 @@ export const products: Product[] = [
     name:   'Ginger',
     slug:   'ginger',
     icon:   '🫚',
-    image:  'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=600&q=80&fit=crop',
+    image:  GingerImg,
     type:   'export',
     detail: 'Dried/Split · Min. 10 MT · Kaduna',
     tagline: "High-pungency dried ginger from Nigeria's premier ginger belt.",
