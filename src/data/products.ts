@@ -1,3 +1,5 @@
+import palmOilImg from '@/assets/PO600.png'
+
 export interface Product {
   name:         string
   slug:         string
@@ -187,7 +189,7 @@ export const products: Product[] = [
     name:   'Palm Oil',
     slug:   'palm-oil',
     icon:   '🫒',
-    image:  'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=600&q=80&fit=crop',
+    image:  palmOilImg,
     type:   'local',
     detail: 'Min. 1,000 litres · South South',
     tagline: 'Bulk palm oil supply for Nigerian food processors and distributors.',
