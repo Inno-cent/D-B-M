@@ -1,5 +1,7 @@
 import palmOilImg from '@/assets/PO600.png'
 import GingerImg from '@/assets/GR600.png'
+import SBIMG from '@/assets/SB600.png'
+
 
 
 export interface Product {
@@ -96,7 +98,7 @@ export const products: Product[] = [
     name:   'Shea Butter',
     slug:   'shea-butter',
     icon:   '✨',
-    image:  'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&q=80&fit=crop',
+    image:  SBIMG,
     type:   'export',
     detail: 'Refined/Crude · Min. 5 MT · North',
     tagline: 'Refined and crude shea butter from Northern Nigeria.',
