@@ -1,107 +1,152 @@
-/// <reference types="node" />
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { supabase } from '../lib/supabase'
+import type { QuoteRequest, OrderTracking } from '../types/database'
 
-export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' })
+export const useQuoteStore = defineStore('quotes', () => {
+  const quotes          = ref<QuoteRequest[]>([])
+  const trackingMap     = ref<Record<string, OrderTracking[]>>({})
+  const loading         = ref(false)
+  const trackingLoading = ref(false)
+  const error           = ref<string | null>(null)
+
+  // ── Submit quote ──────────────────────────────────────────────
+  const submitQuote = async (payload: {
+    user_id?:              string | null
+    company_name:          string
+    email:                 string
+    phone?:                string
+    product:               string
+    quantity:              string
+    buyer_country:         string
+    delivery_destination?: string
+    ship_date?:            string
+    notes?:                string
+  }) => {
+    loading.value = true
+    error.value   = null
+
+    try {
+      // 1 — Save to Supabase
+      const { data, error: dbError } = await supabase
+        .from('quote_requests')
+        .insert({
+          user_id:              payload.user_id              || null,
+          company_name:         payload.company_name,
+          email:                payload.email,
+          phone:                payload.phone                || null,
+          product:              payload.product,
+          quantity:             payload.quantity,
+          buyer_country:        payload.buyer_country,
+          delivery_destination: payload.delivery_destination || null,
+          ship_date:            payload.ship_date            || null,
+          notes:                payload.notes                || null,
+          status:               'pending',
+        })
+        .select()
+        .single()
+
+      if (dbError) throw dbError
+
+      // Add to local list
+      if (data) quotes.value.unshift(data as QuoteRequest)
+
+      // 2 — Send to your API handler (WhatsApp + Google Sheets)
+      sendToHandler({
+        product:     payload.product,
+        quantity:    payload.quantity,
+        company:     payload.company_name,
+        email:       payload.email,
+        phone:       payload.phone        || '',
+        country:     payload.buyer_country,
+        destination: payload.delivery_destination || '',
+        shipDate:    payload.ship_date            || '',
+        notes:       payload.notes                || '',
+      }).catch(e => console.warn('Handler notification failed:', e))
+
+      return data
+
+    } catch (e: any) {
+      error.value = e.message || 'Failed to submit quote'
+      throw e
+    } finally {
+      loading.value = false
+    }
   }
 
-  try {
-    const { product, quantity, company, email, phone, country, destination, shipDate, notes } =
-      req.body
+  // ── Send to your API handler (WhatsApp + Sheets) ──────────────
+  const sendToHandler = async (data: {
+    product:     string
+    quantity:    string
+    company:     string
+    email:       string
+    phone:       string
+    country:     string
+    destination: string
+    shipDate:    string
+    notes:       string
+  }) => {
+    // This calls your api/quote.ts handler
+    // In dev: Vite proxy or direct call
+    // In prod: your deployed serverless function URL
+    const apiUrl = import.meta.env.VITE_QUOTE_API_URL || '/api/quote'
 
-    const date = new Date().toISOString()
-
-    // ==========================
-    // ENV VARIABLES CHECK
-    // ==========================
-    const { WASENDER_API_KEY, ADMIN_PHONE, SHEETDB_URL } = process.env
-
-    if (!WASENDER_API_KEY || !ADMIN_PHONE || !SHEETDB_URL) {
-      console.error('❌ Missing env variables')
-      return res.status(500).json({ error: 'Missing environment variables' })
-    }
-
-    // ==========================
-    // 1. WHATSAPP (WasenderAPI)
-    // ==========================
-    const waRes = await fetch('https://wasenderapi.com/api/send-message', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${WASENDER_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to: ADMIN_PHONE,
-        text: `🔥 NEW QUOTE
-
-📦 Product: ${product}
-🔢 Quantity: ${quantity}
-
-👤 Name: ${company}
-📧 Email: ${email}
-📞 Phone: ${phone || '—'}
-
-🏢 Company: ${company}
-
-🌍 Country: ${country}
-🚚 Destination: ${destination || '—'}
-📅 Ship Date: ${shipDate || '—'}
-
-📝 Notes: ${notes || '—'}
-`,
-      }),
-    })
-
-    const waText = await waRes.text()
-    console.log('📲 WHATSAPP RESPONSE:', waRes.status, waText)
-
-    if (!waRes.ok) {
-      throw new Error(`WhatsApp failed: ${waText}`)
-    }
-
-    // ==========================
-    // 2. GOOGLE SHEETS (SheetDB)
-    // ==========================
-    const sheetRes = await fetch(SHEETDB_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        Date: date,
-        Name: company,
-        Email: email,
-        Phone: phone,
-        Company: company,
-        Product: product,
-        Quantity: quantity,
-        Country: country,
-        Destination: destination,
-        'Ship Date': shipDate,
-        Notes: notes,
-        Status: 'New',
-      }),
-    })
-
-    const sheetText = await sheetRes.text()
-    console.log('📄 SHEET RESPONSE:', sheetRes.status, sheetText)
-
-    if (!sheetRes.ok) {
-      throw new Error(`SheetDB failed: ${sheetText}`)
-    }
-
-    // ==========================
-    // SUCCESS
-    // ==========================
-    return res.status(200).json({
-      success: true,
-      message: 'Quote sent successfully',
-    })
-  } catch (err: any) {
-    console.error('🔥 ERROR:', err.message)
-
-    return res.status(500).json({
-      error: err.message || 'Internal Server Error',
+    await fetch(apiUrl, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(data),
     })
   }
-}
+
+  // ── Fetch user's quotes ───────────────────────────────────────
+  const fetchMyQuotes = async (userId: string) => {
+    loading.value = true
+    error.value   = null
+    try {
+      const { data, error: err } = await supabase
+        .from('quote_requests')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+
+      if (err) throw err
+      quotes.value = (data as QuoteRequest[]) || []
+    } catch (e: any) {
+      error.value = e.message
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // ── Fetch tracking for a specific quote ───────────────────────
+  const fetchTracking = async (quoteId: string) => {
+    trackingLoading.value = true
+    try {
+      const { data, error: err } = await supabase
+        .from('order_tracking')
+        .select('*')
+        .eq('quote_id', quoteId)
+        .order('created_at', { ascending: true })
+
+      if (err) throw err
+      trackingMap.value[quoteId] = (data as OrderTracking[]) || []
+    } catch (e: any) {
+      console.error('Tracking fetch failed:', e)
+    } finally {
+      trackingLoading.value = false
+    }
+  }
+
+  // ── Get tracking for a quote (with fetch if not loaded) ───────
+  const getTracking = async (quoteId: string): Promise<OrderTracking[]> => {
+    if (!trackingMap.value[quoteId]) {
+      await fetchTracking(quoteId)
+    }
+    return trackingMap.value[quoteId] || []
+  }
+
+  return {
+    quotes, trackingMap, loading, trackingLoading, error,
+    submitQuote, fetchMyQuotes, fetchTracking, getTracking,
+  }
+})

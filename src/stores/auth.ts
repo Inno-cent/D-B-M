@@ -15,11 +15,9 @@ export const useAuthStore = defineStore('auth', () => {
   const fullName   = computed(() =>
     profile.value?.full_name || user.value?.email?.split('@')[0] || ''
   )
-  const firstName = computed(() =>
-    fullName.value.split(' ')[0]
-  )
+  const firstName = computed(() => fullName.value.split(' ')[0])
 
-  // ── Init ────────────────────────────────────────────────────
+  // ── Init ──────────────────────────────────────────────────────
   const init = async () => {
     loading.value = true
     try {
@@ -38,14 +36,16 @@ export const useAuthStore = defineStore('auth', () => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         if (user.value) await fetchProfile()
       }
-
       if (event === 'SIGNED_OUT') {
         profile.value = null
+      }
+      if (event === 'PASSWORD_RECOVERY') {
+        // Handled in ResetPasswordView
       }
     })
   }
 
-  // ── Fetch profile ───────────────────────────────────────────
+  // ── Fetch profile ─────────────────────────────────────────────
   const fetchProfile = async () => {
     if (!user.value) return
     const { data, error } = await supabase
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!error && data) profile.value = data as Profile
   }
 
-  // ── Sign up ─────────────────────────────────────────────────
+  // ── Sign up ───────────────────────────────────────────────────
   const signUp = async (
     email:       string,
     password:    string,
@@ -82,7 +82,7 @@ export const useAuthStore = defineStore('auth', () => {
     return data
   }
 
-  // ── Sign in ─────────────────────────────────────────────────
+  // ── Sign in ───────────────────────────────────────────────────
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -92,7 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
     return data
   }
 
-  // ── Sign out ────────────────────────────────────────────────
+  // ── Sign out ──────────────────────────────────────────────────
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
@@ -101,7 +101,7 @@ export const useAuthStore = defineStore('auth', () => {
     session.value = null
   }
 
-  // ── Forgot password ─────────────────────────────────────────
+  // ── Forgot password ───────────────────────────────────────────
   const forgotPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
@@ -109,7 +109,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (error) throw error
   }
 
-  // ── Reset password ──────────────────────────────────────────
+  // ── Reset password ────────────────────────────────────────────
   const resetPassword = async (newPassword: string) => {
     const { data, error } = await supabase.auth.updateUser({
       password: newPassword,
@@ -118,7 +118,7 @@ export const useAuthStore = defineStore('auth', () => {
     return data
   }
 
-  // ── Update profile ──────────────────────────────────────────
+  // ── Update profile ────────────────────────────────────────────
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user.value) return
     const { data, error } = await supabase

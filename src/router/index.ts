@@ -40,18 +40,18 @@ const router = createRouter({
     { path: '/about', name: 'about', component: () => import('../views/AboutView.vue') },
     { path: '/contact', name: 'contact', component: () => import('../views/ContactView.vue') },
 
-    // Auth routes
+    // ── Auth routes ─────────────────────────────────────────────
     {
       path: '/signup',
       name: 'signup',
       component: () => import('../views/SignupView.vue'),
-      meta: { guestOnly: true, layout: 'auth' },
+      meta: { guestOnly: true },
     },
     {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),
-      meta: { guestOnly: true, layout: 'auth' },
+      meta: { guestOnly: true },
     },
     {
       path: '/forgot-password',
@@ -70,7 +70,7 @@ const router = createRouter({
       component: () => import('../views/AuthCallbackView.vue'),
     },
 
-    // Protected
+    // ── Protected routes ────────────────────────────────────────
     {
       path: '/dashboard',
       name: 'dashboard',
@@ -89,7 +89,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
 
-  // Wait for auth to finish initialising
+  // Wait for auth to finish initialising before making decisions
   if (auth.loading) {
     await new Promise<void>((resolve) => {
       const stop = watch(
