@@ -453,36 +453,125 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch } from "vue";
+import { ref, computed, reactive, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
+import { useQuoteStore } from "../stores/quotes";
+import type { OrderTracking } from "../types/database";
 
 const auth = useAuthStore();
+const quoteStore = useQuoteStore();
 const router = useRouter();
 
 const profile = computed(() => auth.profile);
 const user = computed(() => auth.user);
 
+// ── Load quotes on mount ───────────────────────────────────────
+onMounted(async () => {
+  if (auth.user) {
+    await quoteStore.fetchMyQuotes(auth.user.id);
+  }
+});
+
+const quotes = computed(() => quoteStore.quotes);
+const loadingQuotes = computed(() => quoteStore.loading);
+
 // ── Tracking expansion ─────────────────────────────────────────
 const expandedQuotes = ref<string[]>([]);
+const trackingData = ref<Record<string, OrderTracking[]>>({});
+const loadingTracking = ref<Record<string, boolean>>({});
 
-const toggleTracking = (id: string) => {
-  const idx = expandedQuotes.value.indexOf(id);
+const toggleTracking = async (quoteId: string) => {
+  const idx = expandedQuotes.value.indexOf(quoteId);
   if (idx === -1) {
-    expandedQuotes.value.push(id);
+    expandedQuotes.value.push(quoteId);
+    // Fetch tracking if not already loaded
+    if (!trackingData.value[quoteId]) {
+      loadingTracking.value[quoteId] = true;
+      const data = await quoteStore.getTracking(quoteId);
+      trackingData.value[quoteId] = data;
+      loadingTracking.value[quoteId] = false;
+    }
   } else {
     expandedQuotes.value.splice(idx, 1);
   }
 };
 
-// ── Status styles ──────────────────────────────────────────────
+// ── All possible tracking steps in order ──────────────────────
+const allSteps = [
+  {
+    status: "pending",
+    label: "Quote Received",
+    desc: "Your quote request was received and logged.",
+  },
+  {
+    status: "reviewing",
+    label: "Under Review",
+    desc: "Our team is reviewing your requirements.",
+  },
+  {
+    status: "sourcing",
+    label: "Sourcing Product",
+    desc: "We are identifying the best verified supplier.",
+  },
+  {
+    status: "in_store",
+    label: "Parcel in Store",
+    desc: "Product collected and at our processing facility.",
+  },
+  {
+    status: "transit",
+    label: "In Transit",
+    desc: "Shipment has departed Nigeria and is in transit.",
+  },
+  {
+    status: "out_for_delivery",
+    label: "Out for Delivery",
+    desc: "Arrived at destination, being delivered.",
+  },
+  {
+    status: "completed",
+    label: "Delivered",
+    desc: "Successfully delivered to the agreed address.",
+  },
+];
+
+// Build the tracking steps UI from the logged history
+const buildTrackingSteps = (quoteId: string, currentStatus: string) => {
+  const logged = trackingData.value[quoteId] || [];
+  const loggedStatuses = logged.map((l) => l.status);
+
+  const currentIdx = allSteps.findIndex((s) => s.status === currentStatus);
+
+  return allSteps.map((step, i) => {
+    const loggedEntry = logged.find((l) => l.status === step.status);
+    return {
+      ...step,
+      completed: i < currentIdx,
+      active: i === currentIdx,
+      pending: i > currentIdx,
+      date: loggedEntry
+        ? new Date(loggedEntry.created_at).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : null,
+    };
+  });
+};
+
+// ── Status display helpers ─────────────────────────────────────
 const statusStyles: Record<string, string> = {
   pending: "bg-amber-50  text-amber-700  border-amber-200",
   reviewing: "bg-blue-50   text-blue-700   border-blue-200",
   sourcing: "bg-violet-50 text-violet-700 border-violet-200",
-  transit: "bg-orange-50 text-orange-700 border-orange-200",
-  delivered: "bg-forest-50 text-forest-700 border-forest-200",
-  completed: "bg-green-50  text-green-700  border-green-200",
+  in_store: "bg-orange-50 text-orange-700 border-orange-200",
+  transit: "bg-sky-50    text-sky-700    border-sky-200",
+  out_for_delivery: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  completed: "bg-forest-50 text-forest-700 border-forest-200",
   cancelled: "bg-red-50    text-red-700    border-red-200",
 };
 
@@ -490,225 +579,40 @@ const statusLabels: Record<string, string> = {
   pending: "Quote Received",
   reviewing: "Under Review",
   sourcing: "Sourcing Product",
+  in_store: "Parcel in Store",
   transit: "In Transit",
-  delivered: "Out for Delivery",
+  out_for_delivery: "Out for Delivery",
   completed: "Delivered",
   cancelled: "Cancelled",
 };
 
-// ── Dummy quote data ───────────────────────────────────────────
-const dummyQuotes = [
-  {
-    id: "q1",
-    ref: "DM-2025-001",
-    product: "Sesame Seeds",
-    icon: "🌿",
-    quantity: "25 MT",
-    destination: "Hamburg, Germany",
-    date: "12 Jan 2025",
-    eta: "28 Feb 2025",
-    status: "transit",
-    tracking: [
-      {
-        label: "Quote Received",
-        desc: "Your quote request was received and logged in our system.",
-        completed: true,
-        active: false,
-        date: "12 Jan 2025, 09:14",
-      },
-      {
-        label: "Under Review",
-        desc: "Our sourcing team reviewed your requirements and confirmed availability.",
-        completed: true,
-        active: false,
-        date: "13 Jan 2025, 11:30",
-      },
-      {
-        label: "Supplier Confirmed",
-        desc: "A verified supplier in Jigawa was matched and terms were agreed.",
-        completed: true,
-        active: false,
-        date: "15 Jan 2025, 14:05",
-      },
-      {
-        label: "Parcel in Store",
-        desc: "Product has been collected, graded, and is at our processing facility.",
-        completed: true,
-        active: false,
-        date: "20 Jan 2025, 08:50",
-      },
-      {
-        label: "In Transit",
-        desc: "Shipment has departed Nigeria and is currently in transit to destination.",
-        completed: false,
-        active: true,
-        date: null,
-      },
-      {
-        label: "Out for Delivery",
-        desc:
-          "Shipment has arrived at destination port and is being processed for delivery.",
-        completed: false,
-        active: false,
-        date: null,
-      },
-      {
-        label: "Delivered",
-        desc: "Parcel successfully delivered to the agreed delivery address.",
-        completed: false,
-        active: false,
-        date: null,
-      },
-    ],
-  },
-  {
-    id: "q2",
-    ref: "DM-2025-002",
-    product: "Hibiscus Flower",
-    icon: "🌺",
-    quantity: "5 MT",
-    destination: "Rotterdam, Netherlands",
-    date: "18 Jan 2025",
-    eta: "TBC",
-    status: "sourcing",
-    tracking: [
-      {
-        label: "Quote Received",
-        desc: "Your quote request was received and logged in our system.",
-        completed: true,
-        active: false,
-        date: "18 Jan 2025, 15:22",
-      },
-      {
-        label: "Under Review",
-        desc: "Our sourcing team reviewed your requirements and confirmed availability.",
-        completed: true,
-        active: false,
-        date: "19 Jan 2025, 10:00",
-      },
-      {
-        label: "Supplier Confirmed",
-        desc: "A verified supplier in Kano was matched and terms were agreed.",
-        completed: false,
-        active: true,
-        date: null,
-      },
-      {
-        label: "Parcel in Store",
-        desc: "Product has been collected, graded, and is at our processing facility.",
-        completed: false,
-        active: false,
-        date: null,
-      },
-      {
-        label: "In Transit",
-        desc: "Shipment has departed Nigeria and is in transit to destination.",
-        completed: false,
-        active: false,
-        date: null,
-      },
-      {
-        label: "Out for Delivery",
-        desc: "Shipment has arrived at destination port and is being cleared.",
-        completed: false,
-        active: false,
-        date: null,
-      },
-      {
-        label: "Delivered",
-        desc: "Parcel successfully delivered to the agreed delivery address.",
-        completed: false,
-        active: false,
-        date: null,
-      },
-    ],
-  },
-  {
-    id: "q3",
-    ref: "DM-2024-089",
-    product: "Cashew Nuts",
-    icon: "🥜",
-    quantity: "20 MT",
-    destination: "Mumbai, India",
-    date: "05 Nov 2024",
-    eta: "10 Dec 2024",
-    status: "completed",
-    tracking: [
-      {
-        label: "Quote Received",
-        desc: "Your quote request was received and logged in our system.",
-        completed: true,
-        active: false,
-        date: "05 Nov 2024",
-      },
-      {
-        label: "Under Review",
-        desc: "Our sourcing team reviewed your requirements.",
-        completed: true,
-        active: false,
-        date: "06 Nov 2024",
-      },
-      {
-        label: "Supplier Confirmed",
-        desc: "Verified supplier in Oyo confirmed and terms agreed.",
-        completed: true,
-        active: false,
-        date: "08 Nov 2024",
-      },
-      {
-        label: "Parcel in Store",
-        desc: "Product collected, graded and at processing facility.",
-        completed: true,
-        active: false,
-        date: "14 Nov 2024",
-      },
-      {
-        label: "In Transit",
-        desc: "Shipment departed Nigeria.",
-        completed: true,
-        active: false,
-        date: "18 Nov 2024",
-      },
-      {
-        label: "Out for Delivery",
-        desc: "Arrived at Mumbai port, cleared customs.",
-        completed: true,
-        active: false,
-        date: "08 Dec 2024",
-      },
-      {
-        label: "Delivered",
-        desc: "Parcel successfully delivered.",
-        completed: true,
-        active: false,
-        date: "10 Dec 2024",
-      },
-    ],
-  },
-];
+const formatDate = (dateStr: string) =>
+  new Date(dateStr).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
-// ── Stats derived from dummy data ──────────────────────────────
+// ── Stats ──────────────────────────────────────────────────────
 const stats = computed(() => [
-  {
-    icon: "📋",
-    value: dummyQuotes.length,
-    label: "Total Requests",
-  },
+  { icon: "📋", value: quotes.value.length, label: "Total Requests" },
   {
     icon: "⏳",
-    value: dummyQuotes.filter((q) =>
+    value: quotes.value.filter((q) =>
       ["pending", "reviewing", "sourcing"].includes(q.status)
     ).length,
     label: "In Progress",
   },
   {
     icon: "🚢",
-    value: dummyQuotes.filter((q) => ["transit", "delivered"].includes(q.status)).length,
+    value: quotes.value.filter((q) =>
+      ["in_store", "transit", "out_for_delivery"].includes(q.status)
+    ).length,
     label: "In Transit",
   },
   {
     icon: "✅",
-    value: dummyQuotes.filter((q) => q.status === "completed").length,
+    value: quotes.value.filter((q) => q.status === "completed").length,
     label: "Completed",
   },
 ]);
@@ -780,11 +684,7 @@ const accountFields = computed(() => [
           month: "long",
           year: "numeric",
         })
-      : new Date().toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        }),
+      : "—",
   },
 ]);
 

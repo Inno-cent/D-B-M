@@ -1,315 +1,282 @@
 <template>
-  <div class="bg-cream text-earth-900 min-h-screen">
-    <div class="page-hero">
-      <div class="max-w-7xl mx-auto">
-        <span class="section-label">Get Started</span>
-        <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-4 text-earth-900">
-          Request a Quote
-        </h1>
-        <p class="text-earth-600 text-lg max-w-xl">
-          Fill in the form and we will respond within 24 hours with pricing and
-          availability.
-        </p>
-      </div>
-    </div>
+  <div class="min-h-screen bg-cream flex items-center justify-center px-6 py-20">
+    <div class="w-full max-w-md">
 
-    <div class="max-w-7xl mx-auto px-6 md:px-10 py-16">
-      <div class="grid lg:grid-cols-5 gap-16">
-        <div class="lg:col-span-3" data-reveal>
-          <Transition name="fade-slide" mode="out-in">
-            <div v-if="!submitted" class="space-y-5">
-              <div class="grid sm:grid-cols-2 gap-5">
-                <div>
-                  <label class="block text-sm font-semibold mb-2 text-earth-800"
-                    >Company Name *</label
-                  >
-                  <input
-                    v-model="form.company"
-                    type="text"
-                    placeholder="Your company name"
-                    class="input-field"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold mb-2 text-earth-800"
-                    >Email Address *</label
-                  >
-                  <input
-                    v-model="form.email"
-                    type="email"
-                    placeholder="you@company.com"
-                    class="input-field"
-                  />
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold mb-2 text-earth-800"
-                  >Phone / WhatsApp</label
-                >
-                <input
-                  v-model="form.phone"
-                  type="tel"
-                  placeholder="+1 234 567 8900"
-                  class="input-field"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-semibold mb-2 text-earth-800"
-                  >Product Required *</label
-                >
-                <select v-model="form.product" class="input-field">
-                  <option value="">Select a product...</option>
-                  <optgroup label="Export Commodities">
-                    <option v-for="p in exportProducts" :key="p">{{ p }}</option>
-                  </optgroup>
-                  <optgroup label="Local Wholesale">
-                    <option v-for="p in localProducts" :key="p">{{ p }}</option>
-                  </optgroup>
-                  <option value="Other">Other (specify in notes)</option>
-                </select>
-              </div>
-              <div class="grid sm:grid-cols-2 gap-5">
-                <div>
-                  <label class="block text-sm font-semibold mb-2 text-earth-800"
-                    >Quantity Needed *</label
-                  >
-                  <input
-                    v-model="form.quantity"
-                    type="text"
-                    placeholder="e.g. 25 MT"
-                    class="input-field"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold mb-2 text-earth-800"
-                    >Buyer Country *</label
-                  >
-                  <input
-                    v-model="form.country"
-                    type="text"
-                    placeholder="e.g. Germany"
-                    class="input-field"
-                  />
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold mb-2 text-earth-800"
-                  >Delivery Destination</label
-                >
-                <input
-                  v-model="form.destination"
-                  type="text"
-                  placeholder="Port, city, or address"
-                  class="input-field"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-semibold mb-2 text-earth-800"
-                  >Intended Shipment Date</label
-                >
-                <input v-model="form.shipDate" type="date" class="input-field" />
-              </div>
-              <div>
-                <label class="block text-sm font-semibold mb-2 text-earth-800"
-                  >Additional Notes</label
-                >
-                <textarea
-                  v-model="form.notes"
-                  rows="4"
-                  placeholder="Grade preference, packaging type, certifications needed..."
-                  class="input-field resize-none"
-                />
-              </div>
-              <button
-                @click="submit"
-                :disabled="
-                  loading ||
-                  !form.company ||
-                  !form.email ||
-                  !form.product ||
-                  !form.quantity
-                "
-                class="btn-primary w-full justify-center py-4 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                <span v-if="!loading">Submit Quote Request →</span>
-                <span v-else>Sending...</span>
-              </button>
-              <p class="text-xs text-earth-400 text-center">
-                We respond within 24 hours. No spam, ever.
-              </p>
-            </div>
+      <!-- Logo -->
+      <RouterLink to="/" class="flex items-center gap-3 mb-10 group w-fit">
+        <div class="w-9 h-9 bg-forest-700 rounded-xl flex items-center justify-center
+                    group-hover:bg-forest-600 transition-colors shadow-lg">
+          <span class="text-white font-bold text-xs">DM</span>
+        </div>
+        <div>
+          <span class="font-bold text-earth-900 block leading-none">DualMarket</span>
+          <span class="text-earth-500 text-xs">Brokerage</span>
+        </div>
+      </RouterLink>
 
-            <div v-else class="text-center py-16">
-              <div
-                class="w-20 h-20 border-2 border-forest-500 rounded-3xl flex items-center justify-center mx-auto mb-6 bg-forest-50"
-              >
-                <svg
-                  class="w-10 h-10 text-forest-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <h2 class="text-3xl font-bold mb-3 text-earth-900">Request Received</h2>
-              <p class="text-earth-600 text-lg mb-2">
-                We will be in touch within 24 hours.
-              </p>
-              <p class="text-sm text-earth-400 mb-10">
-                Check your inbox at <strong>{{ form.email }}</strong>
-              </p>
-              <button @click="reset" class="btn-outline">Submit another request</button>
-            </div>
-          </Transition>
+      <div class="border-2 border-earth-200 rounded-3xl p-8 bg-white shadow-sm">
+
+        <!-- Icon -->
+        <div class="w-14 h-14 bg-forest-50 border-2 border-forest-200 rounded-2xl
+                    flex items-center justify-center mb-6">
+          <svg class="w-7 h-7 text-forest-600" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
         </div>
 
-        <div class="lg:col-span-2" data-reveal data-reveal-delay="2">
-          <div class="border-2 border-earth-200 rounded-2xl p-8 bg-white sticky top-24">
-            <h3 class="font-bold text-lg mb-6 text-earth-900">What happens next?</h3>
-            <div class="space-y-6 mb-8">
-              <div v-for="(step, i) in nextSteps" :key="step.title" class="flex gap-4">
-                <div
-                  class="w-8 h-8 min-w-[32px] border-2 border-earth-300 rounded-xl flex items-center justify-center text-xs font-bold text-earth-800 bg-parchment"
-                >
-                  {{ i + 1 }}
-                </div>
-                <div>
-                  <p class="text-sm font-semibold mb-0.5 text-earth-900">
-                    {{ step.title }}
-                  </p>
-                  <p class="text-xs text-earth-500 leading-relaxed">{{ step.desc }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="border-t-2 border-earth-100 pt-6 space-y-4">
-              <p class="text-xs font-semibold text-earth-400 uppercase tracking-wider">
-                Prefer direct contact?
-              </p>
-              <div class="flex items-center gap-3 text-sm text-earth-700">
-                <div
-                  class="w-9 h-9 border-2 border-earth-200 rounded-xl flex items-center justify-center bg-parchment"
-                >
-                  📧
-                </div>
-                <span>hello@dualmarket.com</span>
-              </div>
-              <div class="flex items-center gap-3 text-sm text-earth-700">
-                <div
-                  class="w-9 h-9 border-2 border-earth-200 rounded-xl flex items-center justify-center bg-parchment"
-                >
-                  💬
-                </div>
-                <span>WhatsApp available</span>
-              </div>
-            </div>
+        <Transition name="fade-slide" mode="out-in">
+
+          <!-- Invalid token -->
+          <div v-if="invalidToken" key="invalid" class="text-center py-4">
+            <h2 class="text-2xl font-bold text-earth-900 mb-3">Link expired</h2>
+            <p class="text-earth-500 text-sm leading-relaxed mb-6">
+              This password reset link has expired or is invalid.
+              Please request a new one.
+            </p>
+            <RouterLink to="/forgot-password"
+              class="btn-primary w-full justify-center py-3">
+              Request New Link
+            </RouterLink>
           </div>
-        </div>
+
+          <!-- Success -->
+          <div v-else-if="success" key="success" class="text-center py-4">
+            <div class="w-16 h-16 bg-forest-50 border-2 border-forest-300 rounded-2xl
+                        flex items-center justify-center mx-auto mb-5">
+              <svg class="w-8 h-8 text-forest-600" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-earth-900 mb-3">Password updated</h2>
+            <p class="text-earth-500 text-sm leading-relaxed mb-6">
+              Your password has been successfully updated.
+              You can now sign in with your new password.
+            </p>
+            <RouterLink to="/login"
+              class="btn-primary w-full justify-center py-4">
+              Sign In →
+            </RouterLink>
+          </div>
+
+          <!-- Reset form -->
+          <div v-else key="form">
+            <h1 class="text-2xl font-bold text-earth-900 mb-2">Set new password</h1>
+            <p class="text-earth-500 text-sm leading-relaxed mb-6">
+              Choose a strong new password for your DualMarket account.
+            </p>
+
+            <!-- Error -->
+            <Transition name="fade-slide">
+              <div v-if="error"
+                class="mb-5 p-4 bg-red-50 border-2 border-red-200 rounded-xl
+                       text-red-700 text-sm flex items-start gap-3">
+                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor"
+                  viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clip-rule="evenodd" />
+                </svg>
+                {{ error }}
+              </div>
+            </Transition>
+
+            <form @submit.prevent="handleReset" class="space-y-5">
+
+              <!-- New password -->
+              <div>
+                <label class="block text-sm font-semibold mb-2 text-earth-800">
+                  New Password
+                </label>
+                <div class="relative">
+                  <input
+                    v-model="password"
+                    :type="showPassword ? 'text' : 'password'"
+                    placeholder="At least 8 characters"
+                    class="input-field pr-12"
+                    required
+                    minlength="8"
+                  />
+                  <button type="button" @click="showPassword = !showPassword"
+                    class="absolute right-4 top-1/2 -translate-y-1/2
+                           text-earth-400 hover:text-earth-700 transition-colors">
+                    <svg v-if="!showPassword" class="w-5 h-5" fill="none"
+                      stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <svg v-else class="w-5 h-5" fill="none"
+                      stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Strength bar -->
+                <div v-if="password" class="mt-2 flex gap-1">
+                  <div v-for="i in 4" :key="i"
+                    :class="['h-1 flex-1 rounded-full transition-all duration-300',
+                      strength >= i ? strengthColor : 'bg-earth-200']" />
+                </div>
+                <p v-if="password" class="text-xs mt-1" :class="strengthTextColor">
+                  {{ strengthLabel }}
+                </p>
+              </div>
+
+              <!-- Confirm password -->
+              <div>
+                <label class="block text-sm font-semibold mb-2 text-earth-800">
+                  Confirm New Password
+                </label>
+                <input
+                  v-model="confirmPassword"
+                  type="password"
+                  placeholder="Repeat your new password"
+                  :class="[
+                    'input-field',
+                    confirmPassword && password !== confirmPassword
+                      ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
+                      : ''
+                  ]"
+                  required
+                />
+                <p v-if="confirmPassword && password !== confirmPassword"
+                  class="text-red-500 text-xs mt-1">
+                  Passwords do not match
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                :disabled="loading || !password || password !== confirmPassword || strength < 2"
+                class="btn-primary w-full justify-center py-4
+                       disabled:opacity-40 disabled:cursor-not-allowed
+                       disabled:hover:scale-100"
+              >
+                <svg v-if="loading" class="animate-spin w-5 h-5"
+                  fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10"
+                    stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                {{ loading ? 'Updating password...' : 'Update Password' }}
+              </button>
+            </form>
+          </div>
+
+        </Transition>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
-import { useReveal } from "../composables/useReveal";
-import { sendQuote } from "@/services/quoteService"; 
+import { ref, computed, onMounted } from 'vue'
+import { useAuthStore } from '../stores/auth'
+import { supabase } from '../lib/supabase'
 
-const { observe } = useReveal();
-onMounted(() => observe());
+const auth            = useAuthStore()
+const password        = ref('')
+const confirmPassword = ref('')
+const loading         = ref(false)
+const error           = ref('')
+const success         = ref(false)
+const invalidToken    = ref(false)
+const showPassword    = ref(false)
 
-const submitted = ref(false);
-const loading = ref(false); 
+// Supabase sends the user to this page with a hash containing
+// the access_token and type=recovery. We need to set the session
+// from those tokens so updateUser works.
+onMounted(async () => {
+  const hash   = window.location.hash
+  const params = new URLSearchParams(hash.replace('#', '?'))
 
-const emptyForm = {
-  company: "",
-  email: "",
-  phone: "",
-  product: "",
-  quantity: "",
-  country: "",
-  destination: "",
-  shipDate: "",
-  notes: "",
-};
+  const errorCode = params.get('error_code')
+  const errorDesc = params.get('error_description')
 
-const form = reactive({ ...emptyForm });
-
-
-const submit = async () => {
-  if (!form.company || !form.email || !form.product || !form.quantity) return;
-
-  try {
-    loading.value = true;
-
-    await sendQuote({
-      company: form.company,
-      email: form.email,
-      phone: form.phone,
-      product: form.product,
-      quantity: form.quantity,
-      country: form.country,
-      destination: form.destination,
-      shipDate: form.shipDate,
-      notes: form.notes,
-    });
-
-    submitted.value = true;
-    console.log(">>>>>>>><><><><>Otiloooooooo")
-  } catch (err) {
-    console.error(err);
-    alert("Failed to send quote. Please try again.");
-  } finally {
-    loading.value = false;
+  if (errorCode || errorDesc) {
+    invalidToken.value = true
+    return
   }
-};
 
-const reset = () => {
-  submitted.value = false;
-  Object.assign(form, emptyForm);
-};
+  const accessToken  = params.get('access_token')
+  const refreshToken = params.get('refresh_token')
+  const type         = params.get('type')
 
-const exportProducts = [
-  "Sesame Seeds",
-  "Hibiscus Flower",
-  "Ginger",
-  "Cashew Nuts",
-  "Shea Butter",
-];
-const localProducts = ["Rice", "Palm Oil", "Maize", "Packaging Materials"];
+  if (type === 'recovery' && accessToken) {
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token:  accessToken,
+      refresh_token: refreshToken || '',
+    })
+    if (sessionError) {
+      invalidToken.value = true
+    }
+  } else {
+    // No recovery tokens — likely accessed directly
+    // Check if user is already in a password_recovery session
+    const { data } = await supabase.auth.getSession()
+    if (!data.session) {
+      invalidToken.value = true
+    }
+  }
+})
 
-const nextSteps = [
-  {
-    title: "We review your request",
-    desc: "Our team checks your requirements against current supplier availability.",
-  },
-  {
-    title: "We contact you within 24hrs",
-    desc: "You receive pricing, grade details, and a delivery timeline.",
-  },
-  {
-    title: "Terms agreed and locked",
-    desc: "A proforma invoice is issued once both parties confirm.",
-  },
-];
+// Password strength
+const strength = computed(() => {
+  const p = password.value
+  if (!p) return 0
+  let s = 0
+  if (p.length >= 8)            s++
+  if (/[A-Z]/.test(p))         s++
+  if (/[0-9]/.test(p))         s++
+  if (/[^A-Za-z0-9]/.test(p)) s++
+  return s
+})
+
+const strengthColor = computed(() => [
+  '', 'bg-red-400', 'bg-amber-400', 'bg-yellow-400', 'bg-forest-500'
+][strength.value])
+
+const strengthTextColor = computed(() => [
+  '', 'text-red-500', 'text-amber-600', 'text-yellow-600', 'text-forest-600'
+][strength.value])
+
+const strengthLabel = computed(() => [
+  '',
+  'Weak — add uppercase, numbers or symbols',
+  'Fair — getting better',
+  'Good password',
+  'Strong password ✓',
+][strength.value])
+
+const handleReset = async () => {
+  if (password.value !== confirmPassword.value) return
+  loading.value = true
+  error.value   = ''
+  try {
+    await auth.resetPassword(password.value)
+    success.value = true
+  } catch (e: any) {
+    error.value = e.message?.includes('expired')
+      ? 'This reset link has expired. Please request a new one.'
+      : e.message || 'Something went wrong. Please try again.'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <style scoped>
-.fade-slide-enter-active,
-.fade-slide-leave-active {
+.fade-slide-enter-active, .fade-slide-leave-active {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateY(12px);
-}
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
+.fade-slide-enter-from { opacity: 0; transform: translateY(10px); }
+.fade-slide-leave-to   { opacity: 0; transform: translateY(-10px); }
 </style>
