@@ -71,7 +71,7 @@
         </div>
       </div>
 
-      <!-- Quote history with tracking -->
+      <!-- Quote requests & tracking -->
       <div class="mb-12">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-2xl font-bold text-earth-900">Quote Requests & Tracking</h2>
@@ -83,198 +83,20 @@
           </RouterLink>
         </div>
 
-        <!-- Quote cards -->
-        <div class="space-y-5">
+        <!-- Loading quotes -->
+        <div
+          v-if="loadingQuotes"
+          class="border-2 border-earth-200 rounded-2xl p-16 text-center bg-white"
+        >
           <div
-            v-for="quote in dummyQuotes"
-            :key="quote.id"
-            class="border-2 border-earth-200 rounded-2xl bg-white overflow-hidden hover:border-forest-300 hover:shadow-lg transition-all duration-300"
-          >
-            <!-- Quote header -->
-            <div
-              class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 border-b-2 border-earth-100"
-            >
-              <div class="flex items-start gap-4">
-                <div
-                  class="w-12 h-12 bg-forest-50 border-2 border-forest-200 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                >
-                  {{ quote.icon }}
-                </div>
-                <div>
-                  <h3 class="font-bold text-earth-900 text-base">{{ quote.product }}</h3>
-                  <p class="text-earth-500 text-sm mt-0.5">
-                    {{ quote.quantity }} · {{ quote.destination }}
-                  </p>
-                  <p class="text-earth-400 text-xs mt-0.5">Submitted {{ quote.date }}</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 sm:flex-shrink-0">
-                <span
-                  :class="[
-                    'text-xs px-3 py-1.5 rounded-full font-semibold border',
-                    statusStyles[quote.status],
-                  ]"
-                >
-                  {{ statusLabels[quote.status] }}
-                </span>
-                <button
-                  @click="toggleTracking(quote.id)"
-                  class="text-xs font-semibold text-forest-600 hover:text-forest-700 border-2 border-forest-200 hover:border-forest-400 px-3 py-1.5 rounded-xl transition-all duration-200"
-                >
-                  {{ expandedQuotes.includes(quote.id) ? "Hide" : "Track" }} →
-                </button>
-              </div>
-            </div>
-
-            <!-- Tracking timeline -->
-            <Transition name="tracking">
-              <div
-                v-if="expandedQuotes.includes(quote.id)"
-                class="px-6 py-6 bg-parchment/40"
-              >
-                <p
-                  class="text-xs font-semibold text-earth-500 uppercase tracking-widest mb-5"
-                >
-                  Shipment Tracking
-                </p>
-                <div class="relative">
-                  <!-- Vertical line -->
-                  <div class="absolute left-4 top-4 bottom-4 w-0.5 bg-earth-200" />
-
-                  <div class="space-y-0">
-                    <div
-                      v-for="(step, i) in quote.tracking"
-                      :key="step.label"
-                      class="relative flex gap-5 pb-6 last:pb-0"
-                    >
-                      <!-- Step indicator -->
-                      <div
-                        :class="[
-                          'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
-                          'border-2 z-10 relative',
-                          step.completed
-                            ? 'bg-forest-600 border-forest-600'
-                            : step.active
-                            ? 'bg-white border-forest-600 shadow-md shadow-forest-200'
-                            : 'bg-white border-earth-300',
-                        ]"
-                      >
-                        <!-- Completed checkmark -->
-                        <svg
-                          v-if="step.completed"
-                          class="w-4 h-4 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="3"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        <!-- Active pulse -->
-                        <div
-                          v-else-if="step.active"
-                          class="w-3 h-3 bg-forest-600 rounded-full animate-pulse"
-                        />
-                        <!-- Pending dot -->
-                        <div v-else class="w-2.5 h-2.5 bg-earth-300 rounded-full" />
-                      </div>
-
-                      <!-- Step content -->
-                      <div class="flex-1 pt-0.5">
-                        <div class="flex items-start justify-between gap-4">
-                          <div>
-                            <p
-                              :class="[
-                                'font-semibold text-sm',
-                                step.completed || step.active
-                                  ? 'text-earth-900'
-                                  : 'text-earth-400',
-                              ]"
-                            >
-                              {{ step.label }}
-                            </p>
-                            <p
-                              :class="[
-                                'text-xs mt-0.5 leading-relaxed',
-                                step.completed || step.active
-                                  ? 'text-earth-500'
-                                  : 'text-earth-300',
-                              ]"
-                            >
-                              {{ step.desc }}
-                            </p>
-                          </div>
-                          <div class="flex-shrink-0 text-right">
-                            <span
-                              v-if="step.date"
-                              class="text-xs text-earth-500 font-medium"
-                            >
-                              {{ step.date }}
-                            </span>
-                            <span
-                              v-else-if="step.active"
-                              class="text-xs text-forest-600 font-semibold bg-forest-50 px-2 py-0.5 rounded-full border border-forest-200"
-                            >
-                              In Progress
-                            </span>
-                            <span v-else class="text-xs text-earth-300">Pending</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Quote details summary -->
-                <div
-                  class="mt-6 pt-5 border-t-2 border-earth-200 grid sm:grid-cols-3 gap-4"
-                >
-                  <div>
-                    <p
-                      class="text-xs text-earth-400 uppercase tracking-wide font-medium mb-1"
-                    >
-                      Reference
-                    </p>
-                    <p class="text-sm font-bold text-earth-900 font-mono">
-                      {{ quote.ref }}
-                    </p>
-                  </div>
-                  <div>
-                    <p
-                      class="text-xs text-earth-400 uppercase tracking-wide font-medium mb-1"
-                    >
-                      Estimated Delivery
-                    </p>
-                    <p class="text-sm font-bold text-earth-900">
-                      {{ quote.eta || "TBC" }}
-                    </p>
-                  </div>
-                  <div>
-                    <p
-                      class="text-xs text-earth-400 uppercase tracking-wide font-medium mb-1"
-                    >
-                      Contact
-                    </p>
-                    <a
-                      href="mailto:hello@dualmarket.com"
-                      class="text-sm font-bold text-forest-600 hover:text-forest-700 transition-colors"
-                    >
-                      hello@dualmarket.com
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </Transition>
-          </div>
+            class="w-8 h-8 border-4 border-earth-200 border-t-forest-600 rounded-full animate-spin mx-auto mb-4"
+          />
+          <p class="text-earth-400 text-sm">Loading your requests...</p>
         </div>
 
-        <!-- Empty state (shown when no quotes) -->
+        <!-- Empty state -->
         <div
-          v-if="dummyQuotes.length === 0"
+          v-else-if="quotes.length === 0"
           class="border-2 border-dashed border-earth-300 rounded-3xl p-16 text-center bg-white"
         >
           <p class="text-6xl mb-5">🌾</p>
@@ -287,8 +109,211 @@
             Request Your First Quote →
           </RouterLink>
         </div>
-      </div>
 
+        <!-- Quote cards -->
+        <div v-else class="space-y-5">
+          <div
+            v-for="quote in quotes"
+            :key="quote.id"
+            class="border-2 border-earth-200 rounded-2xl bg-white overflow-hidden hover:border-forest-300 hover:shadow-lg transition-all duration-300"
+          >
+            <!-- Quote header -->
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 border-b-2 border-earth-100"
+            >
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-12 h-12 bg-forest-50 border-2 border-forest-200 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                >
+                  🌿
+                </div>
+                <div>
+                  <h3 class="font-bold text-earth-900 text-base">{{ quote.product }}</h3>
+                  <p class="text-earth-500 text-sm mt-0.5">
+                    {{ quote.quantity }}
+                    <span v-if="quote.delivery_destination">
+                      · {{ quote.delivery_destination }}
+                    </span>
+                  </p>
+                  <p class="text-earth-400 text-xs mt-0.5 font-mono">{{ quote.ref }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 sm:flex-shrink-0">
+                <span
+                  :class="[
+                    'text-xs px-3 py-1.5 rounded-full font-semibold border',
+                    statusStyles[quote.status] ||
+                      'bg-earth-100 text-earth-600 border-earth-200',
+                  ]"
+                >
+                  {{ statusLabels[quote.status] || quote.status }}
+                </span>
+                <span class="text-xs text-earth-400">
+                  {{ formatDate(quote.created_at) }}
+                </span>
+                <button
+                  @click="toggleTracking(quote.id)"
+                  class="text-xs font-semibold text-forest-600 hover:text-forest-700 border-2 border-forest-200 hover:border-forest-400 px-3 py-1.5 rounded-xl transition-all duration-200"
+                >
+                  {{ expandedQuotes.includes(quote.id) ? "Hide" : "Track" }} →
+                </button>
+              </div>
+            </div>
+
+            <!-- Tracking panel -->
+            <Transition name="tracking">
+              <div
+                v-if="expandedQuotes.includes(quote.id)"
+                class="px-6 py-6 bg-parchment/40"
+              >
+                <!-- Loading tracking -->
+                <div v-if="loadingTracking[quote.id]" class="text-center py-8">
+                  <div
+                    class="w-6 h-6 border-4 border-earth-200 border-t-forest-600 rounded-full animate-spin mx-auto mb-2"
+                  />
+                  <p class="text-earth-400 text-xs">Loading tracking...</p>
+                </div>
+
+                <!-- Tracking timeline -->
+                <div v-else>
+                  <p
+                    class="text-xs font-semibold text-earth-500 uppercase tracking-widest mb-5"
+                  >
+                    Shipment Tracking
+                  </p>
+                  <div class="relative">
+                    <!-- Vertical connector line -->
+                    <div class="absolute left-4 top-4 bottom-4 w-0.5 bg-earth-200" />
+
+                    <div class="space-y-0">
+                      <div
+                        v-for="step in buildTrackingSteps(quote.id, quote.status)"
+                        :key="step.status"
+                        class="relative flex gap-5 pb-6 last:pb-0"
+                      >
+                        <!-- Step dot -->
+                        <div
+                          :class="[
+                            'w-8 h-8 rounded-full flex items-center justify-center',
+                            'flex-shrink-0 border-2 z-10 relative',
+                            step.completed
+                              ? 'bg-forest-600 border-forest-600'
+                              : step.active
+                              ? 'bg-white border-forest-600 shadow-md shadow-forest-200'
+                              : 'bg-white border-earth-300',
+                          ]"
+                        >
+                          <svg
+                            v-if="step.completed"
+                            class="w-4 h-4 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="3"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          <div
+                            v-else-if="step.active"
+                            class="w-3 h-3 bg-forest-600 rounded-full animate-pulse"
+                          />
+                          <div v-else class="w-2.5 h-2.5 bg-earth-300 rounded-full" />
+                        </div>
+
+                        <!-- Step content -->
+                        <div class="flex-1 pt-0.5">
+                          <div class="flex items-start justify-between gap-4">
+                            <div>
+                              <p
+                                :class="[
+                                  'font-semibold text-sm',
+                                  step.completed || step.active
+                                    ? 'text-earth-900'
+                                    : 'text-earth-400',
+                                ]"
+                              >
+                                {{ step.label }}
+                              </p>
+                              <p
+                                :class="[
+                                  'text-xs mt-0.5 leading-relaxed',
+                                  step.completed || step.active
+                                    ? 'text-earth-500'
+                                    : 'text-earth-300',
+                                ]"
+                              >
+                                {{ step.desc }}
+                              </p>
+                            </div>
+                            <div class="flex-shrink-0 text-right">
+                              <span
+                                v-if="step.date"
+                                class="text-xs text-earth-500 font-medium"
+                              >
+                                {{ step.date }}
+                              </span>
+                              <span
+                                v-else-if="step.active"
+                                class="text-xs text-forest-600 font-semibold bg-forest-50 px-2 py-0.5 rounded-full border border-forest-200"
+                              >
+                                In Progress
+                              </span>
+                              <span v-else class="text-xs text-earth-300">Pending</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Quote summary footer -->
+                  <div
+                    class="mt-6 pt-5 border-t-2 border-earth-200 grid sm:grid-cols-3 gap-4"
+                  >
+                    <div>
+                      <p
+                        class="text-xs text-earth-400 uppercase tracking-wide font-medium mb-1"
+                      >
+                        Reference
+                      </p>
+                      <p class="text-sm font-bold text-earth-900 font-mono">
+                        {{ quote.ref }}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        class="text-xs text-earth-400 uppercase tracking-wide font-medium mb-1"
+                      >
+                        Est. Delivery
+                      </p>
+                      <p class="text-sm font-bold text-earth-900">
+                        {{ quote.eta || "TBC" }}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        class="text-xs text-earth-400 uppercase tracking-wide font-medium mb-1"
+                      >
+                        Support
+                      </p>
+                      <a
+                        href="mailto:hello@dualmarket.com"
+                        class="text-sm font-bold text-forest-600 hover:text-forest-700 transition-colors"
+                      >
+                        hello@dualmarket.com
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Transition>
+          </div>
+        </div>
+      </div>
       <!-- Account details -->
       <div class="mb-12">
         <div class="flex items-center justify-between mb-6">
