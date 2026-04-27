@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import { createClient } from '@supabase/supabase-js'
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -8,20 +7,14 @@ export default async function handler(req: any, res: any) {
 
   try {
     const {
+      full_name,
       product, quantity, company, email, phone,
       country, destination, shipDate, notes,
-      user_id,
     } = req.body
 
     const date = new Date().toISOString()
 
-    const {
-      WASENDER_API_KEY,
-      ADMIN_PHONE,
-      SHEETDB_URL,
-      SUPABASE_URL,
-      SUPABASE_SERVICE_KEY,
-    } = process.env
+    const { WASENDER_API_KEY, ADMIN_PHONE, SHEETDB_URL } = process.env
 
     if (!WASENDER_API_KEY || !ADMIN_PHONE || !SHEETDB_URL) {
       console.error('❌ Missing env variables')
@@ -29,32 +22,7 @@ export default async function handler(req: any, res: any) {
     }
 
     // ==========================
-    // 0. SUPABASE (if keys exist)
-    // ==========================
-    if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
-      try {
-        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-        await supabase.from('quote_requests').insert({
-          user_id:              user_id              || null,
-          company_name:         company,
-          email,
-          phone:                phone                || null,
-          product,
-          quantity,
-          buyer_country:        country,
-          delivery_destination: destination          || null,
-          ship_date:            shipDate             || null,
-          notes:                notes                || null,
-          status:               'pending',
-        })
-        console.log('✅ Supabase insert successful')
-      } catch (supaErr: any) {
-        console.warn('⚠️ Supabase insert failed (non-critical):', supaErr.message)
-      }
-    }
-
-    // ==========================
-    // 1. WHATSAPP (WasenderAPI)
+    // 1. WHATSAPP
     // ==========================
     const waRes = await fetch('https://wasenderapi.com/api/send-message', {
       method: 'POST',
@@ -64,15 +32,15 @@ export default async function handler(req: any, res: any) {
       },
       body: JSON.stringify({
         to:   ADMIN_PHONE,
-        text: `🔥 NEW QUOTE
+        text: `🔥 NEW QUOTE REQUEST
 
-📦 Product: ${product}
-🔢 Quantity: ${quantity}
-
-👤 Company: ${company}
+👤 Name: ${full_name || '—'}
+🏢 Company: ${company}
 📧 Email: ${email}
 📞 Phone: ${phone || '—'}
 
+📦 Product: ${product}
+🔢 Quantity: ${quantity}
 🌍 Country: ${country}
 🚚 Destination: ${destination || '—'}
 📅 Ship Date: ${shipDate || '—'}
@@ -90,7 +58,7 @@ export default async function handler(req: any, res: any) {
     }
 
     // ==========================
-    // 2. GOOGLE SHEETS (SheetDB)
+    // 2. GOOGLE SHEETS
     // ==========================
     const sheetRes = await fetch(SHEETDB_URL, {
       method:  'POST',
@@ -98,16 +66,17 @@ export default async function handler(req: any, res: any) {
       body: JSON.stringify({
         data: {
           Date:        date,
+          'Full Name': full_name   || '',
           Name:        company,
           Email:       email,
-          Phone:       phone        || '',
+          Phone:       phone       || '',
           Company:     company,
           Product:     product,
           Quantity:    quantity,
           Country:     country,
-          Destination: destination  || '',
-          'Ship Date': shipDate     || '',
-          Notes:       notes        || '',
+          Destination: destination || '',
+          'Ship Date': shipDate    || '',
+          Notes:       notes       || '',
           Status:      'New',
         }
       }),
@@ -120,7 +89,7 @@ export default async function handler(req: any, res: any) {
       throw new Error(`SheetDB failed: ${sheetText}`)
     }
 
-    return res.status(200).json({ success: true, message: 'Quote sent successfully' })
+    return res.status(200).json({ success: true })
 
   } catch (err: any) {
     console.error('🔥 ERROR:', err.message)

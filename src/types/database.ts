@@ -1,18 +1,8 @@
-export interface Profile {
-  id:           string
-  full_name:    string | null
-  company_name: string | null
-  country:      string | null
-  phone:        string | null
-  role:         'buyer' | 'admin'
-  created_at:   string
-  updated_at:   string
-}
-
 export interface QuoteRequest {
   id:                   string
   user_id:              string | null
   ref:                  string
+  full_name:            string | null
   company_name:         string
   email:                string
   phone:                string | null
@@ -30,13 +20,24 @@ export interface QuoteRequest {
 }
 
 export interface OrderTracking {
-  id:         string
-  quote_id:   string
-  status:     string
-  label:      string
-  description:string | null
-  location:   string | null
-  created_at: string
+  id:          string
+  quote_id:    string
+  status:      string
+  label:       string
+  description: string | null
+  location:    string | null
+  created_at:  string
+}
+
+export interface Profile {
+  id:           string
+  full_name:    string | null
+  company_name: string | null
+  country:      string | null
+  phone:        string | null
+  role:         'user' | 'admin'
+  created_at:   string
+  updated_at:   string
 }
 
 export type QuoteStatus =
