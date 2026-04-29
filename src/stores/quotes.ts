@@ -28,8 +28,7 @@ export const useQuoteStore = defineStore('quotes', () => {
     error.value   = null
 
     try {
-      // ── STEP 1: Save to Supabase ───────────────────────────
-      // This is the ONLY step that determines success or failure
+      // ── 1. Save to Supabase (source of truth) ──────────────
       const { data, error: dbError } = await supabase
         .from('quote_requests')
         .insert({
@@ -50,20 +49,27 @@ export const useQuoteStore = defineStore('quotes', () => {
         .single()
 
       if (dbError) {
-        console.error('❌ Supabase error:', dbError)
+        console.error('❌ Supabase insert error:', dbError.message)
         throw new Error(dbError.message)
       }
 
-      // ✅ Supabase saved — we are done from the user's perspective
+      // ✅ Quote saved — update local list and return
       if (data) quotes.value.unshift(data as QuoteRequest)
 
-      // ── STEP 2: Fire notifications — completely detached ───
-      // These run after we return. If they fail, the quote is already saved.
-      setTimeout(() => {
-        sendNotifications(payload).catch(e =>
-          console.warn('⚠️ Notification failed (non-critical):', e?.message)
-        )
-      }, 0)
+      // ── 2. Notify via API (fire and forget after success) ──
+      // This runs in the background — does NOT block or affect loading
+      notifyViaApi({
+        full_name:   payload.full_name,
+        company:     payload.company_name,
+        email:       payload.email,
+        phone:       payload.phone                ?? '',
+        product:     payload.product,
+        quantity:    payload.quantity,
+        country:     payload.buyer_country,
+        destination: payload.delivery_destination ?? '',
+        shipDate:    payload.ship_date            ?? '',
+        notes:       payload.notes                ?? '',
+      })
 
       return data
 
@@ -71,53 +77,55 @@ export const useQuoteStore = defineStore('quotes', () => {
       error.value = e.message || 'Failed to submit quote'
       throw e
     } finally {
-      // loading turns off as soon as Supabase responds
-      // Notifications run separately after this
+      // loading turns off ONLY after Supabase responds
+      // API notifications run completely independently
       loading.value = false
     }
   }
 
-  // ── Send notifications via Supabase Edge Function ─────────────
-  // This is completely fire-and-forget — it does not block the UI
-  const sendNotifications = async (payload: {
-    full_name:             string
-    company_name:          string
-    email:                 string
-    phone?:                string
-    product:               string
-    quantity:              string
-    buyer_country:         string
-    delivery_destination?: string
-    ship_date?:            string
-    notes?:                string
+  // ── Fire API notification — completely detached ───────────────
+  const notifyViaApi = (data: {
+    full_name:   string
+    company:     string
+    email:       string
+    phone:       string
+    product:     string
+    quantity:    string
+    country:     string
+    destination: string
+    shipDate:    string
+    notes:       string
   }) => {
-    // Try Supabase Edge Function first
-    try {
-      const { error: fnError } = await supabase.functions.invoke(
-        'send-quote-notification',
-        {
-          body: {
-            full_name:   payload.full_name,
-            company:     payload.company_name,
-            email:       payload.email,
-            phone:       payload.phone                ?? '',
-            product:     payload.product,
-            quantity:    payload.quantity,
-            country:     payload.buyer_country,
-            destination: payload.delivery_destination ?? '',
-            shipDate:    payload.ship_date            ?? '',
-            notes:       payload.notes                ?? '',
-          }
+    // Determine API URL
+    // In dev: Vite proxy routes /api to Vercel dev server
+    // In prod: same origin /api/quote
+    const url = '/api/quote'
+
+    // Use a 15 second timeout — completely non-blocking
+    const controller = new AbortController()
+    const timeout    = setTimeout(() => {
+      controller.abort()
+      console.warn('⏱ Notification request timed out — quote already saved to Supabase')
+    }, 15000)
+
+    fetch(url, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(data),
+      signal:  controller.signal,
+    })
+      .then(async (res) => {
+        clearTimeout(timeout)
+        const json = await res.json().catch(() => ({}))
+        console.log('📬 Notification result:', json)
+      })
+      .catch((e) => {
+        clearTimeout(timeout)
+        if (e.name !== 'AbortError') {
+          console.warn('📬 Notification failed (non-critical):', e.message)
         }
-      )
-      if (fnError) {
-        console.warn('Edge function warning:', fnError.message)
-      } else {
-        console.log('✅ Notification sent via Edge Function')
-      }
-    } catch (e: any) {
-      console.warn('Edge function failed:', e?.message)
-    }
+      })
+    // No await — returns immediately
   }
 
   // ── Fetch user's quotes ───────────────────────────────────────
