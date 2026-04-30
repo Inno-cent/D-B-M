@@ -4,134 +4,136 @@ import { supabase } from '../lib/supabase'
 import type { QuoteRequest, OrderTracking } from '../types/database'
 
 export const useQuoteStore = defineStore('quotes', () => {
-  const quotes          = ref<QuoteRequest[]>([])
-  const trackingMap     = ref<Record<string, OrderTracking[]>>({})
-  const loading         = ref(false)
+  const quotes = ref<QuoteRequest[]>([])
+  const trackingMap = ref<Record<string, OrderTracking[]>>({})
+  const loading = ref(false)
   const trackingLoading = ref(false)
-  const error           = ref<string | null>(null)
+  const error = ref<string | null>(null)
 
   // ── Submit quote ──────────────────────────────────────────────
   const submitQuote = async (payload: {
-    user_id?:              string | null
-    full_name:             string
-    company_name:          string
-    email:                 string
-    phone?:                string
-    product:               string
-    quantity:              string
-    buyer_country:         string
+    user_id?: string | null
+    full_name: string
+    company_name: string
+    email: string
+    phone?: string
+    product: string
+    quantity: string
+    buyer_country: string
     delivery_destination?: string
-    ship_date?:            string
-    notes?:                string
-  }) => {
+    ship_date?: string
+    notes?: string
+  }): Promise<QuoteRequest> => {
+    console.log('🚀 submitQuote started')
     loading.value = true
-    error.value   = null
+    error.value = null
 
     try {
-      // ── 1. Save to Supabase (source of truth) ──────────────
+      console.log('📡 Inserting into Supabase...')
+
       const { data, error: dbError } = await supabase
         .from('quote_requests')
         .insert({
-          user_id:              payload.user_id              ?? null,
-          full_name:            payload.full_name,
-          company_name:         payload.company_name,
-          email:                payload.email,
-          phone:                payload.phone                ?? null,
-          product:              payload.product,
-          quantity:             payload.quantity,
-          buyer_country:        payload.buyer_country,
+          user_id: payload.user_id ?? null,
+          full_name: payload.full_name,
+          company_name: payload.company_name,
+          email: payload.email,
+          phone: payload.phone ?? null,
+          product: payload.product,
+          quantity: payload.quantity,
+          buyer_country: payload.buyer_country,
           delivery_destination: payload.delivery_destination ?? null,
-          ship_date:            payload.ship_date            ?? null,
-          notes:                payload.notes                ?? null,
-          status:               'pending',
+          ship_date: payload.ship_date ?? null,
+          notes: payload.notes ?? null,
+          status: 'pending',
         })
         .select()
         .single()
 
       if (dbError) {
-        console.error('❌ Supabase insert error:', dbError.message)
+        console.error('❌ Supabase error:', dbError.code, dbError.message)
         throw new Error(dbError.message)
       }
 
-      // ✅ Quote saved — update local list and return
+      console.log('✅ Supabase success. Ref:', (data as any)?.ref)
+
       if (data) quotes.value.unshift(data as QuoteRequest)
 
-      // ── 2. Notify via API (fire and forget after success) ──
-      // This runs in the background — does NOT block or affect loading
-      notifyViaApi({
-        full_name:   payload.full_name,
-        company:     payload.company_name,
-        email:       payload.email,
-        phone:       payload.phone                ?? '',
-        product:     payload.product,
-        quantity:    payload.quantity,
-        country:     payload.buyer_country,
+      // Fire notifications after loading is cleared
+      const notifPayload = {
+        full_name: payload.full_name,
+        company: payload.company_name,
+        email: payload.email,
+        phone: payload.phone ?? '',
+        product: payload.product,
+        quantity: payload.quantity,
+        country: payload.buyer_country,
         destination: payload.delivery_destination ?? '',
-        shipDate:    payload.ship_date            ?? '',
-        notes:       payload.notes                ?? '',
-      })
+        shipDate: payload.ship_date ?? '',
+        notes: payload.notes ?? '',
+      }
 
-      return data
+      setTimeout(() => {
+        sendNotifications(notifPayload)
+      }, 0)
 
+      return data as QuoteRequest
     } catch (e: any) {
+      console.error('❌ submitQuote error:', e.message)
       error.value = e.message || 'Failed to submit quote'
       throw e
     } finally {
-      // loading turns off ONLY after Supabase responds
-      // API notifications run completely independently
+      console.log('🏁 finally — loading = false')
       loading.value = false
     }
   }
 
-  // ── Fire API notification — completely detached ───────────────
-  const notifyViaApi = (data: {
-    full_name:   string
-    company:     string
-    email:       string
-    phone:       string
-    product:     string
-    quantity:    string
-    country:     string
+  // ── Send notifications — fire and forget ──────────────────────
+  const sendNotifications = async (data: {
+    full_name: string
+    company: string
+    email: string
+    phone: string
+    product: string
+    quantity: string
+    country: string
     destination: string
-    shipDate:    string
-    notes:       string
-  }) => {
-    // Determine API URL
-    // In dev: Vite proxy routes /api to Vercel dev server
-    // In prod: same origin /api/quote
-    const url = '/api/quote'
+    shipDate: string
+    notes: string
+  }): Promise<void> => {
+    console.log('📬 Starting background notifications...')
 
-    // Use a 15 second timeout — completely non-blocking
     const controller = new AbortController()
-    const timeout    = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       controller.abort()
-      console.warn('⏱ Notification request timed out — quote already saved to Supabase')
-    }, 15000)
+      console.warn('⏱ Notification timed out — quote already saved ✅')
+    }, 30000)
 
-    fetch(url, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(data),
-      signal:  controller.signal,
-    })
-      .then(async (res) => {
-        clearTimeout(timeout)
-        const json = await res.json().catch(() => ({}))
-        console.log('📬 Notification result:', json)
+    try {
+      const response = await fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        signal: controller.signal,
       })
-      .catch((e) => {
-        clearTimeout(timeout)
-        if (e.name !== 'AbortError') {
-          console.warn('📬 Notification failed (non-critical):', e.message)
-        }
-      })
-    // No await — returns immediately
+
+      clearTimeout(timeoutId)
+      const json = await response.json().catch(() => ({}))
+      console.log('📬 Notification result:', response.status, json)
+    } catch (e: any) {
+      clearTimeout(timeoutId)
+      if (e.name === 'AbortError') {
+        console.warn('📬 Notification timed out — non-critical, quote saved ✅')
+      } else {
+        console.warn('📬 Notification failed:', e.message, '— non-critical, quote saved ✅')
+      }
+    }
   }
 
-  // ── Fetch user's quotes ───────────────────────────────────────
-  const fetchMyQuotes = async (userId: string) => {
+  // ── Fetch user quotes ─────────────────────────────────────────
+  const fetchMyQuotes = async (userId: string): Promise<void> => {
     loading.value = true
-    error.value   = null
+    error.value = null
     try {
       const { data, error: err } = await supabase
         .from('quote_requests')
@@ -148,8 +150,8 @@ export const useQuoteStore = defineStore('quotes', () => {
     }
   }
 
-  // ── Fetch tracking for a quote ────────────────────────────────
-  const fetchTracking = async (quoteId: string) => {
+  // ── Fetch tracking ────────────────────────────────────────────
+  const fetchTracking = async (quoteId: string): Promise<void> => {
     trackingLoading.value = true
     try {
       const { data, error: err } = await supabase
@@ -175,7 +177,14 @@ export const useQuoteStore = defineStore('quotes', () => {
   }
 
   return {
-    quotes, trackingMap, loading, trackingLoading, error,
-    submitQuote, fetchMyQuotes, fetchTracking, getTracking,
+    quotes,
+    trackingMap,
+    loading,
+    trackingLoading,
+    error,
+    submitQuote,
+    fetchMyQuotes,
+    fetchTracking,
+    getTracking,
   }
 })
