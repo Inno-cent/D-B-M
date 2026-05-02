@@ -180,6 +180,11 @@ export const useQuoteStore = defineStore('quotes', () => {
     quotes,
     trackingMap,
     loading,
-   
+    trackingLoading,
+    error,
+    submitQuote,
+    fetchMyQuotes,
+    fetchTracking,
+    getTracking,
   }
 })
