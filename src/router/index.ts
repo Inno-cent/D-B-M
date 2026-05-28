@@ -24,29 +24,31 @@ const router = createRouter({
       path:      '/signup',
       name:      'signup',
       component: () => import('../views/SignupView.vue'),
-      meta:      { guestOnly: true },
+      meta:      { guestOnly: true, layout: 'auth' },
     },
     {
       path:      '/login',
       name:      'login',
       component: () => import('../views/LoginView.vue'),
-      meta:      { guestOnly: true },
+      meta:      { guestOnly: true, layout: 'auth' },
     },
     {
       path:      '/forgot-password',
       name:      'forgot-password',
       component: () => import('../views/ForgotPasswordView.vue'),
-      meta:      { guestOnly: true },
+      meta:      { guestOnly: true, layout: 'auth' },
     },
     {
       path:      '/auth/reset-password',
       name:      'reset-password',
       component: () => import('../views/ResetPasswordView.vue'),
+       meta:      { layout: 'auth' },
     },
     {
       path:      '/auth/callback',
       name:      'auth-callback',
       component: () => import('../views/AuthCallbackView.vue'),
+       meta:      { layout: 'auth' },
     },
 
     // ── Protected routes ────────────────────────────────────────
