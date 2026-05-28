@@ -23,7 +23,7 @@
             to="/signup"
             class="text-forest-600 font-semibold hover:text-forest-700 transition-colors underline-offset-2 hover:underline"
           >
-            Create one free
+            Create one for free
           </RouterLink>
         </p>
       </div>
