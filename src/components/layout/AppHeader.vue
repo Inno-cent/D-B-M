@@ -210,7 +210,7 @@ const navLinks = [
   { label: "Home", path: "/" },
   { label: "Products", path: "/products" },
   { label: "How It Works", path: "/how-it-works" },
-  { label: "Suppliers", path: "/supplier-network" },
+  // { label: "Suppliers", path: "/supplier-network" },
   { label: "Blog", path: "/blog" },
   { label: "About", path: "/about" },
   { label: "Contact", path: "/contact" },
