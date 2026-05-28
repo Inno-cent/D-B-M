@@ -12,13 +12,13 @@
         <div
           class="w-10 h-10 bg-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg shadow-forest-900/20"
         >
-          <span class="text-forest-700 font-bold text-sm">DM</span>
+          <span class="text-forest-700 font-bold text-sm">MP</span>
         </div>
         <div>
           <span class="text-white font-bold text-base block leading-none"
-            >DualMarket</span
+            >Marketplace</span
           >
-          <span class="text-forest-300 text-xs leading-none">Brokerage</span>
+          <!-- <span class="text-forest-300 text-xs leading-none">Brokerage</span> -->
         </div>
       </RouterLink>
 
