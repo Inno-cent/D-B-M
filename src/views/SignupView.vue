@@ -1,168 +1,182 @@
 <template>
-  <div class="min-h-screen bg-cream flex">
-    <!-- Left — form panel -->
-    <div class="flex-1 flex items-center justify-center px-6 py-20 overflow-y-auto">
-      <div class="w-full max-w-md">
-        <!-- Logo -->
-        <RouterLink to="/" class="flex items-center gap-3 mb-10 group w-fit">
-          <div
-            class="w-9 h-9 bg-forest-700 rounded-xl flex items-center justify-center group-hover:bg-forest-600 transition-colors shadow-lg"
-          >
-            <span class="text-white font-bold text-xs">DM</span>
-          </div>
-          <div>
-            <span class="font-bold text-earth-900 block leading-none text-base"
-              >DualMarket</span
-            >
-            <span class="text-earth-500 text-xs">Brokerage</span>
-          </div>
-        </RouterLink>
+  <div class="min-h-screen bg-cream flex items-center justify-center px-4 py-12">
+    <!-- Subtle background -->
+    <div
+      class="fixed inset-0 pointer-events-none"
+      style="
+        background-image: radial-gradient(
+            circle at 80% 50%,
+            rgba(30, 107, 35, 0.04) 0%,
+            transparent 60%
+          ),
+          radial-gradient(circle at 20% 80%, rgba(30, 107, 35, 0.03) 0%, transparent 50%);
+      "
+    />
 
-        <h1 class="text-3xl font-bold text-earth-900 mb-2">Create your account</h1>
-        <p class="text-earth-500 mb-8 text-sm">
-          Already have an account?
+    <div class="w-full max-w-sm relative">
+      <!-- Heading -->
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-bold text-earth-900 mb-2 tracking-tight">
+          Create your account
+        </h1>
+        <p class="text-earth-500 text-sm">
+          Already have one?
           <RouterLink
             to="/login"
-            class="text-forest-600 font-semibold hover:text-forest-700 transition-colors"
+            class="text-forest-600 font-semibold hover:text-forest-700 transition-colors underline-offset-2 hover:underline"
           >
-            Sign in here
+            Sign in
           </RouterLink>
         </p>
+      </div>
 
-        <!-- Error message -->
-        <Transition name="fade-slide">
-          <div
-            v-if="error"
-            class="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl text-red-700 text-sm flex items-start gap-3"
-          >
-            <svg
-              class="w-5 h-5 flex-shrink-0 mt-0.5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
+      <!-- Error -->
+      <Transition name="slide-down">
+        <div
+          v-if="error"
+          class="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-center gap-2.5"
+        >
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          {{ error }}
+        </div>
+      </Transition>
+
+      <!-- Success -->
+      <Transition name="slide-down">
+        <div
+          v-if="success"
+          class="mb-5 p-4 bg-forest-50 border border-forest-200 rounded-xl"
+        >
+          <div class="flex items-center gap-3 mb-1.5">
+            <div
+              class="w-6 h-6 bg-forest-600 rounded-lg flex items-center justify-center flex-shrink-0"
             >
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            {{ error }}
-          </div>
-        </Transition>
-
-        <!-- Success message -->
-        <Transition name="fade-slide">
-          <div
-            v-if="success"
-            class="mb-6 p-5 bg-forest-50 border-2 border-forest-200 rounded-xl text-forest-800"
-          >
-            <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-8 h-8 bg-forest-600 rounded-lg flex items-center justify-center flex-shrink-0"
+              <svg
+                class="w-3.5 h-3.5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  class="w-4 h-4 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="3"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <p class="font-bold">Account created successfully!</p>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="3"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
             </div>
-            <p class="text-sm text-forest-700 ml-11">
-              <RouterLink
-                to="/login"
-                class="underline font-semibold hover:text-forest-900"
-              >
-                Click here to sign in
-              </RouterLink>
-              with your new account.
-            </p>
+            <p class="font-semibold text-forest-800 text-sm">Account created!</p>
           </div>
-        </Transition>
+          <p class="text-forest-700 text-xs ml-9 leading-relaxed">
+            <RouterLink to="/login" class="underline font-semibold hover:text-forest-900">
+              Sign in here
+            </RouterLink>
+            to access your dashboard.
+          </p>
+        </div>
+      </Transition>
 
-        <!-- Form -->
-        <form v-if="!success" @submit.prevent="handleSignup" class="space-y-5">
-          <div class="grid sm:grid-cols-2 gap-5">
+      <!-- Form card -->
+      <div
+        v-if="!success"
+        class="bg-white border border-earth-200 rounded-2xl p-7 shadow-sm shadow-earth-900/5"
+      >
+        <form @submit.prevent="handleSignup" class="space-y-4">
+          <!-- Full name + Company -->
+          <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800">
-                Full Name <span class="text-red-400">*</span>
+              <label
+                class="block text-xs font-semibold mb-1.5 text-earth-600 uppercase tracking-wider"
+              >
+                Full Name <span class="text-red-400 normal-case">*</span>
               </label>
               <input
                 v-model="form.fullName"
                 type="text"
                 placeholder="Jane Smith"
-                class="input-field"
+                class="w-full px-3.5 py-3 rounded-xl border border-earth-200 bg-cream text-earth-900 text-sm outline-none focus:border-forest-400 focus:ring-2 focus:ring-forest-100 transition-all duration-200 placeholder:text-earth-300"
                 required
               />
             </div>
             <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800"
-                >Company Name</label
+              <label
+                class="block text-xs font-semibold mb-1.5 text-earth-600 uppercase tracking-wider"
               >
+                Company
+              </label>
               <input
                 v-model="form.companyName"
                 type="text"
-                placeholder="Your company"
-                class="input-field"
+                placeholder="Optional"
+                class="w-full px-3.5 py-3 rounded-xl border border-earth-200 bg-cream text-earth-900 text-sm outline-none focus:border-forest-400 focus:ring-2 focus:ring-forest-100 transition-all duration-200 placeholder:text-earth-300"
               />
             </div>
           </div>
 
+          <!-- Email -->
           <div>
-            <label class="block text-sm font-semibold mb-2 text-earth-800">
-              Email Address <span class="text-red-400">*</span>
+            <label
+              class="block text-xs font-semibold mb-1.5 text-earth-600 uppercase tracking-wider"
+            >
+              Email <span class="text-red-400 normal-case">*</span>
             </label>
             <input
               v-model="form.email"
               type="email"
               placeholder="you@company.com"
-              class="input-field"
+              class="w-full px-4 py-3 rounded-xl border border-earth-200 bg-cream text-earth-900 text-sm outline-none focus:border-forest-400 focus:ring-2 focus:ring-forest-100 transition-all duration-200 placeholder:text-earth-300"
               required
+              autocomplete="email"
             />
           </div>
 
+          <!-- Country -->
           <div>
-            <label class="block text-sm font-semibold mb-2 text-earth-800">
-              Country <span class="text-red-400">*</span>
+            <label
+              class="block text-xs font-semibold mb-1.5 text-earth-600 uppercase tracking-wider"
+            >
+              Country <span class="text-red-400 normal-case">*</span>
             </label>
             <input
               v-model="form.country"
               type="text"
-              placeholder="e.g. Germany, United States, China"
-              class="input-field"
+              placeholder="e.g. Germany, United States"
+              class="w-full px-4 py-3 rounded-xl border border-earth-200 bg-cream text-earth-900 text-sm outline-none focus:border-forest-400 focus:ring-2 focus:ring-forest-100 transition-all duration-200 placeholder:text-earth-300"
               required
             />
           </div>
 
+          <!-- Password -->
           <div>
-            <label class="block text-sm font-semibold mb-2 text-earth-800">
-              Password <span class="text-red-400">*</span>
+            <label
+              class="block text-xs font-semibold mb-1.5 text-earth-600 uppercase tracking-wider"
+            >
+              Password <span class="text-red-400 normal-case">*</span>
             </label>
             <div class="relative">
               <input
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
-                placeholder="At least 8 characters"
-                class="input-field pr-12"
+                placeholder="Min. 8 characters"
+                class="w-full px-4 py-3 rounded-xl border border-earth-200 bg-cream text-earth-900 text-sm outline-none pr-11 focus:border-forest-400 focus:ring-2 focus:ring-forest-100 transition-all duration-200 placeholder:text-earth-300"
                 required
                 minlength="8"
+                autocomplete="new-password"
               />
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-4 top-1/2 -translate-y-1/2 text-earth-400 hover:text-earth-700 transition-colors"
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-earth-300 hover:text-earth-600 transition-colors"
               >
                 <svg
                   v-if="!showPassword"
-                  class="w-5 h-5"
+                  class="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -171,18 +185,12 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                   />
                 </svg>
                 <svg
                   v-else
-                  class="w-5 h-5"
+                  class="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -197,14 +205,14 @@
               </button>
             </div>
 
-            <!-- Password strength -->
+            <!-- Strength bar -->
             <div v-if="form.password" class="mt-2 flex gap-1">
               <div
                 v-for="i in 4"
                 :key="i"
                 :class="[
-                  'h-1 flex-1 rounded-full transition-all duration-300',
-                  passwordStrength >= i ? strengthColor : 'bg-earth-200',
+                  'h-0.5 flex-1 rounded-full transition-all duration-300',
+                  strength >= i ? strengthColor : 'bg-earth-200',
                 ]"
               />
             </div>
@@ -213,21 +221,27 @@
             </p>
           </div>
 
+          <!-- Confirm password -->
           <div>
-            <label class="block text-sm font-semibold mb-2 text-earth-800">
-              Confirm Password <span class="text-red-400">*</span>
+            <label
+              class="block text-xs font-semibold mb-1.5 text-earth-600 uppercase tracking-wider"
+            >
+              Confirm Password <span class="text-red-400 normal-case">*</span>
             </label>
             <input
               v-model="form.confirmPassword"
               type="password"
-              placeholder="Repeat your password"
-              class="input-field"
-              :class="
+              placeholder="Repeat password"
+              :class="[
+                'w-full px-4 py-3 rounded-xl border bg-cream text-earth-900',
+                'text-sm outline-none transition-all duration-200 placeholder:text-earth-300',
+                'focus:ring-2',
                 form.confirmPassword && form.password !== form.confirmPassword
-                  ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
-                  : ''
-              "
+                  ? 'border-red-300 focus:border-red-300 focus:ring-red-100'
+                  : 'border-earth-200 focus:border-forest-400 focus:ring-forest-100',
+              ]"
               required
+              autocomplete="new-password"
             />
             <p
               v-if="form.confirmPassword && form.password !== form.confirmPassword"
@@ -237,36 +251,48 @@
             </p>
           </div>
 
-          <div class="flex items-start gap-3">
-            <input
-              v-model="form.agreed"
-              type="checkbox"
-              id="terms"
-              class="mt-0.5 w-4 h-4 accent-forest-600 cursor-pointer rounded"
-            />
-            <label
-              for="terms"
-              class="text-sm text-earth-600 cursor-pointer leading-relaxed"
+          <!-- Terms -->
+          <label class="flex items-start gap-2.5 cursor-pointer group">
+            <div class="relative mt-0.5 flex-shrink-0">
+              <input v-model="form.agreed" type="checkbox" class="sr-only peer" />
+              <div
+                class="w-4 h-4 rounded border border-earth-300 bg-cream peer-checked:bg-forest-600 peer-checked:border-forest-600 transition-all duration-200 flex items-center justify-center"
+              >
+                <svg
+                  v-if="form.agreed"
+                  class="w-2.5 h-2.5 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+            <span
+              class="text-xs text-earth-500 leading-relaxed group-hover:text-earth-700 transition-colors select-none"
             >
               I agree to the
-              <a href="#" class="text-forest-600 font-semibold hover:underline"
-                >Terms of Service</a
-              >
+              <a href="#" class="text-forest-600 font-semibold hover:underline">Terms</a>
               and
               <a href="#" class="text-forest-600 font-semibold hover:underline"
                 >Privacy Policy</a
               >
-            </label>
-          </div>
+            </span>
+          </label>
 
+          <!-- Submit -->
           <button
             type="submit"
             :disabled="loading || !canSubmit"
-            class="btn-primary w-full justify-center py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+            class="w-full py-3 rounded-xl bg-forest-700 text-white text-sm font-semibold tracking-wide mt-2 hover:bg-forest-600 active:bg-forest-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-md shadow-forest-900/20"
           >
             <svg
               v-if="loading"
-              class="animate-spin w-5 h-5"
+              class="animate-spin w-4 h-4"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -280,83 +306,30 @@
               />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
             </svg>
-            {{ loading ? "Creating account..." : "Create Account →" }}
+            {{ loading ? "Creating account..." : "Create Account" }}
           </button>
         </form>
       </div>
-    </div>
 
-    <!-- Right — farm image panel -->
-    <div class="hidden lg:flex flex-1 relative overflow-hidden max-w-xl">
-      <img
-        src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1200&q=90&fit=crop&crop=center"
-        alt="Nigerian farm"
-        class="w-full h-full object-cover"
-      />
-      <div
-        class="absolute inset-0 bg-gradient-to-br from-forest-900/82 to-forest-800/55"
-      />
-      <div class="absolute inset-0 flex flex-col justify-end p-12">
-        <div class="space-y-6">
-          <div
-            class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full"
-          >
-            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span class="text-white text-sm font-medium">Join our buyer network</span>
-          </div>
-          <h2 class="text-3xl font-bold text-white leading-tight">
-            Source quality Nigerian commodities with confidence
-          </h2>
-          <div class="space-y-3">
-            <div v-for="point in benefits" :key="point" class="flex items-center gap-3">
-              <div
-                class="w-5 h-5 bg-green-500/20 border border-green-400/40 rounded-lg flex items-center justify-center flex-shrink-0"
-              >
-                <svg
-                  class="w-3 h-3 text-green-400"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
-              <span class="text-forest-100 text-sm">{{ point }}</span>
-            </div>
-          </div>
-
-          <!-- Trust badge -->
-          <div class="border-t border-white/10 pt-6 flex items-center gap-4">
-            <div class="flex -space-x-2">
-              <div
-                v-for="(color, i) in avatarColors"
-                :key="i"
-                :class="`w-8 h-8 rounded-full border-2 border-forest-800 flex items-center
-                         justify-center text-xs font-bold text-white ${color}`"
-              >
-                {{ avatarInitials[i] }}
-              </div>
-            </div>
-            <p class="text-forest-200 text-xs">
-              <span class="text-white font-semibold">500+ buyers</span> trust DualMarket
-            </p>
-          </div>
-        </div>
-      </div>
+      <!-- Footer -->
+      <p class="text-center text-xs text-earth-400 mt-6">
+        Already have an account?
+        <RouterLink
+          to="/login"
+          class="text-forest-600 font-semibold hover:text-forest-700 transition-colors"
+        >
+          Sign in →
+        </RouterLink>
+      </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
-import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 
 const auth = useAuthStore();
-const router = useRouter();
 const loading = ref(false);
 const error = ref("");
 const success = ref(false);
@@ -373,7 +346,7 @@ const form = reactive({
   agreed: false,
 });
 
-const passwordStrength = computed(() => {
+const strength = computed(() => {
   const p = form.password;
   if (!p) return 0;
   let s = 0;
@@ -386,15 +359,13 @@ const passwordStrength = computed(() => {
 
 const strengthColor = computed(
   () =>
-    ["", "bg-red-400", "bg-amber-400", "bg-yellow-400", "bg-forest-500"][
-      passwordStrength.value
-    ]
+    ["", "bg-red-400", "bg-amber-400", "bg-yellow-400", "bg-forest-500"][strength.value]
 );
 
 const strengthTextColor = computed(
   () =>
-    ["", "text-red-500", "text-amber-600", "text-yellow-600", "text-forest-600"][
-      passwordStrength.value
+    ["", "text-red-500", "text-amber-500", "text-yellow-600", "text-forest-600"][
+      strength.value
     ]
 );
 
@@ -405,8 +376,8 @@ const strengthLabel = computed(
       "Weak — add uppercase, numbers or symbols",
       "Fair — getting better",
       "Good password",
-      "Strong password ✓",
-    ][passwordStrength.value]
+      "Strong ✓",
+    ][strength.value]
 );
 
 const canSubmit = computed(
@@ -434,38 +405,26 @@ const handleSignup = async () => {
     );
     success.value = true;
   } catch (e: any) {
-    if (e.message?.includes("already registered")) {
-      error.value = "An account with this email already exists. Please sign in.";
-    } else {
-      error.value = e.message || "Something went wrong. Please try again.";
-    }
+    error.value = e.message?.includes("already registered")
+      ? "An account with this email already exists. Please sign in."
+      : e.message || "Something went wrong. Please try again.";
   } finally {
     loading.value = false;
   }
 };
-
-const benefits = [
-  "Submit quote requests and track their status",
-  "Access verified Nigerian commodity suppliers",
-  "Get pricing and availability within 24 hours",
-  "Full logistics and documentation handled for you",
-];
-
-const avatarColors = ["bg-forest-600", "bg-harvest", "bg-earth-500", "bg-forest-400"];
-const avatarInitials = ["AK", "LM", "JW", "PN"];
 </script>
 
 <style scoped>
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease, max-height 0.3s ease;
+  max-height: 100px;
+  overflow: hidden;
 }
-.fade-slide-enter-from {
+.slide-down-enter-from,
+.slide-down-leave-to {
   opacity: 0;
-  transform: translateY(-8px);
-}
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(-6px);
+  max-height: 0;
 }
 </style>

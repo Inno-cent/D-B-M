@@ -1,107 +1,104 @@
 <template>
-  <div class="min-h-screen bg-cream flex">
-    <!-- Left — farm image panel -->
-    <div class="hidden lg:flex flex-1 relative overflow-hidden">
-      <img
-        src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1200&q=85&fit=crop"
-        alt="Nigerian farm workers"
-        class="w-full h-full object-cover"
-      />
-      <div
-        class="absolute inset-0 bg-gradient-to-br from-forest-900/80 to-forest-800/55"
-      />
-      <div class="absolute inset-0 flex flex-col justify-end p-12">
-        <div class="space-y-5">
-          <blockquote class="text-xl font-medium text-white leading-relaxed italic">
-            "DualMarket connected us with a verified sesame supplier in Jigawa within 48
-            hours. The entire process was seamless."
-          </blockquote>
-          <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-harvest rounded-full flex items-center justify-center text-white font-bold text-sm"
-            >
-              AK
-            </div>
-            <div>
-              <p class="text-white text-sm font-semibold">Ahmad K.</p>
-              <p class="text-forest-300 text-xs">Import Manager · Germany</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="min-h-screen bg-cream flex items-center justify-center px-4 py-12">
+    <!-- Subtle background texture -->
+    <div
+      class="fixed inset-0 pointer-events-none"
+      style="
+        background-image: radial-gradient(
+            circle at 20% 50%,
+            rgba(30, 107, 35, 0.04) 0%,
+            transparent 60%
+          ),
+          radial-gradient(circle at 80% 20%, rgba(30, 107, 35, 0.03) 0%, transparent 50%);
+      "
+    />
 
-    <!-- Right — form -->
-    <div class="flex-1 flex items-center justify-center px-6 py-20">
-      <div class="w-full max-w-md">
-        <RouterLink to="/" class="flex items-center gap-3 mb-10 group w-fit">
-          <div
-            class="w-9 h-9 bg-forest-700 rounded-xl flex items-center justify-center group-hover:bg-forest-600 transition-colors"
-          >
-            <span class="text-white font-bold text-xs">DM</span>
-          </div>
-          <span class="font-bold text-earth-900">DualMarket Brokerage</span>
-        </RouterLink>
-
-        <h1 class="text-3xl font-bold text-earth-900 mb-2">Welcome back</h1>
-        <p class="text-earth-500 mb-8">
-          Don't have an account?
+    <div class="w-full max-w-sm relative">
+      <!-- Heading -->
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-bold text-earth-900 mb-2 tracking-tight">Sign in</h1>
+        <p class="text-earth-500 text-sm">
+          No account?
           <RouterLink
             to="/signup"
-            class="text-forest-600 font-semibold hover:text-forest-700"
+            class="text-forest-600 font-semibold hover:text-forest-700 transition-colors underline-offset-2 hover:underline"
           >
-            Sign up free
+            Create one free
           </RouterLink>
         </p>
+      </div>
 
-        <!-- Error -->
+      <!-- Error -->
+      <Transition name="slide-down">
         <div
           v-if="error"
-          class="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl text-red-700 text-sm"
+          class="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-center gap-2.5"
         >
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
+          </svg>
           {{ error }}
         </div>
+      </Transition>
 
-        <form @submit.prevent="handleLogin" class="space-y-5">
+      <!-- Form card -->
+      <div
+        class="bg-white border border-earth-200 rounded-2xl p-7 shadow-sm shadow-earth-900/5"
+      >
+        <form @submit.prevent="handleLogin" class="space-y-4">
+          <!-- Email -->
           <div>
-            <label class="block text-sm font-semibold mb-2 text-earth-800"
-              >Email Address</label
+            <label
+              class="block text-xs font-semibold mb-1.5 text-earth-600 uppercase tracking-wider"
             >
+              Email
+            </label>
             <input
               v-model="form.email"
               type="email"
               placeholder="you@company.com"
-              class="input-field"
+              class="w-full px-4 py-3 rounded-xl border border-earth-200 bg-cream text-earth-900 text-sm outline-none focus:border-forest-400 focus:ring-2 focus:ring-forest-100 transition-all duration-200 placeholder:text-earth-300"
               required
+              autocomplete="email"
             />
           </div>
 
+          <!-- Password -->
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <label class="text-sm font-semibold text-earth-800">Password</label>
+            <div class="flex items-center justify-between mb-1.5">
+              <label
+                class="text-xs font-semibold text-earth-600 uppercase tracking-wider"
+              >
+                Password
+              </label>
               <RouterLink
                 to="/forgot-password"
-                class="text-xs text-forest-600 font-semibold hover:text-forest-700 transition-colors"
+                class="text-xs text-forest-600 hover:text-forest-700 transition-colors font-medium"
               >
-                Forgot password?
+                Forgot?
               </RouterLink>
             </div>
             <div class="relative">
               <input
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
-                placeholder="Your password"
-                class="input-field pr-12"
+                placeholder="••••••••"
+                class="w-full px-4 py-3 rounded-xl border border-earth-200 bg-cream text-earth-900 text-sm outline-none pr-11 focus:border-forest-400 focus:ring-2 focus:ring-forest-100 transition-all duration-200 placeholder:text-earth-300"
                 required
+                autocomplete="current-password"
               />
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-4 top-1/2 -translate-y-1/2 text-earth-400 hover:text-earth-700 transition-colors"
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-earth-300 hover:text-earth-600 transition-colors"
               >
                 <svg
                   v-if="!showPassword"
-                  class="w-5 h-5"
+                  class="w-4.5 h-4.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -110,18 +107,12 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                   />
                 </svg>
                 <svg
                   v-else
-                  class="w-5 h-5"
+                  class="w-4.5 h-4.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -137,22 +128,39 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-3">
-            <input
-              v-model="form.remember"
-              type="checkbox"
-              id="remember"
-              class="w-4 h-4 accent-forest-600 cursor-pointer"
-            />
-            <label for="remember" class="text-sm text-earth-600 cursor-pointer">
+          <!-- Remember me -->
+          <label class="flex items-center gap-2.5 cursor-pointer group">
+            <div class="relative">
+              <input v-model="form.remember" type="checkbox" class="sr-only peer" />
+              <div
+                class="w-4 h-4 rounded border border-earth-300 bg-cream peer-checked:bg-forest-600 peer-checked:border-forest-600 transition-all duration-200 flex items-center justify-center"
+              >
+                <svg
+                  v-if="form.remember"
+                  class="w-2.5 h-2.5 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+            <span
+              class="text-sm text-earth-500 group-hover:text-earth-700 transition-colors select-none"
+            >
               Keep me signed in
-            </label>
-          </div>
+            </span>
+          </label>
 
+          <!-- Submit -->
           <button
             type="submit"
-            :disabled="loading"
-            class="btn-primary w-full justify-center py-4 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+            :disabled="loading || !form.email || !form.password"
+            class="w-full py-3 rounded-xl bg-forest-700 text-white text-sm font-semibold tracking-wide hover:bg-forest-600 active:bg-forest-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-md shadow-forest-900/20 mt-2"
           >
             <svg
               v-if="loading"
@@ -173,16 +181,23 @@
             {{ loading ? "Signing in..." : "Sign In" }}
           </button>
         </form>
-
-        <div class="mt-8 pt-8 border-t-2 border-earth-200 text-center">
-          <p class="text-xs text-earth-400">
-            By signing in you agree to our
-            <a href="#" class="text-forest-600 hover:underline">Terms of Service</a>
-            and
-            <a href="#" class="text-forest-600 hover:underline">Privacy Policy</a>
-          </p>
-        </div>
       </div>
+
+      <!-- Footer note -->
+      <p class="text-center text-xs text-earth-400 mt-6 leading-relaxed">
+        By signing in you agree to our
+        <a
+          href="#"
+          class="hover:text-earth-600 transition-colors underline underline-offset-2"
+          >Terms</a
+        >
+        and
+        <a
+          href="#"
+          class="hover:text-earth-600 transition-colors underline underline-offset-2"
+          >Privacy Policy</a
+        >
+      </p>
     </div>
   </div>
 </template>
@@ -220,10 +235,19 @@ const handleLogin = async () => {
     loading.value = false;
   }
 };
-
-const sideStats = [
-  { value: "50+", label: "Suppliers" },
-  { value: "18", label: "Countries" },
-  { value: "24h", label: "Response" },
-];
 </script>
+
+<style scoped>
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease, max-height 0.25s ease;
+  max-height: 80px;
+  overflow: hidden;
+}
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+  max-height: 0;
+}
+</style>
