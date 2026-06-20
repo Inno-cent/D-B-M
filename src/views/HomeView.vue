@@ -2,17 +2,20 @@
   <div class="bg-cream text-earth-900">
     <HeroSection />
 
-    <!-- Marquee -->
+    <!-- Marquee — local products lead, export follows, divider between -->
     <div class="border-y-2 border-earth-200 py-4 overflow-hidden bg-forest-800">
       <div class="flex animate-marquee whitespace-nowrap">
         <span v-for="i in 2" :key="i" class="flex">
           <span
             v-for="item in marqueeItems"
-            :key="item"
+            :key="item.label"
             class="text-sm text-forest-200 font-medium mx-8 flex items-center gap-3"
           >
-            <span class="w-1.5 h-1.5 bg-forest-400 rounded-full" />
-            {{ item }}
+            <span
+              class="w-1.5 h-1.5 rounded-full"
+              :class="item.type === 'local' ? 'bg-harvest' : 'bg-forest-400'"
+            />
+            {{ item.label }}
           </span>
         </span>
       </div>
@@ -22,7 +25,7 @@
     <HowItWorksPreview />
     <WhyWorkWithUs />
 
-    <!-- Testimonial / trust strip -->
+    <!-- Trust strip -->
     <section class="py-20 px-6 md:px-10 bg-parchment border-y-2 border-earth-200">
       <div class="max-w-7xl mx-auto">
         <div class="grid md:grid-cols-3 gap-8">
@@ -42,7 +45,7 @@
       </div>
     </section>
 
-    <!-- CTA with farm image -->
+    <!-- CTA with farm image — two paths -->
     <section class="relative py-28 px-6 md:px-10 overflow-hidden">
       <div class="absolute inset-0">
         <img
@@ -59,28 +62,29 @@
           Start Today
         </span>
         <h2 class="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-          Ready to source from Nigeria?
+          Buy local produce now, or source export commodities to order
         </h2>
         <p class="text-xl text-forest-200 mb-10 max-w-2xl mx-auto leading-relaxed">
-          Tell us what you need. We respond within 24 hours with pricing and
-          availability from verified Nigerian suppliers.
+          8 local products at today's live price, delivered to your door.
+          For export commodities, we respond within 24 hours with pricing
+          and availability.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <RouterLink
-            to="/request-quote"
+            to="/products"
             class="inline-flex items-center justify-center gap-3 bg-white text-forest-800
                    px-10 py-4 rounded-xl font-bold hover:bg-cream hover:scale-105
                    transition-all shadow-2xl active:scale-95"
           >
-            Request a Quote →
+            Buy Local Produce →
           </RouterLink>
           <RouterLink
-            to="/products"
+            to="/request-quote"
             class="inline-flex items-center justify-center gap-3
                    border-2 border-white/30 text-white px-10 py-4 rounded-xl font-bold
                    hover:bg-white/10 hover:border-white/60 transition-all active:scale-95"
           >
-            Browse Products
+            Request an Export Quote
           </RouterLink>
         </div>
       </div>
@@ -100,14 +104,29 @@ const { observe } = useReveal()
 onMounted(() => observe())
 
 const marqueeItems = [
-  'Sesame Seeds', 'Hibiscus Flower', 'Ginger', 'Cashew Nuts',
-  'Shea Butter', 'Palm Oil', 'Rice', 'Maize',
-  'Verified Network', 'Export Documentation', 'Quality Control', 'Lagos Nigeria'
+  { label: 'Rice',                  type: 'local'  },
+  { label: 'Palm Oil',              type: 'local'  },
+  { label: 'Maize',                 type: 'local'  },
+  { label: 'Beans',                 type: 'local'  },
+  { label: 'Onions',                type: 'local'  },
+  { label: 'Cassava',               type: 'local'  },
+  { label: 'Garri',                 type: 'local'  },
+  { label: 'Wheat',                 type: 'local'  },
+  { label: 'Ginger',                type: 'export' },
+  { label: 'Cashew Nuts',           type: 'export' },
+  { label: 'Shea Butter',           type: 'export' },
+  { label: 'Groundnut',             type: 'export' },
+  { label: 'Cocoa Beans',           type: 'export' },
+  { label: 'Soyabeans',             type: 'export' },
+  { label: 'Live Pricing',          type: 'local'  },
+  { label: 'Verified Network',      type: 'export' },
 ]
 
+// "24h" stat replaced — that claim only applies to the export quote flow;
+// leading with local-produce metrics that apply site-wide instead
 const trustStats = [
-  { icon: '🌾', value: '50+', label: 'Verified Suppliers Across Nigeria' },
-  { icon: '🌍', value: '18',  label: 'Countries We Have Served' },
-  { icon: '⚡', value: '24h', label: 'Average Quote Response Time' },
+  { icon: '🌾', value: '8',   label: 'Local Products at Live Pricing' },
+  { icon: '🤝', value: '50+', label: 'Verified Suppliers Across Nigeria' },
+  { icon: '🌍', value: '18',  label: 'Countries Served for Export Sourcing' },
 ]
 </script>

@@ -49,3 +49,26 @@ export type QuoteStatus =
   | 'out_for_delivery'
   | 'completed'
   | 'cancelled'
+
+// ── Pricing ──────────────────────────────────────────────────────
+
+export interface ProductPrice {
+  id:            string
+  product_slug:  string
+  product_name:  string
+  price_ngn:     number
+  unit:          string
+  min_qty:       number
+  is_available:  boolean
+  updated_by:    string | null
+  last_updated:  string
+}
+
+export interface PriceHistory {
+  id:             string
+  product_slug:   string
+  old_price_ngn:  number | null
+  new_price_ngn:  number
+  changed_by:     string | null
+  changed_at:     string
+}
