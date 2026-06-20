@@ -72,3 +72,54 @@ export interface PriceHistory {
   changed_by:     string | null
   changed_at:     string
 }
+
+// ── Delivery ─────────────────────────────────────────────────────
+
+export interface DeliveryZone {
+  id:               string
+  zone_name:        string
+  states:           string[]
+  fee_ngn:          number | null  // null for international
+  days_estimate:    string | null
+  is_available:     boolean
+  is_international: boolean
+  created_at:       string
+}
+
+// ── Orders ───────────────────────────────────────────────────────
+
+export type PaymentMethod = 'card' | 'bank_transfer' | 'ussd'
+export type PaymentStatus = 'pending' | 'paid' | 'failed'
+export type OrderStatus   = 'pending' | 'confirmed' | 'preparing' | 'dispatched' | 'delivered' | 'cancelled'
+
+export interface Order {
+  id:                string
+  ref:               string
+  user_id:           string | null
+  full_name:         string
+  phone:             string
+  delivery_address:  string
+  state:             string
+  delivery_zone:     string | null
+  delivery_fee_ngn:  number
+  subtotal_ngn:      number
+  total_ngn:         number
+  payment_method:    PaymentMethod | null
+  payment_status:    PaymentStatus
+  paystack_ref:      string | null
+  paystack_data:     Record<string, unknown> | null
+  order_status:      OrderStatus
+  created_at:        string
+  updated_at:        string
+}
+
+export interface OrderItem {
+  id:            string
+  order_id:      string
+  product_slug:  string
+  product_name:  string
+  quantity:      number
+  unit:          string
+  price_ngn:     number
+  subtotal_ngn:  number
+}

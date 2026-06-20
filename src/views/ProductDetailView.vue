@@ -139,26 +139,21 @@
                   </p>
                 </div>
 
-                <button
-                  @click="handleAddToCart"
+                <AddToCartButton
+                  :slug="product.slug"
+                  :name="product.name"
+                  :image="product.image"
+                  :unit="price.unit"
+                  :min-qty="price.min_qty"
+                  :price-ngn="price.price_ngn"
                   :disabled="!price.is_available"
-                  class="btn-primary px-8 py-3 whitespace-nowrap disabled:opacity-40
-                         disabled:cursor-not-allowed"
-                >
-                  Add to Cart
-                </button>
+                />
               </div>
 
               <div v-else class="text-sm text-earth-500">
                 Price currently unavailable — please check back shortly or
                 <RouterLink to="/contact" class="text-forest-600 font-semibold underline">contact us</RouterLink>.
               </div>
-
-              <!-- Cart store isn't wired yet — this is a visible, honest stub,
-                   not a silent no-op, so it's obvious what's pending. -->
-              <p v-if="cartStubMessage" class="text-xs text-earth-400 mt-3 italic">
-                {{ cartStubMessage }}
-              </p>
             </div>
 
             <!-- Specs -->
@@ -229,11 +224,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { products } from '../data/products'
 import { useReveal } from '../composables/useReveal'
 import { usePricesStore } from '../stores/prices'
+import AddToCartButton from '../components/products/AddToCartButton.vue'
 
 const { observe } = useReveal()
 onMounted(() => observe())
@@ -266,16 +262,6 @@ onMounted(fetchIfLocal)
 // Re-fetch context if the user navigates directly between two product
 // detail pages (slug changes but component is reused by the router)
 watch(() => route.params.slug, fetchIfLocal)
-
-// ── Add to Cart stub ───────────────────────────────────────────
-// cart.ts store doesn't exist yet. This gives honest, visible feedback
-// instead of pretending the click did something it didn't.
-const cartStubMessage = ref('')
-const handleAddToCart = () => {
-  cartStubMessage.value =
-    'Cart isn\u2019t wired up yet \u2014 this button will add the item once the cart store is built.'
-  setTimeout(() => { cartStubMessage.value = '' }, 4000)
-}
 
 const formatRelativeTime = (iso: string) => {
   const diffMs = Date.now() - new Date(iso).getTime()

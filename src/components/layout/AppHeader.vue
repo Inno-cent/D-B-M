@@ -12,11 +12,11 @@
         <div
           class="w-10 h-10 bg-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg shadow-forest-900/20"
         >
-          <span class="text-forest-700 font-bold text-sm">OR</span>
+          <span class="text-forest-700 font-bold text-sm">PG</span>
         </div>
         <div>
           <span class="text-white font-bold text-base block leading-none"
-            >ORENA</span
+            >PRENA GLOBAL</span
           >
           <!-- <span class="text-forest-300 text-xs leading-none">Brokerage</span> -->
         </div>
@@ -36,6 +36,29 @@
 
       <!-- Right side -->
       <div class="flex items-center gap-3">
+
+        <!-- Cart icon — always visible, logged in or not -->
+        <button
+          @click="cartOpen = true"
+          aria-label="Open cart"
+          class="relative w-9 h-9 flex items-center justify-center rounded-xl
+                 border-2 border-white/20 hover:border-white/50 hover:bg-white/10
+                 transition-all duration-200"
+        >
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span
+            v-if="cart.itemCount > 0"
+            class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1
+                   bg-harvest text-forest-900 rounded-full text-[10px] font-bold
+                   flex items-center justify-center leading-none"
+          >
+            {{ cart.itemCount }}
+          </span>
+        </button>
+
         <!-- Logged in -->
         <template v-if="isLoggedIn">
           <RouterLink
@@ -125,6 +148,19 @@
           >
             {{ link.label }}
           </RouterLink>
+          <RouterLink
+            to="/cart"
+            class="flex items-center justify-between text-sm px-4 py-3 rounded-xl
+                   text-forest-200 hover:text-white hover:bg-white/10 transition-all duration-200"
+            @click="mobileOpen = false"
+          >
+            <span>Cart</span>
+            <span v-if="cart.itemCount > 0"
+              class="bg-harvest text-forest-900 rounded-full text-xs font-bold
+                     min-w-[20px] h-5 px-1.5 flex items-center justify-center">
+              {{ cart.itemCount }}
+            </span>
+          </RouterLink>
         </nav>
         <div class="flex flex-col gap-3">
           <RouterLink
@@ -155,20 +191,27 @@
       </div>
     </Transition>
   </header>
+
+  <!-- Cart drawer — owned here since the header is rendered on every page -->
+  <CartDrawer v-model="cartOpen" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
+import { useCartStore } from "../../stores/cart";
+import CartDrawer from "../ui/CartDrawer.vue";
 
 const auth = useAuthStore();
+const cart = useCartStore();
 const router = useRouter();
 const route = useRoute();
 const isLoggedIn = computed(() => auth.isLoggedIn);
 
 const scrolled = ref(false);
 const mobileOpen = ref(false);
+const cartOpen = ref(false);
 
 // True when the header should show a solid background.
 // On the home route ('/') we defer to scroll position.
@@ -200,7 +243,6 @@ watch(
 const handleSignOut = async () => {
   try {
     await auth.signOut();
-    console.log(auth, "clicked");
     router.push("/");
   } catch (e) {
     console.error("Sign out failed:", e);
