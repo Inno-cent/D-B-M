@@ -22,7 +22,8 @@
           Built on trust and real supplier relationships
         </h2>
         <p class="text-forest-200 text-lg max-w-2xl mx-auto">
-          Everything you need for trusted Nigerian commodity sourcing
+          Whether you're buying local produce today or sourcing for export,
+          the same standards apply.
         </p>
       </div>
 
@@ -56,12 +57,12 @@ const features = [
   { icon: '★', title: 'Quality Control',
     desc: 'Pre-shipment inspections on every consignment. You receive exactly what was agreed.' },
   { icon: '📦', title: 'Full Logistics',
-    desc: 'Freight forwarding, customs clearance, and export documentation handled end to end.' },
+    desc: 'Freight forwarding, customs clearance, and local delivery handled end to end.' },
+  { icon: '💱', title: 'Transparent Pricing',
+    desc: 'Local produce prices are live and timestamped. Every change is logged for full accountability.' },
   { icon: '🌍', title: 'Export Expertise',
     desc: 'Deep knowledge of Nigerian commodity trade cycles, seasonal pricing, and grading standards.' },
-  { icon: '⚡', title: '24h Response',
-    desc: 'Submit a quote request and receive a detailed response within one business day.' },
-  { icon: '🤝', title: 'Trusted Deals',
-    desc: 'Every transaction is backed by formal agreements and transparent pricing. No hidden fees.' },
+  { icon: '🤝', title: 'Trusted Transactions',
+    desc: 'Backed by formal agreements and transparent pricing on every order and quote. No hidden fees.' },
 ]
 </script>

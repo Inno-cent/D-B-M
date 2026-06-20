@@ -112,6 +112,50 @@
               {{ product.description }}
             </p>
 
+            <!-- ── Local products: live price + Add to Cart ──────────── -->
+            <div
+              v-if="product.type === 'local'"
+              class="border-2 border-forest-200 bg-forest-50/50 rounded-2xl p-6 mb-8"
+            >
+              <div v-if="pricesStore.loading && !price" class="text-sm text-earth-400">
+                Loading current price…
+              </div>
+
+              <div v-else-if="price" class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                  <p class="text-xs uppercase tracking-widest text-earth-500 font-semibold mb-1">
+                    Current Price
+                  </p>
+                  <p class="text-3xl font-bold text-forest-700">
+                    {{ pricesStore.formatNgn(price.price_ngn) }}
+                    <span class="text-base font-medium text-earth-500">/ {{ price.unit }}</span>
+                  </p>
+                  <p class="text-xs text-earth-400 mt-1">
+                    Min. order: {{ price.min_qty }} {{ price.unit }}{{ price.min_qty > 1 ? 's' : '' }}
+                    · Updated {{ formatRelativeTime(price.last_updated) }}
+                  </p>
+                  <p v-if="!price.is_available" class="text-xs text-red-600 font-semibold mt-1">
+                    Currently unavailable
+                  </p>
+                </div>
+
+                <AddToCartButton
+                  :slug="product.slug"
+                  :name="product.name"
+                  :image="product.image"
+                  :unit="price.unit"
+                  :min-qty="price.min_qty"
+                  :price-ngn="price.price_ngn"
+                  :disabled="!price.is_available"
+                />
+              </div>
+
+              <div v-else class="text-sm text-earth-500">
+                Price currently unavailable — please check back shortly or
+                <RouterLink to="/contact" class="text-forest-600 font-semibold underline">contact us</RouterLink>.
+              </div>
+            </div>
+
             <!-- Specs -->
             <h3 class="font-bold text-sm uppercase tracking-widest text-earth-500 mb-4">
               Product Specifications
@@ -131,7 +175,8 @@
               </div>
             </div>
 
-            <!-- CTAs -->
+            <!-- CTAs — export products keep quote-only flow;
+                 local products still offer quote as a secondary option -->
             <div class="flex flex-col gap-3 mb-8">
               <RouterLink
                 to="/request-quote"
@@ -179,15 +224,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { products } from '../data/products'
 import { useReveal } from '../composables/useReveal'
+import { usePricesStore } from '../stores/prices'
+import AddToCartButton from '../components/products/AddToCartButton.vue'
 
 const { observe } = useReveal()
 onMounted(() => observe())
 
 const route = useRoute()
+const pricesStore = usePricesStore()
 
 const product = computed(() =>
   products.find(p => p.slug === route.params.slug)
@@ -199,6 +247,32 @@ const relatedProducts = computed(() =>
     .filter(p => p.type === product.value?.type)
     .slice(0, 5)
 )
+
+const price = computed(() =>
+  product.value ? pricesStore.priceMap[product.value.slug] ?? null : null
+)
+
+const fetchIfLocal = () => {
+  if (product.value?.type === 'local') {
+    pricesStore.fetchPrices()
+  }
+}
+
+onMounted(fetchIfLocal)
+// Re-fetch context if the user navigates directly between two product
+// detail pages (slug changes but component is reused by the router)
+watch(() => route.params.slug, fetchIfLocal)
+
+const formatRelativeTime = (iso: string) => {
+  const diffMs = Date.now() - new Date(iso).getTime()
+  const mins = Math.round(diffMs / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.round(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  const days = Math.round(hrs / 24)
+  return `${days}d ago`
+}
 
 const trustBadges = [
   { icon: '✓', label: 'Verified Source', sub: 'All suppliers audited' },
