@@ -1,60 +1,99 @@
 <template>
   <div class="bg-cream min-h-screen text-earth-900">
 
-    <!-- Header -->
-    <div class="bg-forest-800 pt-24 pb-12 px-6 md:px-10">
-      <div class="max-w-7xl mx-auto">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div>
-            <p class="text-forest-300 text-sm mb-1">Welcome back 👋</p>
-            <h1 class="text-3xl font-bold text-white">
-              {{ profile?.full_name || user?.email }}
-            </h1>
-            <p class="text-forest-300 text-sm mt-1 flex items-center gap-2">
-              <span>{{ profile?.company_name || 'Buyer Account' }}</span>
-              <span v-if="profile?.country" class="w-1 h-1 bg-forest-400 rounded-full" />
-              <span>{{ profile?.country }}</span>
-            </p>
+    <!-- Header — slimmer, no big welcome banner -->
+    <div class="bg-forest-800 pt-24 pb-10 px-6 md:px-10">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-full bg-forest-600 flex items-center justify-center
+                        text-white font-bold text-sm flex-shrink-0">
+              {{ initials }}
+            </div>
+            <div>
+              <h1 class="text-lg font-bold text-white leading-tight">
+                {{ profile?.full_name || user?.email }}
+              </h1>
+              <p class="text-forest-300 text-xs mt-0.5">
+                {{ profile?.company_name || 'Buyer' }}
+                <span v-if="profile?.country"> · {{ profile.country }}</span>
+              </p>
+            </div>
           </div>
-          <div class="flex items-center gap-3 flex-wrap">
-            <RouterLink to="/request-quote" class="btn-harvest inline-flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              New Quote Request
+
+          <div class="flex items-center gap-3">
+            <RouterLink
+              v-if="auth.isAdmin"
+              to="/admin/prices"
+              class="text-xs font-semibold text-forest-200 border border-forest-600
+                     rounded-lg px-3 py-2 hover:bg-forest-700 hover:text-white
+                     transition-all duration-200"
+            >
+              Manage Prices
             </RouterLink>
             <button @click="handleSignOut"
-              class="inline-flex items-center gap-2 border-2 border-white/20 text-white
-                     text-sm py-2.5 px-4 rounded-xl font-semibold
-                     hover:bg-white/10 hover:border-white/40 transition-all duration-200">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              class="text-xs font-semibold text-white/70 hover:text-white
+                     transition-colors duration-200">
               Sign Out
             </button>
+          </div>
+        </div>
+
+        <!-- Slim status strip — signature element, replaces the 4-tile stats grid -->
+        <div class="mt-7 flex items-center gap-5 flex-wrap text-sm">
+          <div v-for="(stat, i) in statusStrip" :key="stat.label" class="flex items-center gap-5">
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-xl font-bold text-white">{{ stat.value }}</span>
+              <span class="text-forest-300 text-xs">{{ stat.label }}</span>
+            </div>
+            <span v-if="i < statusStrip.length - 1" class="w-px h-4 bg-forest-600/60" />
           </div>
         </div>
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-6 md:px-10 py-12">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-10">
 
-      <!-- Stats -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-12">
-        <div v-for="stat in stats" :key="stat.label"
-          class="border-2 border-earth-200 rounded-2xl p-6 bg-white
-                 hover:border-forest-300 hover:shadow-lg transition-all duration-300">
-          <div class="text-2xl mb-3">{{ stat.icon }}</div>
-          <div class="text-2xl font-bold text-forest-700">{{ stat.value }}</div>
-          <div class="text-sm text-earth-500 mt-0.5">{{ stat.label }}</div>
+      <!-- Tab strip: Orders leads, Quotes secondary -->
+      <div class="flex items-center gap-1 mb-6 border-b-2 border-earth-200">
+        <button
+          v-for="tab in tabs"
+          :key="tab.value"
+          @click="activeTab = tab.value"
+          :class="[
+            'px-4 py-3 text-sm font-semibold transition-all duration-200 -mb-[2px] border-b-2',
+            activeTab === tab.value
+              ? 'border-forest-700 text-forest-800'
+              : 'border-transparent text-earth-400 hover:text-earth-600'
+          ]"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <!-- ── Orders panel ──────────────────────────────────────────── -->
+      <div v-if="activeTab === 'orders'">
+        <!-- Empty state — orders.ts not built yet, this is the real
+             intended state, not a loading placeholder -->
+        <div class="border-2 border-dashed border-earth-300 rounded-3xl p-14 text-center bg-white">
+          <p class="text-5xl mb-4">📦</p>
+          <h3 class="text-lg font-bold text-earth-900 mb-2">No orders yet</h3>
+          <p class="text-earth-500 mb-7 max-w-sm mx-auto text-sm leading-relaxed">
+            Browse local produce, add what you need to your cart, and check out —
+            your orders will show up here.
+          </p>
+          <RouterLink to="/products" class="btn-primary px-7 py-3 text-sm">
+            Browse Products →
+          </RouterLink>
         </div>
       </div>
 
-      <!-- Quote History -->
-      <div class="mb-12">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-earth-900">Quote History</h2>
+      <!-- ── Quote Requests panel — same logic as before, just relocated ── -->
+      <div v-else>
+        <div class="flex items-center justify-between mb-5">
+          <p class="text-sm text-earth-500">
+            For export commodities sourced to order.
+          </p>
           <RouterLink to="/request-quote"
             class="text-sm font-semibold text-forest-600 hover:text-forest-700 transition-colors">
             + New Request
@@ -71,15 +110,15 @@
 
         <!-- Empty -->
         <div v-else-if="quotes.length === 0"
-          class="border-2 border-dashed border-earth-300 rounded-3xl p-16 text-center bg-white">
-          <p class="text-6xl mb-5">🌾</p>
-          <h3 class="text-xl font-bold text-earth-900 mb-3">No quote requests yet</h3>
-          <p class="text-earth-500 mb-8 max-w-sm mx-auto leading-relaxed">
-            Submit your first quote request and we will source the best Nigerian commodity
-            for you within 24 hours.
+          class="border-2 border-dashed border-earth-300 rounded-3xl p-14 text-center bg-white">
+          <p class="text-5xl mb-4">🌾</p>
+          <h3 class="text-lg font-bold text-earth-900 mb-2">No quote requests yet</h3>
+          <p class="text-earth-500 mb-7 max-w-sm mx-auto text-sm leading-relaxed">
+            Need an export commodity sourced? Submit a request and we'll get back
+            to you within 24 hours.
           </p>
-          <RouterLink to="/request-quote" class="btn-primary px-8 py-4">
-            Request Your First Quote →
+          <RouterLink to="/request-quote" class="btn-primary px-7 py-3 text-sm">
+            Request a Quote →
           </RouterLink>
         </div>
 
@@ -158,94 +197,96 @@
         </div>
       </div>
 
-      <!-- Account Details -->
-      <div class="mb-12">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-earth-900">Account Details</h2>
-          <button @click="editMode = !editMode"
-            class="text-sm font-semibold text-forest-600 hover:text-forest-700 transition-colors">
-            {{ editMode ? 'Cancel' : 'Edit Profile' }}
-          </button>
-        </div>
+      <!-- Account Details — collapsed by default -->
+      <div class="mt-12 border-2 border-earth-200 rounded-2xl bg-white overflow-hidden">
+        <button
+          @click="accountOpen = !accountOpen"
+          class="w-full flex items-center justify-between px-6 py-4 text-left"
+        >
+          <span class="text-sm font-bold text-earth-900">Account Details</span>
+          <svg
+            :class="['w-4 h-4 text-earth-400 transition-transform duration-200', accountOpen ? 'rotate-180' : '']"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
 
-        <!-- View mode -->
-        <div v-if="!editMode"
-          class="border-2 border-earth-200 rounded-2xl overflow-hidden bg-white">
-          <div v-for="(field, i) in accountFields" :key="field.label"
-            :class="[
-              'flex items-center justify-between px-6 py-4 text-sm',
-              'border-b-2 last:border-b-0 border-earth-100',
-              i % 2 === 0 ? 'bg-white' : 'bg-parchment/40'
-            ]">
-            <span class="text-earth-500 font-medium w-40 flex-shrink-0">{{ field.label }}</span>
-            <span class="font-semibold text-earth-900 text-right">{{ field.value || '—' }}</span>
+        <div v-if="accountOpen" class="border-t-2 border-earth-100">
+          <!-- View mode -->
+          <div v-if="!editMode">
+            <div v-for="(field, i) in accountFields" :key="field.label"
+              :class="[
+                'flex items-center justify-between px-6 py-3.5 text-sm',
+                'border-b-2 last:border-b-0 border-earth-100',
+                i % 2 === 0 ? 'bg-white' : 'bg-parchment/30'
+              ]">
+              <span class="text-earth-500 font-medium">{{ field.label }}</span>
+              <span class="font-semibold text-earth-900 text-right">{{ field.value || '—' }}</span>
+            </div>
+            <div class="px-6 py-4">
+              <button @click="editMode = true"
+                class="text-sm font-semibold text-forest-600 hover:text-forest-700 transition-colors">
+                Edit Profile
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- Edit mode -->
-        <div v-else class="border-2 border-earth-200 rounded-2xl p-8 bg-white space-y-5">
-          <div class="grid sm:grid-cols-2 gap-5">
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800">Full Name</label>
-              <input v-model="editForm.full_name" type="text" class="input-field" placeholder="Your full name" />
+          <!-- Edit mode -->
+          <div v-else class="p-6 space-y-5">
+            <div class="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-sm font-semibold mb-2 text-earth-800">Full Name</label>
+                <input v-model="editForm.full_name" type="text" class="input-field" placeholder="Your full name" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold mb-2 text-earth-800">Company Name</label>
+                <input v-model="editForm.company_name" type="text" class="input-field" placeholder="Your company" />
+              </div>
             </div>
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800">Company Name</label>
-              <input v-model="editForm.company_name" type="text" class="input-field" placeholder="Your company" />
+            <div class="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-sm font-semibold mb-2 text-earth-800">Country</label>
+                <input v-model="editForm.country" type="text" class="input-field" placeholder="Your country" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold mb-2 text-earth-800">Phone</label>
+                <input v-model="editForm.phone" type="tel" class="input-field" placeholder="+1 234 567 8900" />
+              </div>
             </div>
+            <div class="flex items-center gap-3 pt-2">
+              <button @click="saveProfile" :disabled="savingProfile"
+                class="btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100">
+                <svg v-if="savingProfile" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                {{ savingProfile ? 'Saving...' : 'Save Changes' }}
+              </button>
+              <button @click="editMode = false" class="btn-outline">Cancel</button>
+            </div>
+            <Transition name="fade-slide">
+              <div v-if="saveSuccess"
+                class="flex items-center gap-3 p-4 bg-forest-50 border-2 border-forest-200 rounded-xl text-forest-700 text-sm">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Profile updated successfully
+              </div>
+            </Transition>
           </div>
-          <div class="grid sm:grid-cols-2 gap-5">
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800">Country</label>
-              <input v-model="editForm.country" type="text" class="input-field" placeholder="Your country" />
-            </div>
-            <div>
-              <label class="block text-sm font-semibold mb-2 text-earth-800">Phone</label>
-              <input v-model="editForm.phone" type="tel" class="input-field" placeholder="+1 234 567 8900" />
-            </div>
-          </div>
-          <div class="flex items-center gap-3 pt-2">
-            <button @click="saveProfile" :disabled="savingProfile"
-              class="btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100">
-              <svg v-if="savingProfile" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-              </svg>
-              {{ savingProfile ? 'Saving...' : 'Save Changes' }}
-            </button>
-            <button @click="editMode = false" class="btn-outline">Cancel</button>
-          </div>
-          <Transition name="fade-slide">
-            <div v-if="saveSuccess"
-              class="flex items-center gap-3 p-4 bg-forest-50 border-2 border-forest-200 rounded-xl text-forest-700 text-sm">
-              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              Profile updated successfully
-            </div>
-          </Transition>
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <div>
-        <h2 class="text-2xl font-bold mb-6 text-earth-900">Explore</h2>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <RouterLink v-for="action in quickActions" :key="action.path" :to="action.path"
-            class="group border-2 border-earth-200 rounded-2xl p-6 bg-white
-                   hover:border-forest-400 hover:shadow-lg hover:-translate-y-1
-                   transition-all duration-300 flex items-start gap-4">
-            <div class="text-3xl group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
-              {{ action.icon }}
-            </div>
-            <div>
-              <h3 class="font-bold text-earth-900 mb-1 group-hover:text-forest-700 transition-colors">
-                {{ action.title }}
-              </h3>
-              <p class="text-sm text-earth-500 leading-relaxed">{{ action.desc }}</p>
-            </div>
-          </RouterLink>
-        </div>
+      <!-- Quick Actions — trimmed to what's still relevant -->
+      <div class="mt-10 flex flex-wrap gap-3">
+        <RouterLink v-for="action in quickActions" :key="action.path" :to="action.path"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-earth-600
+                 border-2 border-earth-200 rounded-xl px-4 py-2.5 bg-white
+                 hover:border-forest-400 hover:text-forest-700 transition-all duration-200">
+          <span>{{ action.icon }}</span>
+          {{ action.title }}
+        </RouterLink>
       </div>
 
     </div>
@@ -265,6 +306,16 @@ const router     = useRouter()
 const profile = computed(() => auth.profile)
 const user    = computed(() => auth.user)
 
+const initials = computed(() => {
+  const name = profile.value?.full_name || user.value?.email || ''
+  return name
+    .split(/[\s@]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(s => s[0]?.toUpperCase())
+    .join('') || '?'
+})
+
 // ── Load quotes on mount ───────────────────────────────────────
 onMounted(async () => {
   if (auth.user) {
@@ -275,7 +326,14 @@ onMounted(async () => {
 const quotes        = computed(() => quoteStore.quotes)
 const loadingQuotes = computed(() => quoteStore.loading)
 
-// ── Status display ─────────────────────────────────────────────
+// ── Tabs — Orders leads ─────────────────────────────────────────
+const tabs = [
+  { label: 'Orders',         value: 'orders' as const },
+  { label: 'Quote Requests', value: 'quotes' as const },
+]
+const activeTab = ref<'orders' | 'quotes'>('orders')
+
+// ── Status display (unchanged logic) ────────────────────────────
 const statusStyles: Record<string, string> = {
   pending:          'bg-amber-50  text-amber-700  border-amber-200',
   reviewing:        'bg-blue-50   text-blue-700   border-blue-200',
@@ -303,35 +361,22 @@ const formatDate = (dateStr: string) =>
     day: 'numeric', month: 'short', year: 'numeric'
   })
 
-// ── Stats ──────────────────────────────────────────────────────
-const stats = computed(() => [
+// ── Slim status strip — replaces the 4-tile stats grid.
+//    Orders count is hardcoded to 0 until orders.ts exists; swap in
+//    real data once that store is built. ───────────────────────────
+const statusStrip = computed(() => [
+  { value: 0,                      label: 'Orders' },
+  { value: quotes.value.length,     label: 'Quote Requests' },
   {
-    icon: '📋',
-    value: quotes.value.length,
-    label: 'Total Requests'
-  },
-  {
-    icon: '⏳',
-    value: quotes.value.filter(q =>
-      ['pending', 'reviewing', 'sourcing'].includes(q.status)
-    ).length,
+    value: quotes.value.filter(q => ['pending', 'reviewing', 'sourcing'].includes(q.status)).length,
     label: 'In Progress'
-  },
-  {
-    icon: '🚢',
-    value: quotes.value.filter(q =>
-      ['in_store', 'transit', 'out_for_delivery'].includes(q.status)
-    ).length,
-    label: 'In Transit'
-  },
-  {
-    icon: '✅',
-    value: quotes.value.filter(q => q.status === 'completed').length,
-    label: 'Completed'
   },
 ])
 
-// ── Edit profile ───────────────────────────────────────────────
+// ── Account details collapse ────────────────────────────────────
+const accountOpen = ref(false)
+
+// ── Edit profile (unchanged logic) ──────────────────────────────
 const editMode      = ref(false)
 const savingProfile = ref(false)
 const saveSuccess   = ref(false)
@@ -396,13 +441,13 @@ const accountFields = computed(() => [
   },
 ])
 
+// ── Quick Actions — trimmed; dropped Request Quote duplicate
+//    (already accessible via tab) and Market Insights to reduce noise ──
 const quickActions = [
-  { icon: '📋', title: 'Request a Quote',  path: '/request-quote',    desc: 'Submit a new commodity sourcing request' },
-  { icon: '🌿', title: 'Browse Products',  path: '/products',         desc: 'Explore our full commodity catalogue' },
-  { icon: '🤝', title: 'How It Works',     path: '/how-it-works',     desc: 'Understand our sourcing process' },
-  { icon: '🌍', title: 'Supplier Network', path: '/supplier-network', desc: 'Learn about our verified supplier partners' },
-  { icon: '📧', title: 'Contact Us',       path: '/contact',          desc: 'Get in touch with our sourcing team' },
-  { icon: '📰', title: 'Market Insights',  path: '/blog',             desc: 'Stay updated on Nigerian commodity markets' },
+  { icon: '🌿', title: 'Browse Products',  path: '/products' },
+  { icon: '🤝', title: 'How It Works',      path: '/how-it-works' },
+  { icon: '🌍', title: 'Supplier Network',  path: '/supplier-network' },
+  { icon: '📧', title: 'Contact Us',        path: '/contact' },
 ]
 </script>
 

@@ -8,58 +8,90 @@ const router = createRouter({
     return { top: 0 }
   },
   routes: [
-    { path: '/',                 name: 'home',            component: () => import('../views/HomeView.vue') },
-    { path: '/products',         name: 'products',        component: () => import('../views/ProductsView.vue') },
-    { path: '/products/:slug',   name: 'product-detail',  component: () => import('../views/ProductDetailView.vue') },
-    { path: '/how-it-works',     name: 'how-it-works',    component: () => import('../views/HowItWorksView.vue') },
-    { path: '/supplier-network', name: 'suppliers',       component: () => import('../views/SupplierNetworkView.vue') },
-    { path: '/request-quote',    name: 'quote',           component: () => import('../views/RequestQuoteView.vue') },
-    { path: '/blog',             name: 'blog',            component: () => import('../views/BlogView.vue') },
-    { path: '/blog/:slug',       name: 'blog-post',       component: () => import('../views/BlogPostView.vue') },
-    { path: '/about',            name: 'about',           component: () => import('../views/AboutView.vue') },
-    { path: '/contact',          name: 'contact',         component: () => import('../views/ContactView.vue') },
+    { path: '/', name: 'home', component: () => import('../views/HomeView.vue') },
+    { path: '/products', name: 'products', component: () => import('../views/ProductsView.vue') },
+    {
+      path: '/products/:slug',
+      name: 'product-detail',
+      component: () => import('../views/ProductDetailView.vue'),
+    },
+    {
+      path: '/how-it-works',
+      name: 'how-it-works',
+      component: () => import('../views/HowItWorksView.vue'),
+    },
+    {
+      path: '/supplier-network',
+      name: 'suppliers',
+      component: () => import('../views/SupplierNetworkView.vue'),
+    },
+    {
+      path: '/request-quote',
+      name: 'quote',
+      component: () => import('../views/RequestQuoteView.vue'),
+    },
+    { path: '/blog', name: 'blog', component: () => import('../views/BlogView.vue') },
+    {
+      path: '/blog/:slug',
+      name: 'blog-post',
+      component: () => import('../views/BlogPostView.vue'),
+    },
+    { path: '/about', name: 'about', component: () => import('../views/AboutView.vue') },
+    { path: '/contact', name: 'contact', component: () => import('../views/ContactView.vue') },
 
     // ── Auth routes ─────────────────────────────────────────────
     {
-      path:      '/signup',
-      name:      'signup',
+      path: '/signup',
+      name: 'signup',
       component: () => import('../views/SignupView.vue'),
-      meta:      { guestOnly: true, layout: 'auth' },
+      meta: { guestOnly: true, layout: 'auth' },
     },
     {
-      path:      '/login',
-      name:      'login',
+      path: '/login',
+      name: 'login',
       component: () => import('../views/LoginView.vue'),
-      meta:      { guestOnly: true, layout: 'auth' },
+      meta: { guestOnly: true, layout: 'auth' },
     },
     {
-      path:      '/forgot-password',
-      name:      'forgot-password',
+      path: '/forgot-password',
+      name: 'forgot-password',
       component: () => import('../views/ForgotPasswordView.vue'),
-      meta:      { guestOnly: true, layout: 'auth' },
+      meta: { guestOnly: true, layout: 'auth' },
     },
     {
-      path:      '/auth/reset-password',
-      name:      'reset-password',
+      path: '/auth/reset-password',
+      name: 'reset-password',
       component: () => import('../views/ResetPasswordView.vue'),
-       meta:      { layout: 'auth' },
+      meta: { layout: 'auth' },
     },
     {
-      path:      '/auth/callback',
-      name:      'auth-callback',
+      path: '/auth/callback',
+      name: 'auth-callback',
       component: () => import('../views/AuthCallbackView.vue'),
-       meta:      { layout: 'auth' },
+      meta: { layout: 'auth' },
     },
 
     // ── Protected routes ────────────────────────────────────────
     {
-      path:      '/dashboard',
-      name:      'dashboard',
+      path: '/dashboard',
+      name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
-      meta:      { requiresAuth: true },
+      meta: { requiresAuth: true },
     },
 
-    { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('../views/NotFoundView.vue') },
+    // ── Admin routes ────────────────────────────────────────────
+    {
+      path: '/admin/prices',
+      name: 'admin-prices',
+      component: () => import('../views/AdminPricesView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFoundView.vue'),
+    },
   ],
 })
 
@@ -71,8 +103,13 @@ router.beforeEach(async (to) => {
     await new Promise<void>((resolve) => {
       const stop = watch(
         () => auth.loading,
-        (val) => { if (!val) { stop(); resolve() } },
-        { immediate: true }
+        (val) => {
+          if (!val) {
+            stop()
+            resolve()
+          }
+        },
+        { immediate: true },
       )
     })
   }
@@ -83,6 +120,14 @@ router.beforeEach(async (to) => {
 
   if (to.meta.guestOnly && auth.isLoggedIn) {
     return { name: 'dashboard' }
+  }
+
+  // Admin-gated routes: logged in is checked above (requiresAuth is set
+  // alongside requiresAdmin on every admin route), this only checks role.
+  // Non-admins get sent home rather than a 404, so we don't reveal whether
+  // the route exists to people who don't have a reason to know.
+  if (to.meta.requiresAdmin && !auth.isAdmin) {
+    return { name: 'home' }
   }
 })
 

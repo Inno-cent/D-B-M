@@ -12,11 +12,11 @@
         <div
           class="w-10 h-10 bg-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg shadow-forest-900/20"
         >
-          <span class="text-forest-700 font-bold text-sm">MP</span>
+          <span class="text-forest-700 font-bold text-sm">OR</span>
         </div>
         <div>
           <span class="text-white font-bold text-base block leading-none"
-            >Marketplace</span
+            >ORENA</span
           >
           <!-- <span class="text-forest-300 text-xs leading-none">Brokerage</span> -->
         </div>
@@ -200,6 +200,7 @@ watch(
 const handleSignOut = async () => {
   try {
     await auth.signOut();
+    console.log(auth, "clicked");
     router.push("/");
   } catch (e) {
     console.error("Sign out failed:", e);
