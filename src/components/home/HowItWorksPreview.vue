@@ -7,45 +7,95 @@
           How it works
         </h2>
         <p class="text-earth-600 text-lg max-w-2xl mx-auto">
-          A transparent five-step process from request to delivery
+          Two paths, depending on what you need.
         </p>
       </div>
 
-      <div class="grid md:grid-cols-5 gap-6">
-        <div
-          v-for="(step, i) in steps"
-          :key="step.title"
-          data-reveal
-          :data-reveal-delay="String(i + 1)"
-          class="group relative border-2 border-earth-200 p-6 rounded-2xl bg-white
-                 hover:border-forest-400 hover:shadow-xl hover:shadow-forest-50
-                 hover:scale-105 transition-all duration-300"
-        >
-          <div class="absolute -top-4 -left-4 w-10 h-10 bg-forest-700 text-white
-                      rounded-xl flex items-center justify-center font-bold text-sm shadow-lg
-                      group-hover:bg-harvest transition-colors duration-300">
-            {{ i + 1 }}
+      <!-- ── Local — buy now ───────────────────────────────────────── -->
+      <div class="mb-14">
+        <h3 class="text-base font-bold text-earth-900 flex items-center gap-2 mb-6">
+          <span class="w-2 h-2 rounded-full bg-forest-600" />
+          Buying Local Produce
+        </h3>
+        <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <div
+            v-for="(step, i) in localSteps"
+            :key="step.title"
+            data-reveal
+            :data-reveal-delay="String(i + 1)"
+            class="group relative border-2 border-earth-200 p-6 rounded-2xl bg-white
+                   hover:border-forest-400 hover:shadow-xl hover:shadow-forest-50
+                   hover:scale-105 transition-all duration-300"
+          >
+            <div class="absolute -top-4 -left-4 w-10 h-10 bg-forest-700 text-white
+                        rounded-xl flex items-center justify-center font-bold text-sm shadow-lg
+                        group-hover:bg-harvest transition-colors duration-300">
+              {{ i + 1 }}
+            </div>
+            <div class="w-12 h-12 bg-forest-50 rounded-xl flex items-center justify-center
+                        mb-5 mt-2 group-hover:scale-110 transition-transform duration-300 text-2xl">
+              {{ step.icon }}
+            </div>
+            <h3 class="font-bold text-base mb-2 text-earth-900">{{ step.title }}</h3>
+            <p class="text-earth-500 text-sm leading-relaxed">{{ step.desc }}</p>
           </div>
-          <div class="w-12 h-12 bg-forest-50 rounded-xl flex items-center justify-center
-                      mb-5 mt-2 group-hover:scale-110 transition-transform duration-300 text-2xl">
-            {{ step.icon }}
-          </div>
-          <h3 class="font-bold text-base mb-2 text-earth-900">{{ step.title }}</h3>
-          <p class="text-earth-500 text-sm leading-relaxed">{{ step.desc }}</p>
+        </div>
+        <div class="text-center mt-8" data-reveal>
+          <RouterLink to="/how-it-works" class="btn-outline">
+            See full process →
+          </RouterLink>
         </div>
       </div>
 
-      <div class="text-center mt-12" data-reveal>
-        <RouterLink to="/how-it-works" class="btn-outline">
-          See full process →
-        </RouterLink>
+      <!-- ── Export — quote to order ──────────────────────────────── -->
+      <div>
+        <h3 class="text-base font-bold text-earth-900 flex items-center gap-2 mb-6">
+          <span class="w-2 h-2 rounded-full bg-earth-500" />
+          Sourcing Export Commodities
+        </h3>
+        <div class="grid md:grid-cols-5 gap-6">
+          <div
+            v-for="(step, i) in exportSteps"
+            :key="step.title"
+            data-reveal
+            :data-reveal-delay="String(i + 1)"
+            class="group relative border-2 border-earth-200 p-6 rounded-2xl bg-white
+                   hover:border-forest-400 hover:shadow-xl hover:shadow-forest-50
+                   hover:scale-105 transition-all duration-300"
+          >
+            <div class="absolute -top-4 -left-4 w-10 h-10 bg-earth-600 text-white
+                        rounded-xl flex items-center justify-center font-bold text-sm shadow-lg
+                        group-hover:bg-harvest transition-colors duration-300">
+              {{ i + 1 }}
+            </div>
+            <div class="w-12 h-12 bg-earth-50 rounded-xl flex items-center justify-center
+                        mb-5 mt-2 group-hover:scale-110 transition-transform duration-300 text-2xl">
+              {{ step.icon }}
+            </div>
+            <h3 class="font-bold text-base mb-2 text-earth-900">{{ step.title }}</h3>
+            <p class="text-earth-500 text-sm leading-relaxed">{{ step.desc }}</p>
+          </div>
+        </div>
+        <div class="text-center mt-8" data-reveal>
+          <RouterLink to="/how-it-works" class="btn-outline">
+            See full process →
+          </RouterLink>
+        </div>
       </div>
+
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-const steps = [
+const localSteps = [
+  { icon: '🛒', title: 'Browse & add to cart', desc: 'Pick from 8 local products at today\u2019s live price' },
+  { icon: '📍', title: 'Checkout',              desc: 'Enter delivery address, pay by card, transfer, or USSD' },
+  { icon: '🚚', title: 'We deliver',            desc: 'Your order is fulfilled and dispatched to your address' },
+  { icon: '✅', title: 'Track & receive',        desc: 'Follow your order until it arrives' },
+]
+
+const exportSteps = [
   { icon: '📋', title: 'Submit request',  desc: 'Tell us what you need, the quantity, and destination' },
   { icon: '🔍', title: 'We source',       desc: 'We match your request against our verified supplier network' },
   { icon: '🤝', title: 'Confirm deal',    desc: 'Price and terms agreed, proforma invoice issued' },
