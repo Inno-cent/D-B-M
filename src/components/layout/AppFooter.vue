@@ -6,11 +6,11 @@
         <div class="lg:col-span-2">
           <div class="flex items-center gap-3 mb-5">
             <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-              <span class="text-forest-700 font-bold text-sm">DM</span>
+              <span class="text-forest-700 font-bold text-sm">OG</span>
             </div>
             <div>
-              <span class="text-white font-bold block leading-none text-base">DualMarket</span>
-              <span class="text-forest-400 text-xs">Brokerage</span>
+              <span class="text-white font-bold block leading-none text-base">ORENA</span>
+              <span class="text-forest-400 text-xs">GLOBAL</span>
             </div>
           </div>
           <p class="text-sm text-forest-400 leading-relaxed max-w-xs mb-6">
@@ -55,7 +55,7 @@
       <div class="border-t border-forest-800 pt-8
                   flex flex-col sm:flex-row justify-between items-center gap-4">
         <p class="text-xs text-forest-600">
-          © {{ new Date().getFullYear() }} DualMarket Brokerage. All rights reserved.
+          © {{ new Date().getFullYear() }} ORENA GLOBAL. All rights reserved.
         </p>
         <RouterLink
           to="/request-quote"
