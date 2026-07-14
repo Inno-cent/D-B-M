@@ -11,10 +11,7 @@
       <div class="nav-spacer" />
 
       <div class="left-content">
-        <div class="eyebrow">
-          <span class="eyebrow-dot" />
-          <span class="eyebrow-text">Nigerian commodity brokerage</span>
-        </div>
+       
         <h1 class="headline">
           From Nigeria's<br>farms to your<br>
           <em>market.</em>
