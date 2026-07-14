@@ -252,7 +252,7 @@
           </div>
 
           <!-- Terms -->
-          <label class="flex items-start gap-2.5 cursor-pointer group">
+          <!-- <label class="flex items-start gap-2.5 cursor-pointer group">
             <div class="relative mt-0.5 flex-shrink-0">
               <input v-model="form.agreed" type="checkbox" class="sr-only peer" />
               <div
@@ -282,8 +282,52 @@
                 >Privacy Policy</a
               >
             </span>
-          </label>
+          </label> -->
 
+          <!-- Terms -->
+          <label class="flex items-start gap-2.5 cursor-pointer group">
+            <div class="relative mt-0.5 flex-shrink-0">
+              <input v-model="form.agreed" type="checkbox" class="sr-only peer" />
+              <div
+                class="w-4 h-4 rounded border border-earth-300 bg-cream peer-checked:bg-forest-600 peer-checked:border-forest-600 transition-all duration-200 flex items-center justify-center"
+              >
+                <svg
+                  v-if="form.agreed"
+                  class="w-2.5 h-2.5 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+            <span
+              class="text-xs text-earth-500 leading-relaxed group-hover:text-earth-700 transition-colors select-none"
+            >
+              I agree to the
+              <RouterLink
+                to="/terms"
+                target="_blank"
+                class="text-forest-600 font-semibold hover:underline"
+                @click.stop
+              >
+                Terms
+              </RouterLink>
+              and
+              <RouterLink
+                to="/privacy"
+                target="_blank"
+                class="text-forest-600 font-semibold hover:underline"
+                @click.stop
+              >
+                Privacy Policy
+              </RouterLink>
+            </span>
+          </label>
           <!-- Submit -->
           <button
             type="submit"

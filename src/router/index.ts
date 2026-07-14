@@ -99,6 +99,9 @@ const router = createRouter({
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue'),
     },
+
+    { path: '/terms', component: () => import('../views/Terms.vue') },
+    { path: '/privacy', component: () => import('../views/Privacy.vue') },
   ],
 })
 
