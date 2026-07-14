@@ -1,7 +1,7 @@
 <template>
   <footer class="bg-forest-900 text-forest-300">
     <div class="max-w-7xl mx-auto px-6 md:px-10 py-16">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
 
         <div class="lg:col-span-2">
           <div class="flex items-center gap-3 mb-5">
@@ -50,6 +50,20 @@
             </li>
           </ul>
         </div>
+
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-5">Legal</h4>
+          <ul class="space-y-3">
+            <li v-for="link in legalLinks" :key="link.path">
+              <RouterLink
+                :to="link.path"
+                class="text-sm text-forest-400 hover:text-white transition-colors duration-200"
+              >
+                {{ link.label }}
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div class="border-t border-forest-800 pt-8
@@ -85,5 +99,9 @@ const footerProducts = [
   { name: 'Cashew Nuts',     slug: 'cashew-nuts',     icon: '🥜' },
   { name: 'Palm Oil',        slug: 'palm-oil',        icon: '🫒' },
   { name: 'Shea Butter',     slug: 'shea-butter',     icon: '✨' },
+]
+const legalLinks = [
+  { label: 'Terms & Conditions', path: '/terms' },
+  { label: 'Privacy Policy',     path: '/privacy' },
 ]
 </script>

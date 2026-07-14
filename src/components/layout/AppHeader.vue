@@ -13,10 +13,10 @@
         <div
           class="w-9 h-9 bg-white rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
         >
-          <span class="text-forest-700 font-bold text-xs tracking-tight">PG</span>
+          <span class="text-forest-700 font-bold text-xs tracking-tight">OG</span>
         </div>
         <span class="text-white font-semibold text-[15px] tracking-tight">
-          Prena Global
+          Orena Global
         </span>
       </RouterLink>
 
