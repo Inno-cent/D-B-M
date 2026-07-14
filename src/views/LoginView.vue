@@ -187,13 +187,15 @@
       <p class="text-center text-xs text-earth-400 mt-6 leading-relaxed">
         By signing in you agree to our
         <a
-          href="#"
+          href="/terms"
+          target="_blank"
           class="hover:text-earth-600 transition-colors underline underline-offset-2"
           >Terms</a
         >
         and
         <a
-          href="#"
+          href="/privacy"
+          target="_blank"
           class="hover:text-earth-600 transition-colors underline underline-offset-2"
           >Privacy Policy</a
         >
