@@ -7,12 +7,10 @@
           Manage Prices
         </h1>
         <p class="text-earth-600">
-          Update today's prices for local produce. Every change is logged with a timestamp
-          and your account, for dispute resolution.
+          Update today's prices for local produce. Every change is logged automatically.
         </p>
       </div>
 
-      <!-- Loading state -->
       <div
         v-if="pricesStore.loading && pricesStore.prices.length === 0"
         class="text-earth-400 py-12 text-center"
@@ -20,7 +18,6 @@
         Loading prices…
       </div>
 
-      <!-- Error state -->
       <div
         v-else-if="pricesStore.error"
         class="text-red-600 bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6"
@@ -28,7 +25,6 @@
         {{ pricesStore.error }}
       </div>
 
-      <!-- Price rows -->
       <div v-else class="flex flex-col gap-4">
         <div
           v-for="row in editableRows"
@@ -36,15 +32,12 @@
           class="border-2 border-earth-200 rounded-2xl bg-white p-5"
         >
           <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-            <!-- Product name + unit -->
             <div class="flex-1 min-w-[140px]">
               <p class="font-bold text-earth-900">{{ row.product_name }}</p>
               <p class="text-xs text-earth-400">
                 per {{ row.unit }} · min {{ row.min_qty }}
               </p>
             </div>
-
-            <!-- Price input -->
             <div class="flex items-center gap-2">
               <span class="text-earth-400 font-semibold">₦</span>
               <input
@@ -52,11 +45,9 @@
                 type="number"
                 min="0"
                 step="1"
-                class="w-32 px-3 py-2 border-2 border-earth-200 rounded-xl text-sm bg-white text-earth-900 outline-none focus:border-forest-400 transition-all duration-200"
+                class="w-32 px-3 py-2 border-2 border-earth-200 rounded-xl text-sm bg-white text-earth-900 outline-none focus:border-forest-400 transition-all"
               />
             </div>
-
-            <!-- Availability toggle -->
             <label class="flex items-center gap-2 text-sm text-earth-600 cursor-pointer">
               <input
                 v-model="row.draftAvailable"
@@ -65,8 +56,6 @@
               />
               Available
             </label>
-
-            <!-- Save -->
             <button
               @click="handleSave(row)"
               :disabled="row.saving || !hasChanges(row)"
@@ -74,8 +63,6 @@
             >
               {{ row.saving ? "Saving…" : "Save" }}
             </button>
-
-            <!-- History toggle -->
             <button
               @click="toggleHistory(row.product_slug)"
               class="text-xs font-semibold text-forest-600 underline whitespace-nowrap"
@@ -83,26 +70,23 @@
               {{ openHistorySlug === row.product_slug ? "Hide history" : "View history" }}
             </button>
           </div>
-
-          <!-- Saved confirmation -->
           <p v-if="row.justSaved" class="text-xs text-forest-600 font-semibold mt-3">
-            ✓ Saved — last updated just now
+            ✓ Saved
           </p>
           <p v-else class="text-xs text-earth-400 mt-3">
             Last updated {{ formatRelativeTime(row.last_updated) }}
           </p>
 
-          <!-- History panel -->
           <div
             v-if="openHistorySlug === row.product_slug"
             class="mt-4 pt-4 border-t-2 border-earth-100"
           >
             <p v-if="historyLoading" class="text-xs text-earth-400">Loading history…</p>
             <p
-              v-else-if="historyBySlug[row.product_slug]?.length === 0"
+              v-else-if="!historyBySlug[row.product_slug]?.length"
               class="text-xs text-earth-400"
             >
-              No price changes logged yet.
+              No changes logged yet.
             </p>
             <ul v-else class="flex flex-col gap-2">
               <li
@@ -147,7 +131,8 @@ interface EditableRow extends ProductPrice {
 
 const editableRows = ref<EditableRow[]>([]);
 
-const syncRowsFromStore = () => {
+onMounted(async () => {
+  await pricesStore.fetchPrices();
   editableRows.value = pricesStore.prices.map((p) => ({
     ...p,
     draftPrice: p.price_ngn,
@@ -155,11 +140,6 @@ const syncRowsFromStore = () => {
     saving: false,
     justSaved: false,
   }));
-};
-
-onMounted(async () => {
-  await pricesStore.fetchPrices();
-  syncRowsFromStore();
 });
 
 const hasChanges = (row: EditableRow) =>
@@ -185,11 +165,7 @@ const handleSave = async (row: EditableRow) => {
     setTimeout(() => {
       row.justSaved = false;
     }, 3000);
-
-    // Refresh history if it's currently open for this row
-    if (openHistorySlug.value === row.product_slug) {
-      await loadHistory(row.product_slug);
-    }
+    if (openHistorySlug.value === row.product_slug) await loadHistory(row.product_slug);
   } catch (e) {
     pricesStore.error = e instanceof Error ? e.message : "Failed to save";
   } finally {
@@ -197,7 +173,6 @@ const handleSave = async (row: EditableRow) => {
   }
 };
 
-// ── History ──────────────────────────────────────────────────────
 const openHistorySlug = ref<string | null>(null);
 const historyLoading = ref(false);
 const historyBySlug = reactive<Record<string, PriceHistory[]>>({});
@@ -227,7 +202,6 @@ const formatRelativeTime = (iso: string) => {
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.round(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.round(hrs / 24);
-  return `${days}d ago`;
+  return `${Math.round(hrs / 24)}d ago`;
 };
 </script>

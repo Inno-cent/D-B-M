@@ -39,14 +39,10 @@ const router = createRouter({
     { path: '/about', name: 'about', component: () => import('../views/AboutView.vue') },
     { path: '/contact', name: 'contact', component: () => import('../views/ContactView.vue') },
     { path: '/cart', name: 'cart', component: () => import('../views/CartView.vue') },
-    {
-      path: '/checkout',
-      name: 'checkout',
-      component: () => import('../views/CheckoutView.vue'),
-      meta: { requiresAuth: true },
-    },
+    { path: '/terms', name: 'terms', component: () => import('../views/Terms.vue') },
+    { path: '/privacy', name: 'privacy', component: () => import('../views/Privacy.vue') },
 
-    // ── Auth routes ─────────────────────────────────────────────
+    // ── Auth routes ──────────────────────────────────────────────
     {
       path: '/signup',
       name: 'signup',
@@ -78,15 +74,27 @@ const router = createRouter({
       meta: { layout: 'auth' },
     },
 
-    // ── Protected routes ────────────────────────────────────────
+    // ── Protected routes ─────────────────────────────────────────
     {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('../views/CheckoutView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/orders/:ref',
+      name: 'order-confirmation',
+      component: () => import('../views/OrderConfirmationView.vue'),
+      meta: { requiresAuth: true },
+    },
 
-    // ── Admin routes ────────────────────────────────────────────
+    // ── Admin routes ─────────────────────────────────────────────
     {
       path: '/admin/prices',
       name: 'admin-prices',
@@ -99,16 +107,12 @@ const router = createRouter({
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue'),
     },
-
-    { path: '/terms', component: () => import('../views/Terms.vue') },
-    { path: '/privacy', component: () => import('../views/Privacy.vue') },
   ],
 })
 
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
 
-  // Wait for auth to finish initialising before making decisions
   if (auth.loading) {
     await new Promise<void>((resolve) => {
       const stop = watch(
@@ -124,21 +128,10 @@ router.beforeEach(async (to) => {
     })
   }
 
-  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+  if (to.meta.requiresAuth && !auth.isLoggedIn)
     return { name: 'login', query: { redirect: to.fullPath } }
-  }
-
-  if (to.meta.guestOnly && auth.isLoggedIn) {
-    return { name: 'dashboard' }
-  }
-
-  // Admin-gated routes: logged in is checked above (requiresAuth is set
-  // alongside requiresAdmin on every admin route), this only checks role.
-  // Non-admins get sent home rather than a 404, so we don't reveal whether
-  // the route exists to people who don't have a reason to know.
-  if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return { name: 'home' }
-  }
+  if (to.meta.guestOnly && auth.isLoggedIn) return { name: 'dashboard' }
+  if (to.meta.requiresAdmin && !auth.isAdmin) return { name: 'home' }
 })
 
 export default router
