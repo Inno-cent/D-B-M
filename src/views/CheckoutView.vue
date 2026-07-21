@@ -216,12 +216,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
 import { useDeliveryStore } from '../stores/delivery'
 import { useOrdersStore, type PriceMismatch } from '../stores/orders'
 import { useAuthStore } from '../stores/auth'
+import { usePaystack } from '../composables/usePaystack'
 import type { PaymentMethod } from '../types/database'
 
 const router = useRouter()
@@ -229,6 +230,7 @@ const cart     = useCartStore()
 const delivery = useDeliveryStore()
 const ordersStore = useOrdersStore()
 const auth     = useAuthStore()
+const { openPaystackPopup, isConfigured } = usePaystack()
 
 onMounted(() => {
   if (delivery.zones.length === 0) delivery.fetchZones()
@@ -260,7 +262,6 @@ const priceMismatches = ref<PriceMismatch[]>([])
 
 const applyLivePrices = () => {
   for (const m of priceMismatches.value) {
-    cart.updateQuantity // no-op reference to satisfy lint if unused elsewhere
     const item = cart.items.find(i => i.product_slug === m.product_slug)
     if (item) item.price_ngn = m.live_price
   }
@@ -314,25 +315,43 @@ const handlePay = async () => {
       paymentMethod:   form.value.paymentMethod,
     })
 
-    // ── Paystack inline JS integration — NOT wired yet ─────────────
-    // This is the real next step: launch the Paystack popup here with
-    // order.total_ngn, order.ref as the transaction reference, and on
-    // success call ordersStore.confirmPayment(order.id, paystackRef, data),
-    // then route to the confirmation page. Left as an explicit TODO
-    // rather than faking a successful payment.
-    console.warn(
-      `Order ${order.ref} created (pending payment) — Paystack popup not yet integrated.`
-    )
-    alert(
-      `Order ${order.ref} was created, but payment isn't wired up yet. ` +
-      `Paystack integration is the next step — this order is saved as "pending."`
-    )
+    if (!isConfigured) {
+      formError.value = 'Payment is not configured. Contact support.'
+      submitting.value = false
+      return
+    }
 
-    cart.clearCart()
-    router.push('/dashboard')
+    // NOTE: assumes auth.user has an `.email` field (raw Supabase user object).
+    // If your auth store only exposes `auth.profile`, swap this for
+    // auth.profile?.email instead.
+    await openPaystackPopup(
+      {
+        email:     auth.user!.email!,
+        amountNgn: order.total_ngn,
+        ref:       order.ref,
+        metadata:  { order_id: order.id, order_ref: order.ref },
+      },
+      () => {
+        // onSuccess — Paystack's popup confirmed the charge went through.
+        // We deliberately do NOT write payment_status from the browser.
+        // Only the server-side webhook (api/paystack-webhook.ts) is trusted
+        // to do that, because it verifies Paystack's signature using a
+        // secret key the browser never has access to. The order
+        // confirmation page polls until the webhook has done its job.
+        cart.clearCart()
+        submitting.value = false
+        router.push(`/orders/${order.ref}`)
+      },
+      () => {
+        // onCancel — user closed the Paystack popup without paying.
+        formError.value =
+          `Payment was cancelled. Your order ${order.ref} is saved as pending — ` +
+          'you can retry from your dashboard.'
+        submitting.value = false
+      }
+    )
   } catch (e) {
     formError.value = e instanceof Error ? e.message : 'Something went wrong placing your order.'
-  } finally {
     submitting.value = false
   }
 }
