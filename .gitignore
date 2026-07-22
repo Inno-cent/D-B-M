@@ -39,3 +39,7 @@ __screenshots__/
 *.timestamp-*-*.mjs
 
 .vercel
+
+.vercel
+.env*.local
+.env.webhook.local
