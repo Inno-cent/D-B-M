@@ -20,7 +20,7 @@
           Track Order
         </RouterLink>
         <RouterLink
-          to="/contact-us"
+          to="/contact"
           class="hidden sm:inline hover:text-white transition-colors"
         >
           Help
@@ -328,8 +328,8 @@ const navLinks = [
   { label: "Meal Kits", path: "/meal-kits", badge: "New" },
   { label: "Deals", path: "/deals" },
   { label: "Recipes", path: "/recipes" },
-  { label: "About Us", path: "/about-us" },
-  { label: "Contact Us", path: "/contact-us" },
+  { label: "About Us", path: "/about" },
+  { label: "Contact Us", path: "/contact" },
 ];
 
 // Assumes /products supports a `q` query param for search — wire up

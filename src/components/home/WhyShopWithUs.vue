@@ -1,20 +1,26 @@
 <template>
-  <section class="section-padding !py-14 md:!py-16 bg-parchment border-t-2 border-earth-200">
+  <section
+    class="section-padding !py-14 md:!py-16 bg-parchment border-t-2 border-earth-200"
+  >
     <div class="container-max grid md:grid-cols-2 gap-6">
       <!-- Why shop with us -->
-      <div class="card !border-earth-200 p-6 sm:p-8 grid sm:grid-cols-2 gap-6 items-center" data-reveal>
+      <div
+        class="card !border-earth-200 p-6 sm:p-8 grid sm:grid-cols-2 gap-6 items-center"
+        data-reveal
+      >
         <div>
           <h2 class="text-2xl font-bold text-earth-900 mb-4">Why shop with Orenag?</h2>
           <ul class="space-y-2.5">
-            <li v-for="point in points" :key="point" class="flex items-start gap-2 text-sm text-earth-700">
+            <li
+              v-for="point in points"
+              :key="point"
+              class="flex items-start gap-2 text-sm text-earth-700"
+            >
               <span class="text-forest-600 mt-0.5">✓</span>
               <span>{{ point }}</span>
             </li>
           </ul>
-          <RouterLink
-            to="/about-us"
-            class="btn-outline mt-6 !py-2.5 !px-5 !text-xs"
-          >
+          <RouterLink to="/about" class="btn-outline mt-6 !py-2.5 !px-5 !text-xs">
             Learn More About Us →
           </RouterLink>
         </div>
@@ -28,7 +34,11 @@
       </div>
 
       <!-- Testimonials -->
-      <div class="card !border-earth-200 p-6 sm:p-8 flex flex-col" data-reveal data-reveal-delay="2">
+      <div
+        class="card !border-earth-200 p-6 sm:p-8 flex flex-col"
+        data-reveal
+        data-reveal-delay="2"
+      >
         <h2 class="text-lg font-bold text-earth-900 mb-4">What our customers say</h2>
 
         <div class="flex-1">
@@ -89,39 +99,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 const points = [
-  'Carefully sourced from trusted suppliers',
-  'Fresh, clean and quality ingredients',
-  'Affordable prices for every home',
-  'Fast delivery across Lagos',
-  'Excellent customer support',
-]
+  "Carefully sourced from trusted suppliers",
+  "Fresh, clean and quality ingredients",
+  "Affordable prices for every home",
+  "Fast delivery across Lagos",
+  "Excellent customer support",
+];
 
 // Placeholder testimonials — swap for real reviews data when available.
 const testimonials = [
   {
-    quote: "The jollof rice kit made cooking so easy! Everything was fresh and the delivery was super fast.",
-    name: 'Tolu A.',
-    location: 'Lagos, Nigeria',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80&fit=crop',
+    quote:
+      "The jollof rice kit made cooking so easy! Everything was fresh and the delivery was super fast.",
+    name: "Tolu A.",
+    location: "Lagos, Nigeria",
+    avatar:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80&fit=crop",
   },
   {
-    quote: "Great prices and the produce is always fresh. Orenag has become my go-to for weekly groceries.",
-    name: 'Ifeoma N.',
-    location: 'Lagos, Nigeria',
-    avatar: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=100&q=80&fit=crop',
+    quote:
+      "Great prices and the produce is always fresh. Orenag has become my go-to for weekly groceries.",
+    name: "Ifeoma N.",
+    location: "Lagos, Nigeria",
+    avatar:
+      "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=100&q=80&fit=crop",
   },
   {
-    quote: "Ordering on WhatsApp was so convenient, and my delivery arrived within the hour.",
-    name: 'Chuka O.',
-    location: 'Lagos, Nigeria',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80&fit=crop',
+    quote:
+      "Ordering on WhatsApp was so convenient, and my delivery arrived within the hour.",
+    name: "Chuka O.",
+    location: "Lagos, Nigeria",
+    avatar:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80&fit=crop",
   },
-]
+];
 
-const active = ref(0)
-function next() { active.value = (active.value + 1) % testimonials.length }
-function prev() { active.value = (active.value - 1 + testimonials.length) % testimonials.length }
+const active = ref(0);
+function next() {
+  active.value = (active.value + 1) % testimonials.length;
+}
+function prev() {
+  active.value = (active.value - 1 + testimonials.length) % testimonials.length;
+}
 </script>
