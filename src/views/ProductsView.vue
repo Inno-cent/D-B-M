@@ -13,8 +13,8 @@
       <div class="grid lg:grid-cols-[220px_1fr] gap-8">
         <!-- Sidebar -->
         <aside class="lg:sticky lg:top-[152px] h-fit">
-          <h3 class="font-bold text-sm text-earth-900 mb-3">Categories</h3>
-          <nav class="flex lg:flex-col gap-1.5 flex-wrap mb-8">
+          <h3 class="font-bold text-sm text-earth-900 mb-3">Type</h3>
+          <nav class="flex lg:flex-col gap-1.5 flex-wrap mb-6">
             <button
               v-for="tab in tabs"
               :key="tab.value"
@@ -32,6 +32,45 @@
                 class="text-xs"
               >
                 {{ tab.count }}
+              </span>
+            </button>
+          </nav>
+
+          <h3 class="font-bold text-sm text-earth-900 mb-3">Category</h3>
+          <nav class="flex lg:flex-col gap-1.5 flex-wrap mb-8">
+            <button
+              type="button"
+              :class="[
+                'text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+                !selectedCategory
+                  ? 'bg-forest-700 text-white'
+                  : 'text-earth-700 hover:bg-earth-50',
+              ]"
+              @click="selectedCategory = null"
+            >
+              All Categories
+            </button>
+            <button
+              v-for="cat in categoriesWithCounts"
+              :key="cat.slug"
+              type="button"
+              :disabled="cat.count === 0"
+              :class="[
+                'text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center justify-between gap-2 disabled:opacity-40 disabled:cursor-not-allowed',
+                selectedCategory === cat.slug
+                  ? 'bg-forest-700 text-white'
+                  : 'text-earth-700 hover:bg-earth-50',
+              ]"
+              @click="selectedCategory = cat.slug"
+            >
+              <span>{{ cat.label }}</span>
+              <span
+                :class="
+                  selectedCategory === cat.slug ? 'text-forest-100' : 'text-earth-400'
+                "
+                class="text-xs"
+              >
+                {{ cat.count }}
               </span>
             </button>
           </nav>
@@ -127,6 +166,7 @@
               @click="
                 search = '';
                 filter = 'all';
+                selectedCategory = null;
               "
               class="btn-outline"
             >
@@ -165,6 +205,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import ProductCard from "../components/products/ProductCard.vue";
 import { products } from "../data/products";
+import { categories } from "../data/categories";
 import { useReveal } from "../composables/useReveal";
 import { usePricesStore } from "../stores/prices";
 
@@ -177,15 +218,27 @@ const pricesStore = usePricesStore();
 const filter = ref("all");
 const search = ref("");
 const sort = ref("default");
+const selectedCategory = ref<string | null>(
+  typeof route.query.category === "string" ? route.query.category : null
+);
 
-// Picks up ?q= from the header search bar (AppHeader routes here with it)
+// Picks up ?q= from the header search bar and ?category= from the
+// homepage's Shop by Category tiles (both routed here from elsewhere)
 onMounted(() => {
   if (typeof route.query.q === "string") search.value = route.query.q;
+  if (typeof route.query.category === "string")
+    selectedCategory.value = route.query.category;
 });
 watch(
   () => route.query.q,
   (q) => {
     if (typeof q === "string") search.value = q;
+  }
+);
+watch(
+  () => route.query.category,
+  (c) => {
+    selectedCategory.value = typeof c === "string" ? c : null;
   }
 );
 
@@ -203,13 +256,28 @@ const tabs = [
   },
 ];
 
-const activeTabLabel = computed(
-  () => tabs.find((t) => t.value === filter.value)?.label ?? "All Products"
+const categoriesWithCounts = computed(() =>
+  categories.map((c) => ({
+    ...c,
+    count: products.filter((p) => p.category === c.slug).length,
+  }))
 );
+
+const activeTabLabel = computed(() => {
+  const catLabel = selectedCategory.value
+    ? categories.find((c) => c.slug === selectedCategory.value)?.label
+    : null;
+  const typeLabel = tabs.find((t) => t.value === filter.value)?.label ?? "All Products";
+  return catLabel ?? typeLabel;
+});
 
 const filtered = computed(() => {
   let list =
     filter.value === "all" ? products : products.filter((p) => p.type === filter.value);
+
+  if (selectedCategory.value) {
+    list = list.filter((p) => p.category === selectedCategory.value);
+  }
 
   if (search.value.trim()) {
     const q = search.value.toLowerCase();

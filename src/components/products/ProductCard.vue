@@ -50,16 +50,18 @@
             {{ pricesStore.formatNgn(price.price_ngn) }}
             <span class="text-xs font-normal text-earth-400">/ {{ price.unit }}</span>
           </p>
-          <AddToCartButton
-            :slug="product.slug"
-            :name="product.name"
-            :image="product.image"
-            :unit="price.unit"
-            :min-qty="price.min_qty"
-            :price-ngn="price.price_ngn"
+          <!-- Compact single button, not the full AddToCartButton widget —
+               that component is a stepper + button combo (~280px+) built
+               for the spacious product detail page and overflows a grid
+               card. Adjust quantity from the cart page instead. -->
+          <button
+            type="button"
+            class="btn-primary w-full justify-center !py-2 !text-xs disabled:opacity-40 disabled:cursor-not-allowed"
             :disabled="!price.is_available"
-            class="w-full !py-2 !text-xs justify-center"
-          />
+            @click="handleQuickAdd"
+          >
+            {{ justAdded ? "Added ✓" : "Add to Cart" }}
+          </button>
         </template>
         <span v-else class="text-xs text-earth-400 mb-2 block">Price unavailable</span>
       </template>
@@ -77,14 +79,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import type { Product } from "../../data/products";
 import { usePricesStore } from "../../stores/prices";
-import AddToCartButton from "./AddToCartButton.vue";
+import { useCartStore } from "../../stores/cart";
 
 const props = defineProps<{ product: Product }>();
 
 const pricesStore = usePricesStore();
+const cart = useCartStore();
+const justAdded = ref(false);
 
 // Only fetch prices once per app load — if another component already
 // triggered fetchPrices(), this is a no-op cache hit via priceMap.
@@ -95,6 +99,22 @@ onMounted(() => {
 });
 
 const price = computed(() => pricesStore.priceMap[props.product.slug] ?? null);
+
+function handleQuickAdd() {
+  if (!price.value) return;
+  cart.addItem({
+    product_slug: props.product.slug,
+    product_name: props.product.name,
+    image: props.product.image,
+    unit: price.value.unit,
+    min_qty: price.value.min_qty,
+    price_ngn: price.value.price_ngn,
+  });
+  justAdded.value = true;
+  setTimeout(() => {
+    justAdded.value = false;
+  }, 1800);
+}
 
 const handleImgError = (e: Event) => {
   const img = e.target as HTMLImageElement;

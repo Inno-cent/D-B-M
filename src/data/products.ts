@@ -9,11 +9,11 @@ import garri from '@/assets/garri.jpg'
 import SBIMG from '@/assets/SB600.png'
 import springonions from '@/assets/springonions.jpg'
 import carrot from '@/assets/carrot.jpg'
-import chili from "@/assets/chili.jpg"
+import chili from '@/assets/chili.jpg'
 import driedchili from '@/assets/driedchili.jpg'
-import freshpeppers from "@/assets/freshpeppers.jpg"
-import greenpepper from "@/assets/greenpepper.jpg"
-import greenpeas from "@/assets/greenpeas.jpg"
+import freshpeppers from '@/assets/freshpeppers.jpg'
+import greenpepper from '@/assets/greenpepper.jpg'
+import greenpeas from '@/assets/greenpeas.jpg'
 import okra from '@/assets/okra.jpg'
 import tomato from '@/assets/tomato.jpg'
 import corn from '@/assets/corn.jpg'
@@ -25,6 +25,9 @@ export interface Product {
   icon: string
   image: string
   type: 'export' | 'local'
+  // Matches a slug in data/categories.ts — independent from `type`
+  // (e.g. Shea Butter is category "oils-fats" but type "export").
+  category: string
   detail: string
   tagline: string
   description: string
@@ -39,6 +42,7 @@ export const products: Product[] = [
     icon: '🌾',
     image: rice,
     type: 'local',
+    category: 'staples-grains',
     detail: '50kg bags · Min. 100 bags · Local supply',
     tagline: 'Wholesale rice supply for Nigerian businesses and distributors.',
     description:
@@ -59,6 +63,7 @@ export const products: Product[] = [
     icon: '🫒',
     image: palmOilImg,
     type: 'local',
+    category: 'oils-fats',
     detail: 'Min. 1,000 litres · South South',
     tagline: 'Bulk palm oil supply for Nigerian food processors and distributors.',
     description:
@@ -79,6 +84,7 @@ export const products: Product[] = [
     icon: '🌽',
     image: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&q=80&fit=crop',
     type: 'local',
+    category: 'staples-grains',
     detail: 'Dried · Min. 10 MT · Plateau, Kaduna',
     tagline: 'Dried yellow maize for feed, flour, and food processing.',
     description:
@@ -99,6 +105,7 @@ export const products: Product[] = [
     icon: '🫘',
     image: beans,
     type: 'local',
+    category: 'legumes-nuts',
     detail: 'Brown/White · Min. 5 MT · Ogun, Kwara',
     tagline: 'Quality Nigerian beans for wholesale food supply and distribution.',
     description:
@@ -119,6 +126,7 @@ export const products: Product[] = [
     icon: '🧅',
     image: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&q=80&fit=crop',
     type: 'local',
+    category: 'fresh-produce',
     detail: 'Bulk · Min. 2 MT · Sokoto, Kebbi',
     tagline: 'Fresh Nigerian onions for wholesale markets and food industry.',
     description:
@@ -139,6 +147,7 @@ export const products: Product[] = [
     icon: '🍠',
     image: cassava,
     type: 'local',
+    category: 'staples-grains',
     detail: 'Fresh/Processed · Min. 5 MT · Oyo, Benue',
     tagline: 'Fresh cassava and processed cassava products for food and industrial use.',
     description:
@@ -159,6 +168,7 @@ export const products: Product[] = [
     icon: '🍚',
     image: garri,
     type: 'local',
+    category: 'staples-grains',
     detail: 'White/Yellow · Min. 2 MT · Nationwide',
     tagline: "Nigeria's most popular staple food, available in bulk wholesale.",
     description:
@@ -179,6 +189,7 @@ export const products: Product[] = [
     icon: '🌾',
     image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&q=80&fit=crop',
     type: 'local',
+    category: 'staples-grains',
     detail: 'Hard Red · Min. 20 MT · Imported/Local',
     tagline: 'Wheat grain supply for flour mills and food manufacturers.',
     description:
@@ -193,12 +204,13 @@ export const products: Product[] = [
     ],
     applications: ['Flour Milling', 'Bread Production', 'Noodles', 'Pastry Manufacturing'],
   },
-    {
+  {
     name: 'Okra',
     slug: 'okra',
     icon: '🥬',
     image: okra,
     type: 'local',
+    category: 'soup-ingredients',
     detail: 'Fresh · Min. 1 MT · Northern Nigeria',
     tagline: 'Fresh okra supplied in bulk for wholesale and food service.',
     description:
@@ -219,6 +231,7 @@ export const products: Product[] = [
     icon: '🍅',
     image: tomato,
     type: 'local',
+    category: 'fresh-produce',
     detail: 'Fresh · Min. 2 MT · Kaduna, Kano',
     tagline: 'Premium fresh tomatoes for wholesale supply.',
     description:
@@ -239,6 +252,7 @@ export const products: Product[] = [
     icon: '🌶️',
     image: chili,
     type: 'local',
+    category: 'spices-seasonings',
     detail: 'Fresh · Min. 1 MT',
     tagline: 'Fresh chili peppers for local and export markets.',
     description:
@@ -259,6 +273,7 @@ export const products: Product[] = [
     icon: '🫛',
     image: greenpeas,
     type: 'local',
+    category: 'fresh-produce',
     detail: 'Fresh · Min. 1 MT',
     tagline: 'Fresh green peas for wholesale supply.',
     description:
@@ -279,6 +294,7 @@ export const products: Product[] = [
     icon: '🥕',
     image: carrot,
     type: 'local',
+    category: 'fresh-produce',
     detail: 'Fresh · Min. 2 MT',
     tagline: 'Farm-fresh carrots for wholesale buyers.',
     description:
@@ -299,6 +315,7 @@ export const products: Product[] = [
     icon: '🌶️',
     image: freshpeppers,
     type: 'local',
+    category: 'spices-seasonings',
     detail: 'Fresh · Min. 1 MT',
     tagline: 'Fresh peppers supplied in commercial quantities.',
     description:
@@ -319,6 +336,7 @@ export const products: Product[] = [
     icon: '🫑',
     image: greenpepper,
     type: 'local',
+    category: 'fresh-produce',
     detail: 'Fresh · Min. 1 MT',
     tagline: 'Premium green peppers for wholesale supply.',
     description:
@@ -339,6 +357,7 @@ export const products: Product[] = [
     icon: '🌶️',
     image: driedchili,
     type: 'local',
+    category: 'spices-seasonings',
     detail: 'Dried · Min. 1 MT',
     tagline: 'Sun-dried chili peppers for local and export markets.',
     description:
@@ -359,6 +378,7 @@ export const products: Product[] = [
     icon: '🧅',
     image: springonions,
     type: 'local',
+    category: 'fresh-produce',
     detail: 'Fresh · Min. 500kg',
     tagline: 'Fresh spring onions supplied in bulk.',
     description:
@@ -373,12 +393,13 @@ export const products: Product[] = [
     ],
     applications: ['Retail', 'Restaurants', 'Hotels', 'Food Processing'],
   },
-   {
+  {
     name: 'corn',
     slug: 'corn',
     icon: '🧅',
     image: corn,
     type: 'local',
+    category: 'fresh-produce',
     detail: 'Fresh · Min. 500kg',
     tagline: 'Fresh corn supplied in bulk.',
     description:
@@ -392,5 +413,119 @@ export const products: Product[] = [
       { key: 'Storage', value: 'Cold Chain' },
     ],
     applications: ['Retail', 'Restaurants', 'Hotels', 'Food Processing'],
+  },
+
+  // ── Export commodities — NEW. Images were already imported (GingerImg,
+  // cocoaimg, groundnut, soyabeans, SBIMG) but never used anywhere in the
+  // original array, and every existing product was type:'local' — meaning
+  // the export/quote-only flow had nothing to show. Adding these both uses
+  // the orphaned imports and fixes 3 of the 5 broken footer product links
+  // (cashew-nuts and hibiscus-flower still have no image asset — send
+  // those and I'll add them the same way). Specs are placeholders in the
+  // same style as the rest of the file — replace with real figures.
+  {
+    name: 'Ginger',
+    slug: 'ginger',
+    icon: '🫚',
+    image: GingerImg,
+    type: 'export',
+    category: 'spices-seasonings',
+    detail: 'Dried/Split · Min. 5 MT · Kaduna, Nasarawa',
+    tagline: 'Premium Nigerian ginger for export markets.',
+    description:
+      'Nigeria is one of the world\u2019s top ginger producers. Split, dried ginger sourced from Kaduna and Nasarawa for spice manufacturers and export buyers.',
+    specs: [
+      { key: 'Origin', value: 'Kaduna, Nasarawa' },
+      { key: 'Type', value: 'Dried / Split' },
+      { key: 'Moisture', value: 'Max 12%' },
+      { key: 'Min. Order', value: '5 Metric Tonnes' },
+      { key: 'Packaging', value: '25kg / 50kg bags' },
+      { key: 'Availability', value: 'Dec – Mar (peak)' },
+    ],
+    applications: ['Spice Export', 'Pharmaceutical', 'Food Processing', 'Beverage Industry'],
+  },
+  {
+    name: 'Cocoa Beans',
+    slug: 'cocoa-beans',
+    icon: '🍫',
+    image: cocoaimg,
+    type: 'export',
+    category: 'export-commodities',
+    detail: 'Grade 1 · Min. 10 MT · Ondo, Cross River',
+    tagline: 'Fermented, sun-dried cocoa beans for international buyers.',
+    description:
+      'Grade 1 fermented and sun-dried cocoa beans sourced from Ondo, Cross River, and Osun — Nigeria\u2019s leading cocoa belt. Supplied to chocolate manufacturers and export buyers.',
+    specs: [
+      { key: 'Origin', value: 'Ondo, Cross River, Osun' },
+      { key: 'Grade', value: 'Grade 1' },
+      { key: 'Moisture', value: 'Max 8%' },
+      { key: 'Min. Order', value: '10 Metric Tonnes' },
+      { key: 'Packaging', value: '62.5kg jute bags' },
+      { key: 'Peak Season', value: 'Oct – Mar' },
+    ],
+    applications: ['Chocolate Manufacturing', 'Cocoa Butter Production', 'Export', 'Confectionery'],
+  },
+  {
+    name: 'Groundnut',
+    slug: 'groundnut',
+    icon: '🥜',
+    image: groundnut,
+    type: 'export',
+    category: 'legumes-nuts',
+    detail: 'Raw/Shelled · Min. 10 MT · Kano, Jigawa',
+    tagline: 'Quality Nigerian groundnuts for export and processing.',
+    description:
+      'Raw and shelled groundnuts sourced from Kano and Jigawa, historically one of Nigeria\u2019s largest export crops. Supplied for oil extraction, confectionery, and export.',
+    specs: [
+      { key: 'Origin', value: 'Kano, Jigawa' },
+      { key: 'Type', value: 'Raw / Shelled' },
+      { key: 'Moisture', value: 'Max 8%' },
+      { key: 'Min. Order', value: '10 Metric Tonnes' },
+      { key: 'Packaging', value: '50kg bags' },
+      { key: 'Availability', value: 'Nov – Feb (peak)' },
+    ],
+    applications: ['Oil Extraction', 'Confectionery', 'Export', 'Food Processing'],
+  },
+  {
+    name: 'Soyabeans',
+    slug: 'soyabeans',
+    icon: '🌱',
+    image: soyabeans,
+    type: 'export',
+    category: 'legumes-nuts',
+    detail: 'Grade 1 · Min. 10 MT · Benue, Kaduna',
+    tagline: 'Non-GMO Nigerian soyabeans for export and processing.',
+    description:
+      'Non-GMO soyabeans sourced from Benue and Kaduna for oil extraction, animal feed production, and export to international buyers.',
+    specs: [
+      { key: 'Origin', value: 'Benue, Kaduna' },
+      { key: 'Type', value: 'Non-GMO' },
+      { key: 'Moisture', value: 'Max 13%' },
+      { key: 'Min. Order', value: '10 Metric Tonnes' },
+      { key: 'Packaging', value: '50kg bags / Bulk' },
+      { key: 'Availability', value: 'Oct – Jan (peak)' },
+    ],
+    applications: ['Oil Extraction', 'Animal Feed', 'Export', 'Food Processing'],
+  },
+  {
+    name: 'Shea Butter',
+    slug: 'shea-butter',
+    icon: '✨',
+    image: SBIMG,
+    type: 'export',
+    category: 'oils-fats',
+    detail: 'Raw/Refined · Min. 1,000kg · Niger, Kwara',
+    tagline: 'Raw and refined shea butter for cosmetic and food export markets.',
+    description:
+      'Raw and refined shea butter sourced from Niger and Kwara states, hand-processed by women\u2019s cooperatives. Supplied to cosmetic manufacturers and food-grade fat buyers internationally.',
+    specs: [
+      { key: 'Origin', value: 'Niger, Kwara' },
+      { key: 'Grade', value: 'Raw / Refined' },
+      { key: 'FFA Level', value: 'Max 1%' },
+      { key: 'Min. Order', value: '1,000kg' },
+      { key: 'Packaging', value: '25kg pails / Drums' },
+      { key: 'Availability', value: 'Year-round' },
+    ],
+    applications: ['Cosmetics', 'Skincare', 'Food Grade Fat', 'Export'],
   },
 ]
