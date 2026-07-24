@@ -256,7 +256,12 @@ const tabs = [
   },
 ];
 
-
+const categoriesWithCounts = computed(() =>
+  categories.map((c) => ({
+    ...c,
+    count: products.filter((p) => p.category === c.slug).length,
+  }))
+);
 
 const activeTabLabel = computed(() => {
   const catLabel = selectedCategory.value
