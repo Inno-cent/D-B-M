@@ -2,23 +2,24 @@
   <footer class="bg-forest-900 text-forest-300">
     <div class="max-w-7xl mx-auto px-6 md:px-10 py-16">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
-
         <div class="lg:col-span-2">
           <div class="flex items-center gap-3 mb-5">
             <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
               <span class="text-forest-700 font-bold text-sm">OG</span>
             </div>
             <div>
-              <span class="text-white font-bold block leading-none text-base">ORENA</span>
-              <span class="text-forest-400 text-xs">GLOBAL</span>
+              <span class="text-white font-bold block leading-none text-base"
+                >ORENAG</span
+              >
             </div>
           </div>
           <p class="text-sm text-forest-400 leading-relaxed max-w-xs mb-6">
-            Connecting international buyers and Nigerian businesses with verified, quality-assured suppliers since 2024.
+            Fresh groceries and meal kits delivered across Lagos, plus verified
+            export-commodity sourcing for international buyers.
           </p>
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span class="text-xs text-forest-500">Actively sourcing · Lagos, Nigeria</span>
+            <span class="text-xs text-forest-500">Delivering daily · Lagos, Nigeria</span>
           </div>
         </div>
 
@@ -42,10 +43,10 @@
             <li v-for="p in footerProducts" :key="p.slug">
               <RouterLink
                 :to="`/products/${p.slug}`"
-                class="text-sm text-forest-400 hover:text-white
-                       transition-colors duration-200 flex items-center gap-2"
+                class="text-sm text-forest-400 hover:text-white transition-colors duration-200 flex items-center gap-2"
               >
-                <span>{{ p.icon }}</span>{{ p.name }}
+                <span>{{ p.icon }}</span
+                >{{ p.name }}
               </RouterLink>
             </li>
           </ul>
@@ -66,10 +67,11 @@
         </div>
       </div>
 
-      <div class="border-t border-forest-800 pt-8
-                  flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div
+        class="border-t border-forest-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4"
+      >
         <p class="text-xs text-forest-600">
-          © {{ new Date().getFullYear() }} ORENA GLOBAL. All rights reserved.
+          © {{ new Date().getFullYear() }} ORENAG. All rights reserved.
         </p>
         <RouterLink
           to="/request-quote"
@@ -83,25 +85,30 @@
 </template>
 
 <script setup lang="ts">
+// About/Contact intentionally appear here AND in the header nav —
+// that's a deliberate duplication (common footer pattern), not an
+// oversight left over from the redesign.
 const navLinks = [
-  { label: 'Products',         path: '/products' },
-  { label: 'How It Works',     path: '/how-it-works' },
-  { label: 'Supplier Network', path: '/supplier-network' },
-  { label: 'Request a Quote',  path: '/request-quote' },
-  { label: 'Blog',             path: '/blog' },
-  { label: 'About',            path: '/about' },
-  { label: 'Contact',          path: '/contact' },
-]
+  { label: "Shop Groceries", path: "/products" },
+  { label: "Meal Kits", path: "/meal-kits" },
+  { label: "Deals", path: "/deals" },
+  { label: "How It Works", path: "/how-it-works" },
+  { label: "Supplier Network", path: "/supplier-network" },
+  { label: "Request a Quote", path: "/request-quote" },
+  { label: "Blog", path: "/blog" },
+  { label: "About", path: "/about" },
+  { label: "Contact", path: "/contact" },
+];
 const footerProducts = [
-  { name: 'Sesame Seeds',    slug: 'sesame-seeds',    icon: '🌿' },
-  { name: 'Hibiscus Flower', slug: 'hibiscus-flower', icon: '🌺' },
-  { name: 'Ginger',          slug: 'ginger',          icon: '🫚' },
-  { name: 'Cashew Nuts',     slug: 'cashew-nuts',     icon: '🥜' },
-  { name: 'Palm Oil',        slug: 'palm-oil',        icon: '🫒' },
-  { name: 'Shea Butter',     slug: 'shea-butter',     icon: '✨' },
-]
+  { name: "Sesame Seeds", slug: "sesame-seeds", icon: "🌿" },
+  { name: "Hibiscus Flower", slug: "hibiscus-flower", icon: "🌺" },
+  { name: "Ginger", slug: "ginger", icon: "🫚" },
+  { name: "Cashew Nuts", slug: "cashew-nuts", icon: "🥜" },
+  { name: "Palm Oil", slug: "palm-oil", icon: "🫒" },
+  { name: "Shea Butter", slug: "shea-butter", icon: "✨" },
+];
 const legalLinks = [
-  { label: 'Terms & Conditions', path: '/terms' },
-  { label: 'Privacy Policy',     path: '/privacy' },
-]
+  { label: "Terms & Conditions", path: "/terms" },
+  { label: "Privacy Policy", path: "/privacy" },
+];
 </script>

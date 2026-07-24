@@ -106,16 +106,17 @@
                     >/ {{ pricesStore.priceMap[p.slug].unit }}</span
                   >
                 </p>
-                <AddToCartButton
+                <!-- Compact button, not the full AddToCartButton widget —
+                     that's a stepper+button combo built for the spacious
+                     product detail page; it overflows a card this narrow. -->
+                <button
                   v-if="pricesStore.priceMap[p.slug]"
-                  :slug="p.slug"
-                  :name="p.name"
-                  :image="p.image"
-                  :unit="pricesStore.priceMap[p.slug].unit"
-                  :min-qty="pricesStore.priceMap[p.slug].min_qty"
-                  :price-ngn="pricesStore.priceMap[p.slug].price_ngn"
-                  class="mt-auto w-full justify-center !py-1.5 !text-xs"
-                />
+                  type="button"
+                  class="btn-primary mt-auto w-full justify-center !py-1.5 !text-xs"
+                  @click="handleQuickAdd(p)"
+                >
+                  {{ justAddedSlug === p.slug ? "Added ✓" : "Add to Cart" }}
+                </button>
               </div>
             </div>
           </div>
@@ -158,14 +159,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useCartStore } from "../stores/cart";
 import { usePricesStore } from "../stores/prices";
 import { products } from "../data/products";
-import AddToCartButton from "../components/products/AddToCartButton.vue";
+import type { Product } from "../data/products";
 
 const cart = useCartStore();
 const pricesStore = usePricesStore();
+const justAddedSlug = ref<string | null>(null);
 
 onMounted(() => {
   if (pricesStore.prices.length === 0) pricesStore.fetchPrices();
@@ -178,4 +180,21 @@ const suggestions = computed(() => {
   const inCart = new Set(cart.items.map((i) => i.product_slug));
   return products.filter((p) => p.type === "local" && !inCart.has(p.slug)).slice(0, 3);
 });
+
+function handleQuickAdd(p: Product) {
+  const price = pricesStore.priceMap[p.slug];
+  if (!price) return;
+  cart.addItem({
+    product_slug: p.slug,
+    product_name: p.name,
+    image: p.image,
+    unit: price.unit,
+    min_qty: price.min_qty,
+    price_ngn: price.price_ngn,
+  });
+  justAddedSlug.value = p.slug;
+  setTimeout(() => {
+    justAddedSlug.value = null;
+  }, 1800);
+}
 </script>
