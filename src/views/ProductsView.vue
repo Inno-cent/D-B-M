@@ -46,7 +46,7 @@
                   ? 'bg-forest-700 text-white'
                   : 'text-earth-700 hover:bg-earth-50',
               ]"
-              @click="selectedCategory = null"
+              @click="setCategory(null)"
             >
               All Categories
             </button>
@@ -61,7 +61,7 @@
                   ? 'bg-forest-700 text-white'
                   : 'text-earth-700 hover:bg-earth-50',
               ]"
-              @click="selectedCategory = cat.slug"
+              @click="setCategory(cat.slug)"
             >
               <span>{{ cat.label }}</span>
               <span
@@ -166,7 +166,7 @@
               @click="
                 search = '';
                 filter = 'all';
-                selectedCategory = null;
+                setCategory(null);
               "
               class="btn-outline"
             >
@@ -201,8 +201,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import ProductCard from "../components/products/ProductCard.vue";
 import { products } from "../data/products";
 import { categories } from "../data/categories";
@@ -213,34 +213,33 @@ const { observe } = useReveal();
 onMounted(() => observe());
 
 const route = useRoute();
+const router = useRouter();
 const pricesStore = usePricesStore();
 
 const filter = ref("all");
 const search = ref("");
 const sort = ref("default");
-const selectedCategory = ref<string | null>(
+
+// Single source of truth is the URL — no separate ref to fall out of sync
+// with it. Clicking a category (sidebar OR the homepage tiles, which
+// already link to /products?category=<slug>) pushes a route change; this
+// just reads whatever the route currently says.
+const selectedCategory = computed<string | null>(() =>
   typeof route.query.category === "string" ? route.query.category : null
 );
 
-// Picks up ?q= from the header search bar and ?category= from the
-// homepage's Shop by Category tiles (both routed here from elsewhere)
+function setCategory(slug: string | null) {
+  router.push({
+    path: "/products",
+    query: { ...route.query, category: slug ?? undefined },
+  });
+}
+
+// ?q= from the header search bar still needs a local ref since it's
+// editable inline on this page (not just a one-way link in).
 onMounted(() => {
   if (typeof route.query.q === "string") search.value = route.query.q;
-  if (typeof route.query.category === "string")
-    selectedCategory.value = route.query.category;
 });
-watch(
-  () => route.query.q,
-  (q) => {
-    if (typeof q === "string") search.value = q;
-  }
-);
-watch(
-  () => route.query.category,
-  (c) => {
-    selectedCategory.value = typeof c === "string" ? c : null;
-  }
-);
 
 const tabs = [
   { label: "All Products", value: "all", count: products.length },
