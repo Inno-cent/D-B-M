@@ -145,14 +145,7 @@
           </div>
 
           <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            <div
-              v-for="(p, i) in sorted"
-              :key="p.slug"
-              data-reveal
-              :data-reveal-delay="String((i % 4) + 1)"
-            >
-              <ProductCard :product="p" />
-            </div>
+            <ProductCard v-for="p in sorted" :key="p.slug" :product="p" />
           </div>
 
           <!-- Empty state -->

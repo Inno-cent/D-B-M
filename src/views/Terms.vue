@@ -164,6 +164,35 @@
         </section>
 
         <section>
+          <h2>Food Safety and Customer Claims</h2>
+          <p>
+            Orenag provides a platform through which Customers may purchase products and
+            services offered by independent Vendors. While Orenag manages the ordering process
+            and serves as the Customer's primary point of contact, all products and services
+            available through the Platform are supplied by independent Vendors, who are solely
+            responsible for their quality, safety, legality, accuracy, condition, fitness for
+            purpose, and compliance with all applicable laws and regulations.
+          </p>
+          <p>
+            Orenag does not prepare, package, or inspect any food supplied by vendors and
+            therefore does not warrant the quality, safety, freshness, or suitability of any
+            food products.
+          </p>
+          <p>
+            Except where required by applicable law or where a claim arises directly from
+            Orenag's own negligence or wilful misconduct, Orenag shall not be liable for any
+            illness, food poisoning, allergic reaction, contamination, injury, or other loss
+            arising from the preparation, handling, or consumption of food supplied by a vendor.
+          </p>
+          <p>
+            Customers should report any complaint, claim, or concern relating to a Vendor's
+            product or service directly to Orenag through the Platform. Orenag will review the
+            matter, liaise with the relevant Vendor, and use reasonable efforts to facilitate a
+            fair and timely resolution.
+          </p>
+        </section>
+
+        <section>
           <h2>Reporting Issues</h2>
           <p>
             Customers must report damaged, spoiled, incorrect, or unsafe products within one (1)
