@@ -18,6 +18,13 @@ export const useOrdersStore = defineStore('orders', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  // Admin-only: all orders across every customer, kept in a separate array
+  // from `orders` (which is "my orders" for the logged-in customer) so the
+  // two views can never clobber each other's state.
+  const adminOrders = ref<Order[]>([])
+  const adminLoading = ref(false)
+  const adminError = ref<string | null>(null)
+
   const reconfirmPrices = async (items: CartItem[]): Promise<PriceMismatch[]> => {
     const prices = usePricesStore()
     const mismatches: PriceMismatch[] = []
@@ -133,6 +140,29 @@ export const useOrdersStore = defineStore('orders', () => {
     }
   }
 
+  // Admin-only — every order across every customer. Relies on an RLS
+  // SELECT policy on `orders` that allows admins to read rows they don't
+  // own; the existing policies described in the project doc only cover
+  // UPDATE (admin-only) and each customer reading their own rows. If this
+  // comes back empty despite orders existing, that policy is almost
+  // certainly missing — see the migration note alongside AdminOrdersView.
+  const fetchAllOrders = async () => {
+    adminLoading.value = true
+    adminError.value = null
+    try {
+      const { data, error: err } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (err) throw err
+      adminOrders.value = (data ?? []) as Order[]
+    } catch (e) {
+      adminError.value = e instanceof Error ? e.message : 'Failed to load orders'
+    } finally {
+      adminLoading.value = false
+    }
+  }
+
   const fetchOrderItems = async (orderId: string): Promise<OrderItem[]> => {
     const { data, error: err } = await supabase
       .from('order_items')
@@ -158,10 +188,14 @@ export const useOrdersStore = defineStore('orders', () => {
     orders,
     loading,
     error,
+    adminOrders,
+    adminLoading,
+    adminError,
     reconfirmPrices,
     createOrder,
     confirmPayment,
     fetchMyOrders,
+    fetchAllOrders,
     fetchOrderItems,
     fetchOrderByRef,
   }

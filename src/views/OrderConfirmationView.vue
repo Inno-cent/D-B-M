@@ -4,7 +4,7 @@
       <div class="max-w-3xl mx-auto">
         <span class="section-label">Order Status</span>
         <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-3 text-earth-900">
-          {{ order ? order.ref : 'Loading…' }}
+          {{ order ? order.ref : "Loading…" }}
         </h1>
       </div>
     </div>
@@ -23,7 +23,9 @@
           We couldn't find an order with that reference. If you just paid, check your
           dashboard in a moment.
         </p>
-        <RouterLink to="/dashboard" class="btn-primary px-8 py-4">Go to Dashboard →</RouterLink>
+        <RouterLink to="/dashboard" class="btn-primary px-8 py-4"
+          >Go to Dashboard →</RouterLink
+        >
       </div>
 
       <!-- Order found -->
@@ -52,7 +54,7 @@
             >
               <span
                 >{{ item.product_name }} × {{ item.quantity }} {{ item.unit
-                }}{{ item.quantity > 1 ? 's' : '' }}</span
+                }}{{ item.quantity > 1 ? "s" : "" }}</span
               >
               <span class="font-semibold text-earth-900">{{
                 formatNgn(item.subtotal_ngn)
@@ -120,122 +122,130 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { useOrdersStore } from '../stores/orders'
-import type { Order, OrderItem } from '../types/database'
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useRoute } from "vue-router";
+import { useOrdersStore } from "../stores/orders";
+import type { Order, OrderItem } from "../types/database";
 
-const route = useRoute()
-const ordersStore = useOrdersStore()
+const route = useRoute();
+const ordersStore = useOrdersStore();
 
-const order = ref<Order | null>(null)
-const items = ref<OrderItem[]>([])
-const loading = ref(true)
-const itemsLoading = ref(true)
+const order = ref<Order | null>(null);
+const items = ref<OrderItem[]>([]);
+const loading = ref(true);
+const itemsLoading = ref(true);
 
 // Poll while payment_status is still 'pending' — the webhook is the only
 // thing allowed to flip it to 'paid'/'failed', and it can take a few
 // seconds to arrive after Paystack's popup closes.
-const POLL_INTERVAL_MS = 3000
-const MAX_POLL_ATTEMPTS = 20 // ~1 minute of polling before giving up
-let pollTimer: ReturnType<typeof setInterval> | null = null
-let pollAttempts = 0
-const pollTimedOut = ref(false)
+//
+// Window extended for local dev: observed a real webhook call taking
+// 6.97s round-trip through ngrok + a cold-starting `vercel dev` function,
+// and Paystack retries on slow responses, which can double that. The old
+// ~1 minute window was cutting it close. Production (real Vercel, no
+// ngrok hop, no cold start after warmup) shouldn't need this much slack —
+// safe to dial back down once verified there, per the pending-verification
+// item in the project doc.
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLL_ATTEMPTS = 60; // ~3 minutes of polling before giving up
+let pollTimer: ReturnType<typeof setInterval> | null = null;
+let pollAttempts = 0;
+const pollTimedOut = ref(false);
 
 const loadOrder = async () => {
-  const refParam = route.params.ref as string
-  const result = await ordersStore.fetchOrderByRef(refParam)
-  order.value = result
-  loading.value = false
+  const refParam = route.params.ref as string;
+  const result = await ordersStore.fetchOrderByRef(refParam);
+  order.value = result;
+  loading.value = false;
 
   if (result && items.value.length === 0) {
-    itemsLoading.value = true
-    items.value = await ordersStore.fetchOrderItems(result.id)
-    itemsLoading.value = false
+    itemsLoading.value = true;
+    items.value = await ordersStore.fetchOrderItems(result.id);
+    itemsLoading.value = false;
   }
-}
+};
 
 const poll = async () => {
-  if (!order.value) return
-  if (order.value.payment_status !== 'pending') {
-    stopPolling()
-    return
+  if (!order.value) return;
+  if (order.value.payment_status !== "pending") {
+    stopPolling();
+    return;
   }
-  pollAttempts++
+  pollAttempts++;
   if (pollAttempts >= MAX_POLL_ATTEMPTS) {
-    pollTimedOut.value = true
-    stopPolling()
-    return
+    pollTimedOut.value = true;
+    stopPolling();
+    return;
   }
-  const refreshed = await ordersStore.fetchOrderByRef(order.value.ref)
-  if (refreshed) order.value = refreshed
-}
+  const refreshed = await ordersStore.fetchOrderByRef(order.value.ref);
+  if (refreshed) order.value = refreshed;
+};
 
 const stopPolling = () => {
   if (pollTimer) {
-    clearInterval(pollTimer)
-    pollTimer = null
+    clearInterval(pollTimer);
+    pollTimer = null;
   }
-}
+};
 
 onMounted(async () => {
-  await loadOrder()
-  if (order.value && order.value.payment_status === 'pending') {
-    pollTimer = setInterval(poll, POLL_INTERVAL_MS)
+  await loadOrder();
+  if (order.value && order.value.payment_status === "pending") {
+    pollTimer = setInterval(poll, POLL_INTERVAL_MS);
   }
-})
+});
 
 onUnmounted(() => {
-  stopPolling()
-})
+  stopPolling();
+});
 
 const formatNgn = (amount: number) =>
-  new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency: 'NGN',
+  new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
     maximumFractionDigits: 0,
-  }).format(amount)
+  }).format(amount);
 
 const statusHeading = computed(() => {
-  if (!order.value) return ''
-  if (order.value.payment_status === 'paid') return 'Payment confirmed'
-  if (order.value.payment_status === 'failed') return 'Payment failed'
-  if (pollTimedOut.value) return 'Still confirming your payment'
-  return 'Confirming your payment…'
-})
+  if (!order.value) return "";
+  if (order.value.payment_status === "paid") return "Payment confirmed";
+  if (order.value.payment_status === "failed") return "Payment failed";
+  if (pollTimedOut.value) return "Still confirming your payment";
+  return "Confirming your payment…";
+});
 
 const statusSubtext = computed(() => {
-  if (!order.value) return ''
-  if (order.value.payment_status === 'paid') {
-    return `Your order is confirmed and being prepared. Reference: ${order.value.ref}.`
+  if (!order.value) return "";
+  if (order.value.payment_status === "paid") {
+    return `Your order is confirmed and being prepared. Reference: ${order.value.ref}.`;
   }
-  if (order.value.payment_status === 'failed') {
-    return 'Your payment did not go through. You can retry from your dashboard.'
+  if (order.value.payment_status === "failed") {
+    return "Your payment did not go through. You can retry from your dashboard.";
   }
   if (pollTimedOut.value) {
-    return "This is taking longer than expected. Check your dashboard shortly, or contact support with your order reference if it doesn't update."
+    return "This is taking longer than expected. Check your dashboard shortly, or contact support with your order reference if it doesn't update.";
   }
-  return "We're waiting for confirmation from Paystack. This usually takes a few seconds — no need to refresh."
-})
+  return "We're waiting for confirmation from Paystack. This usually takes a few seconds — no need to refresh.";
+});
 
 const statusIcon = computed(() => {
-  if (!order.value) return ''
-  if (order.value.payment_status === 'paid') return '✅'
-  if (order.value.payment_status === 'failed') return '⚠️'
-  return '⏳'
-})
+  if (!order.value) return "";
+  if (order.value.payment_status === "paid") return "✅";
+  if (order.value.payment_status === "failed") return "⚠️";
+  return "⏳";
+});
 
 const statusBannerClass = computed(() => {
-  if (!order.value) return ''
-  if (order.value.payment_status === 'paid') return 'border-forest-300 bg-forest-50'
-  if (order.value.payment_status === 'failed') return 'border-red-300 bg-red-50'
-  return 'border-amber-300 bg-amber-50'
-})
+  if (!order.value) return "";
+  if (order.value.payment_status === "paid") return "border-forest-300 bg-forest-50";
+  if (order.value.payment_status === "failed") return "border-red-300 bg-red-50";
+  return "border-amber-300 bg-amber-50";
+});
 
 const statusTextClass = computed(() => {
-  if (!order.value) return ''
-  if (order.value.payment_status === 'paid') return 'text-forest-800'
-  if (order.value.payment_status === 'failed') return 'text-red-800'
-  return 'text-amber-800'
-})
+  if (!order.value) return "";
+  if (order.value.payment_status === "paid") return "text-forest-800";
+  if (order.value.payment_status === "failed") return "text-red-800";
+  return "text-amber-800";
+});
 </script>
