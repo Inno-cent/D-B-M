@@ -23,8 +23,10 @@
         </div>
       </div>
 
-      <!-- Image slideshow — masked to fade into the background instead of
-           sitting in a bordered/shadowed card -->
+      <!-- Image slideshow — no card, no border, no shadow: the image sits
+           directly on the page. mix-blend-mode merges its (light) background
+           into the cream page behind it, rather than faking a fade at the
+           edges. -->
       <div class="relative h-72 sm:h-96 lg:h-[26rem]" data-reveal data-reveal-delay="2">
         <!-- Soft floating color blobs behind the image for depth, using the
              existing animate-float utilities already defined in the theme -->
@@ -41,8 +43,7 @@
               v-if="i === activeSlide"
               :src="slide"
               alt="Fresh ingredients and dishes cooked with Orenag produce"
-              class="absolute inset-0 w-full h-full object-cover"
-              :style="maskStyle"
+              class="absolute inset-0 w-full h-full object-contain mix-blend-multiply"
             />
           </Transition>
         </div>
@@ -101,15 +102,6 @@ onMounted(() => {
 onUnmounted(() => {
   if (timer) clearInterval(timer);
 });
-
-// Radial fade mask — edges dissolve into the parchment background instead
-// of a hard rectangular crop. Applied via inline style rather than a
-// Tailwind mask-* utility for reliability regardless of Tailwind version.
-const maskStyle = {
-  WebkitMaskImage:
-    "radial-gradient(ellipse 75% 75% at center, black 55%, transparent 100%)",
-  maskImage: "radial-gradient(ellipse 75% 75% at center, black 55%, transparent 100%)",
-};
 </script>
 
 <style scoped>

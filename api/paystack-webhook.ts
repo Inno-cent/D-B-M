@@ -59,7 +59,7 @@ interface PaystackWebhookPayload {
 
 const notifyAdminWhatsApp = async (message: string) => {
   const apiKey = process.env.WASENDER_API_KEY
-  const adminNumber = process.env.WASENDER_ADMIN_NUMBER
+  const adminNumber = process.env.ADMIN_PHONE
   if (!apiKey || !adminNumber) return // optional — skip silently if not configured
 
   try {

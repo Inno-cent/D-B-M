@@ -128,6 +128,12 @@ const router = createRouter({
       component: () => import('../views/AdminPricesView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
     },
+    {
+      path: '/admin/orders',
+      name: 'admin-orders',
+      component: () => import('../views/AdminOrdersView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
 
     {
       path: '/:pathMatch(.*)*',

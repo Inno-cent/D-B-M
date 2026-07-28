@@ -43,3 +43,6 @@ __screenshots__/
 .vercel
 .env*.local
 .env.webhook.local
+
+.vercel
+.env*.local
