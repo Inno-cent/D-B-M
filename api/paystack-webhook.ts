@@ -63,9 +63,6 @@ const notifyAdminWhatsApp = async (message: string) => {
   if (!apiKey || !adminNumber) return // optional — skip silently if not configured
 
   try {
-    // NOTE: call shape is a best-effort guess based on typical Wasender API
-    // conventions. Paste api/quote.ts's working Wasender call here to
-    // confirm/replace this if it doesn't match.
     await fetch('https://wasenderapi.com/api/send-message', {
       method: 'POST',
       headers: {
@@ -78,9 +75,6 @@ const notifyAdminWhatsApp = async (message: string) => {
       }),
     })
   } catch (err) {
-    // Notification failures should never fail the webhook itself —
-    // the payment confirmation already succeeded in the database by
-    // the time this runs.
     console.error('Wasender notification failed:', err)
   }
 }
@@ -97,7 +91,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const rawBody = await readRawBody(req)
-
+  
+   // important detail
   // Verify this request genuinely came from Paystack. Paystack signs the
   // raw request body with your secret key using HMAC-SHA512 and sends the
   // result in the x-paystack-signature header. If it doesn't match, this

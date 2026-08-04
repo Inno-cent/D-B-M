@@ -16,7 +16,7 @@
           data-reveal
         >
           <span
-            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-earth-200 group-hover:border-forest-400 transition-colors bg-parchment"
+            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden  border-2 border-earth-200 group-hover:border-forest-400 transition-colors bg-parchment"
           >
             <img :src="cat.image" :alt="cat.label" class="w-full h-full object-cover" />
           </span>

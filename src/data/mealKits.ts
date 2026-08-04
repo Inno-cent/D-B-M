@@ -1,3 +1,8 @@
+import jollofrice from '@/assets/jollofrice.png'
+import efo from '@/assets/efo.png'
+import egusi from '@/assets/egusi.png'
+import peppersoup from '@/assets/peppersoup.png'
+
 export interface MealKitSize {
   servings: number
   priceNgn: number
@@ -37,11 +42,12 @@ export const mealKits: MealKit[] = [
   {
     slug: 'jollof-rice-kit',
     name: 'Jollof Rice Kit',
-    image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=600&q=80&fit=crop',
-    galleryImages: [
-      'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=600&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&q=80&fit=crop',
-    ],
+    image: jollofrice,
+    // galleryImages: [
+    //   'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=600&q=80&fit=crop',
+    //   'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&q=80&fit=crop',
+    // ],
+    galleryImages: [jollofrice],
     tagline: 'Everything you need to make delicious party-style Jollof Rice at home.',
     description: 'Everything you need to make delicious party-style Jollof Rice at home.',
     badge: 'Best Seller',
@@ -94,10 +100,12 @@ export const mealKits: MealKit[] = [
   {
     slug: 'egusi-soup-kit',
     name: 'Egusi Soup Kit',
-    image: 'https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=600&q=80&fit=crop',
-    galleryImages: [
-      'https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=600&q=80&fit=crop',
-    ],
+    image: egusi,
+    galleryImages: [egusi],
+
+    // galleryImages: [
+    //   'https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=600&q=80&fit=crop',
+    // ],
     tagline: 'Rich, hearty Egusi soup with all the ground melon-seed goodness, pre-measured.',
     description: 'Rich, hearty Egusi soup with all the ground melon-seed goodness, pre-measured.',
     rating: 4.6,
@@ -133,10 +141,11 @@ export const mealKits: MealKit[] = [
   {
     slug: 'fried-rice-kit',
     name: 'Fried Rice Kit',
-    image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80&fit=crop',
-    galleryImages: [
-      'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80&fit=crop',
-    ],
+    image: jollofrice,
+    galleryImages: [jollofrice],
+    // galleryImages: [
+    //   'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80&fit=crop',
+    // ],
     tagline: 'Colourful, veg-packed Nigerian-style fried rice, ready to cook in one pot.',
     description: 'Colourful, veg-packed Nigerian-style fried rice, ready to cook in one pot.',
     rating: 4.7,
@@ -173,10 +182,11 @@ export const mealKits: MealKit[] = [
   {
     slug: 'pepper-soup-kit',
     name: 'Pepper Soup Kit',
-    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80&fit=crop',
-    galleryImages: [
-      'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80&fit=crop',
-    ],
+    image: peppersoup,
+    galleryImages: [peppersoup],
+    // galleryImages: [
+    //   'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80&fit=crop',
+    // ],
     tagline: 'A warming, spicy Nigerian pepper soup base with all the aromatics measured out.',
     description: 'A warming, spicy Nigerian pepper soup base with all the aromatics measured out.',
     rating: 4.9,
@@ -218,10 +228,11 @@ export const mealKits: MealKit[] = [
   {
     slug: 'efo-riro-kit',
     name: 'Efo Riro Kit',
-    image: 'https://images.unsplash.com/photo-1547573854-74d2a71d0826?w=600&q=80&fit=crop',
-    galleryImages: [
-      'https://images.unsplash.com/photo-1547573854-74d2a71d0826?w=600&q=80&fit=crop',
-    ],
+    image: efo,
+    galleryImages: [efo],
+    // galleryImages: [
+    //   'https://images.unsplash.com/photo-1547573854-74d2a71d0826?w=600&q=80&fit=crop',
+    // ],
     tagline: 'Classic Yoruba vegetable soup with spinach, peppers, and palm oil, pre-portioned.',
     description:
       'Classic Yoruba vegetable soup with spinach, peppers, and palm oil, pre-portioned.',

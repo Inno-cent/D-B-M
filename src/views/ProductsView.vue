@@ -56,7 +56,7 @@
               type="button"
               :disabled="cat.count === 0"
               :class="[
-                'text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center justify-between gap-2 disabled:opacity-40 disabled:cursor-not-allowed',
+                'text-left px-3 py-2 rounded-lg cursor-pointer text-sm font-medium transition-all duration-150 flex items-center justify-between gap-2 disabled:opacity-40 disabled:cursor-not-allowed',
                 selectedCategory === cat.slug
                   ? 'bg-forest-700 text-white'
                   : 'text-earth-700 hover:bg-earth-50',

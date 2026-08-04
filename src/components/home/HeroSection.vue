@@ -62,7 +62,7 @@
         </div>
 
         <!-- Fast delivery floating badge -->
-        <div
+        <!-- <div
           class="absolute -bottom-5 right-4 sm:right-8 bg-white border-2 border-earth-200 rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 z-10"
         >
           <span
@@ -74,7 +74,7 @@
             <p class="font-semibold text-earth-900 leading-tight">Fast Delivery</p>
             <p class="text-earth-500 leading-tight">Across Lagos</p>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </section>

@@ -1,6 +1,6 @@
 <template>
   <!-- Top utility bar -->
-  <div class="fixed top-0 left-0 right-0 z-50 bg-forest-900 text-forest-100 text-xs">
+  <!-- <div class="fixed top-0 left-0 right-0 z-50 bg-forest-900 text-forest-100 text-xs">
     <div
       class="max-w-7xl mx-auto px-6 md:px-10 h-8 flex items-center justify-between gap-4"
     >
@@ -28,12 +28,12 @@
         <span class="flex items-center gap-1"> 📍 Lagos, Nigeria </span>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Main header -->
   <header
     :class="[
-      'fixed top-8 left-0 right-0 z-50 bg-white transition-shadow duration-300',
+      'fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300',
       scrolled ? 'shadow-md border-b border-earth-200' : 'border-b border-earth-100',
     ]"
   >
