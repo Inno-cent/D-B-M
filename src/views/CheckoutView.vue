@@ -223,10 +223,6 @@ import { useDeliveryStore } from '../stores/delivery'
 import { useOrdersStore, type PriceMismatch } from '../stores/orders'
 import { useAuthStore } from '../stores/auth'
 import { usePaystack } from '../composables/usePaystack'
-import type { PaymentMethod } from '../types/database'
-
-const router = useRouter()
-const cart     = useCartStore()
 const delivery = useDeliveryStore()
 const ordersStore = useOrdersStore()
 const auth     = useAuthStore()

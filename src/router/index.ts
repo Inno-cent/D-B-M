@@ -81,6 +81,15 @@ const router = createRouter({
       component: () => import('../views/DashboardView.vue'),
       meta: { requiresAuth: true },
     },
+
+    // ── Admin routes ────────────────────────────────────────────
+    {
+      path: '/admin/prices',
+      name: 'admin-prices',
+      component: () => import('../views/AdminPricesView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+
     {
       path: '/checkout',
       name: 'checkout',
@@ -107,6 +116,9 @@ const router = createRouter({
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue'),
     },
+
+    { path: '/terms', component: () => import('../views/Terms.vue') },
+    { path: '/privacy', component: () => import('../views/Privacy.vue') },
   ],
 })
 

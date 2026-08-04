@@ -26,10 +26,6 @@ export const usePricesStore = defineStore('prices', () => {
     loading.value = true
     error.value = null
     try {
-      const { data, error: err } = await supabase
-        .from('product_prices')
-        .select('*')
-        .order('product_name', { ascending: true })
       if (err) throw err
       prices.value = (data ?? []) as ProductPrice[]
     } catch (e) {
