@@ -136,6 +136,27 @@ const router = createRouter({
     },
 
     {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('../views/CheckoutView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/orders/:ref',
+      name: 'order-confirmation',
+      component: () => import('../views/OrderConfirmationView.vue'),
+      meta: { requiresAuth: true },
+    },
+
+    // ── Admin routes ─────────────────────────────────────────────
+    {
+      path: '/admin/prices',
+      name: 'admin-prices',
+      component: () => import('../views/AdminPricesView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue'),
