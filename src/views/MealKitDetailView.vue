@@ -252,9 +252,10 @@ function decrementAddOn(id: string) {
 }
 
 const total = computed(() => {
-  if (!kit.value) return 0;
-  const sizePrice = kit.value.sizes[activeSizeIndex.value]?.priceNgn ?? 0;
-  const addOnsTotal = kit.value.addOns.reduce(
+  const k = kit.value;
+  if (!k) return 0;
+  const sizePrice = k.sizes[activeSizeIndex.value]?.priceNgn ?? 0;
+  const addOnsTotal = k.addOns.reduce(
     (sum, a) => sum + a.priceNgn * (addOnQty.value[a.id] || 0),
     0
   );
@@ -275,10 +276,11 @@ const total = computed(() => {
 // skipped, not treated as an error). Acceptable for now since kit prices
 // aren't in that live-pricing system, but worth knowing.
 function handleAddToCart() {
-  if (!kit.value) return;
-  const size = kit.value.sizes[activeSizeIndex.value];
+  const k = kit.value;
+  if (!k) return;
+  const size = k.sizes[activeSizeIndex.value];
   if (!size) return; // shouldn't happen (activeSizeIndex is always a valid sizes index), but guards the type
-  const selectedAddOns = kit.value.addOns.filter((a) => (addOnQty.value[a.id] || 0) > 0);
+  const selectedAddOns = k.addOns.filter((a) => (addOnQty.value[a.id] || 0) > 0);
 
   const addOnsLabel = selectedAddOns
     .map((a) =>
@@ -295,13 +297,13 @@ function handleAddToCart() {
 
   cart.addItem(
     {
-      product_slug: `${kit.value.slug}--serves${size.servings}${
+      product_slug: `${k.slug}--serves${size.servings}${
         addOnsKey ? `--${addOnsKey}` : ""
       }`,
-      product_name: `${kit.value.name} (Serves ${size.servings})${
+      product_name: `${k.name} (Serves ${size.servings})${
         addOnsLabel ? ` + ${addOnsLabel}` : ""
       }`,
-      image: kit.value.image,
+      image: k.image,
       unit: "kit",
       min_qty: 1,
       price_ngn: unitPriceNgn,
