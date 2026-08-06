@@ -15,6 +15,23 @@ const router = createRouter({
       name: 'product-detail',
       component: () => import('../views/ProductDetailView.vue'),
     },
+
+    // ── Meal kits — NEW, added for the redesign ───────────────────
+    {
+      path: '/meal-kits',
+      name: 'meal-kits',
+      component: () => import('../views/MealKitsView.vue'),
+    },
+    {
+      path: '/meal-kits/:slug',
+      name: 'meal-kit-detail',
+      component: () => import('../views/MealKitDetailView.vue'),
+    },
+
+    // ── NEW — placeholder pages, referenced by the new header nav ──
+    { path: '/deals', name: 'deals', component: () => import('../views/DealsView.vue') },
+    { path: '/recipes', name: 'recipes', component: () => import('../views/RecipesView.vue') },
+
     {
       path: '/how-it-works',
       name: 'how-it-works',
@@ -81,12 +98,40 @@ const router = createRouter({
       component: () => import('../views/DashboardView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('../views/CheckoutView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/orders/:ref',
+      name: 'order-confirmation',
+      component: () => import('../views/OrderConfirmationView.vue'),
+      meta: { requiresAuth: true },
+    },
+    // NEW — order history list, linked from "Track Order" in the new
+    // header. Backlog doc already notes fetchMyOrders() exists in the
+    // orders store and OrdersView.vue is ready to use it — this route
+    // just needs that view wired up (see placeholder file).
+    {
+      path: '/orders',
+      name: 'orders',
+      component: () => import('../views/OrdersView.vue'),
+      meta: { requiresAuth: true },
+    },
 
-    // ── Admin routes ────────────────────────────────────────────
+    // ── Admin routes ─────────────────────────────────────────────
     {
       path: '/admin/prices',
       name: 'admin-prices',
       component: () => import('../views/AdminPricesView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/admin/orders',
+      name: 'admin-orders',
+      component: () => import('../views/AdminOrdersView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
     },
 
@@ -116,9 +161,6 @@ const router = createRouter({
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue'),
     },
-
-    { path: '/terms', component: () => import('../views/Terms.vue') },
-    { path: '/privacy', component: () => import('../views/Privacy.vue') },
   ],
 })
 

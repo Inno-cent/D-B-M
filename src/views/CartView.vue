@@ -79,6 +79,47 @@
               </button>
             </div>
           </div>
+
+          <!-- You may also need -->
+          <div v-if="suggestions.length" class="pt-6">
+            <h3 class="font-bold text-earth-900 mb-4">You may also need</h3>
+            <div class="grid sm:grid-cols-3 gap-4">
+              <div
+                v-for="p in suggestions"
+                :key="p.slug"
+                class="border-2 border-earth-200 rounded-xl p-3 bg-white flex flex-col"
+              >
+                <img
+                  :src="p.image"
+                  :alt="p.name"
+                  class="w-full h-20 object-cover rounded-lg mb-2"
+                />
+                <p class="text-xs font-semibold text-earth-900 mb-1 line-clamp-1">
+                  {{ p.name }}
+                </p>
+                <p
+                  v-if="pricesStore.priceMap[p.slug]"
+                  class="text-xs font-bold text-forest-700 mb-2"
+                >
+                  {{ cart.formatNgn(pricesStore.priceMap[p.slug].price_ngn) }}
+                  <span class="font-normal text-earth-400"
+                    >/ {{ pricesStore.priceMap[p.slug].unit }}</span
+                  >
+                </p>
+                <!-- Compact button, not the full AddToCartButton widget —
+                     that's a stepper+button combo built for the spacious
+                     product detail page; it overflows a card this narrow. -->
+                <button
+                  v-if="pricesStore.priceMap[p.slug]"
+                  type="button"
+                  class="btn-primary mt-auto w-full justify-center !py-1.5 !text-xs"
+                  @click="handleQuickAdd(p)"
+                >
+                  {{ justAddedSlug === p.slug ? "Added ✓" : "Add to Cart" }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div>
@@ -118,6 +159,42 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
 import { useCartStore } from "../stores/cart";
+import { usePricesStore } from "../stores/prices";
+import { products } from "../data/products";
+import type { Product } from "../data/products";
+
 const cart = useCartStore();
+const pricesStore = usePricesStore();
+const justAddedSlug = ref<string | null>(null);
+
+onMounted(() => {
+  if (pricesStore.prices.length === 0) pricesStore.fetchPrices();
+});
+
+// Up to 3 local products (real add-to-cart works for these) that aren't
+// already in the cart — simple "not in cart" suggestion, not a real
+// recommendation engine.
+const suggestions = computed(() => {
+  const inCart = new Set(cart.items.map((i) => i.product_slug));
+  return products.filter((p) => p.type === "local" && !inCart.has(p.slug)).slice(0, 3);
+});
+
+function handleQuickAdd(p: Product) {
+  const price = pricesStore.priceMap[p.slug];
+  if (!price) return;
+  cart.addItem({
+    product_slug: p.slug,
+    product_name: p.name,
+    image: p.image,
+    unit: price.unit,
+    min_qty: price.min_qty,
+    price_ngn: price.price_ngn,
+  });
+  justAddedSlug.value = p.slug;
+  setTimeout(() => {
+    justAddedSlug.value = null;
+  }, 1800);
+}
 </script>

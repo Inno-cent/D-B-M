@@ -1,81 +1,94 @@
 <template>
-  <RouterLink
-    :to="`/products/${product.slug}`"
-    class="group flex flex-col bg-white rounded-2xl overflow-hidden border border-earth-100 shadow-sm hover:shadow-xl hover:shadow-earth-200/60 hover:-translate-y-1 transition-all duration-300"
+  <div
+    class="group flex flex-col bg-white rounded-2xl overflow-hidden border-2 border-earth-100 hover:border-forest-300 hover:shadow-lg transition-all duration-300"
   >
-    <!-- Image -->
-    <div class="relative h-44 overflow-hidden bg-parchment">
-      <img
-        :src="product.image"
-        :alt="product.name"
-        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-        @error="handleImgError"
-      />
-      <!-- Overlay gradient -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+    <!-- Image + name link to detail page -->
+    <RouterLink :to="`/products/${product.slug}`" class="block">
+      <div class="relative h-40 overflow-hidden bg-parchment">
+        <img
+          :src="product.image"
+          :alt="product.name"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+          @error="handleImgError"
+        />
+        <span
+          :class="[
+            'absolute top-3 left-3 text-xs px-2.5 py-1 rounded-full font-semibold border',
+            product.type === 'export'
+              ? 'bg-forest-600/90 text-white border-forest-500 backdrop-blur-sm'
+              : 'bg-earth-800/80 text-white border-earth-700 backdrop-blur-sm',
+          ]"
+        >
+          {{ product.type === "export" ? "✈ Export" : "🏪 Local" }}
+        </span>
+      </div>
+    </RouterLink>
 
-      <!-- Badge -->
-      <span
-        :class="[
-          'absolute top-3 left-3 text-xs px-2.5 py-1 rounded-full font-semibold border',
-          product.type === 'export'
-            ? 'bg-forest-600/90 text-white border-forest-500 backdrop-blur-sm'
-            : 'bg-earth-800/80 text-white border-earth-700 backdrop-blur-sm',
-        ]"
-      >
-        {{ product.type === "export" ? "✈ Export" : "🏪 Local" }}
-      </span>
-    </div>
-
-    <!-- Content -->
-    <div class="flex flex-col flex-1 p-5">
-      <h3
-        class="font-bold text-base text-earth-900 mb-1 group-hover:text-forest-700 transition-colors duration-200"
-      >
-        {{ product.name }}
-      </h3>
-      <p class="text-xs text-earth-500 leading-relaxed mb-4 flex-1">
+    <div class="flex flex-col flex-1 p-4">
+      <RouterLink :to="`/products/${product.slug}`">
+        <h3
+          class="font-bold text-sm text-earth-900 mb-1 group-hover:text-forest-700 transition-colors duration-200 line-clamp-1"
+        >
+          {{ product.name }}
+        </h3>
+      </RouterLink>
+      <p class="text-xs text-earth-500 leading-relaxed mb-3 line-clamp-2 flex-1">
         {{ product.detail }}
       </p>
 
-      <!-- Footer -->
-      <div class="flex items-center justify-between pt-3 border-t border-earth-100">
-        <!-- Local products: live price from Supabase -->
-        <template v-if="product.type === 'local'">
-          <span v-if="pricesStore.loading && !price" class="text-xs text-earth-400">
-            Loading price…
-          </span>
-          <span v-else-if="price" class="text-sm font-bold text-forest-700">
+      <!-- Local: live price + quick add-to-cart -->
+      <template v-if="product.type === 'local'">
+        <span
+          v-if="pricesStore.loading && !price"
+          class="text-xs text-earth-400 mb-2 block"
+        >
+          Loading price…
+        </span>
+        <template v-else-if="price">
+          <p class="text-sm font-bold text-forest-700 mb-2">
             {{ pricesStore.formatNgn(price.price_ngn) }}
             <span class="text-xs font-normal text-earth-400">/ {{ price.unit }}</span>
-          </span>
-          <span v-else class="text-xs text-earth-400"> Price unavailable </span>
+          </p>
+          <!-- Compact single button, not the full AddToCartButton widget —
+               that component is a stepper + button combo (~280px+) built
+               for the spacious product detail page and overflows a grid
+               card. Adjust quantity from the cart page instead. -->
+          <button
+            type="button"
+            class="btn-primary w-full justify-center !py-2 !text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+            :disabled="!price.is_available"
+            @click="handleQuickAdd"
+          >
+            {{ justAdded ? "Added ✓" : "Add to Cart" }}
+          </button>
         </template>
+        <span v-else class="text-xs text-earth-400 mb-2 block">Price unavailable</span>
+      </template>
 
-        <!-- Export products: unchanged, show first spec instead of price -->
-        <span v-else class="text-xs text-earth-400 font-medium">
-          {{ product.specs[0]?.value }}
-        </span>
-
-        <span
-          class="inline-flex items-center gap-1 text-xs font-semibold text-forest-600 group-hover:gap-2 transition-all duration-200"
-        >
-          View details <span>→</span>
-        </span>
-      </div>
+      <!-- Export: no direct purchase, view details / quote path -->
+      <RouterLink
+        v-else
+        :to="`/products/${product.slug}`"
+        class="btn-outline w-full justify-center !py-2 !text-xs"
+      >
+        View Details →
+      </RouterLink>
     </div>
-  </RouterLink>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import type { Product } from "../../data/products";
 import { usePricesStore } from "../../stores/prices";
+import { useCartStore } from "../../stores/cart";
 
 const props = defineProps<{ product: Product }>();
 
 const pricesStore = usePricesStore();
+const cart = useCartStore();
+const justAdded = ref(false);
 
 // Only fetch prices once per app load — if another component already
 // triggered fetchPrices(), this is a no-op cache hit via priceMap.
@@ -86,6 +99,22 @@ onMounted(() => {
 });
 
 const price = computed(() => pricesStore.priceMap[props.product.slug] ?? null);
+
+function handleQuickAdd() {
+  if (!price.value) return;
+  cart.addItem({
+    product_slug: props.product.slug,
+    product_name: props.product.name,
+    image: props.product.image,
+    unit: price.value.unit,
+    min_qty: price.value.min_qty,
+    price_ngn: price.value.price_ngn,
+  });
+  justAdded.value = true;
+  setTimeout(() => {
+    justAdded.value = false;
+  }, 1800);
+}
 
 const handleImgError = (e: Event) => {
   const img = e.target as HTMLImageElement;
