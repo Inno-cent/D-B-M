@@ -85,37 +85,32 @@
             <h3 class="font-bold text-earth-900 mb-4">You may also need</h3>
             <div class="grid sm:grid-cols-3 gap-4">
               <div
-                v-for="p in suggestions"
-                :key="p.slug"
+                v-for="s in suggestions"
+                :key="s.product.slug"
                 class="border-2 border-earth-200 rounded-xl p-3 bg-white flex flex-col"
               >
                 <img
-                  :src="p.image"
-                  :alt="p.name"
+                  :src="s.product.image"
+                  :alt="s.product.name"
                   class="w-full h-20 object-cover rounded-lg mb-2"
                 />
                 <p class="text-xs font-semibold text-earth-900 mb-1 line-clamp-1">
-                  {{ p.name }}
+                  {{ s.product.name }}
                 </p>
-                <p
-                  v-if="pricesStore.priceMap[p.slug]"
-                  class="text-xs font-bold text-forest-700 mb-2"
-                >
-                  {{ cart.formatNgn(pricesStore.priceMap[p.slug].price_ngn) }}
-                  <span class="font-normal text-earth-400"
-                    >/ {{ pricesStore.priceMap[p.slug].unit }}</span
-                  >
+                <p v-if="s.price" class="text-xs font-bold text-forest-700 mb-2">
+                  {{ cart.formatNgn(s.price.price_ngn) }}
+                  <span class="font-normal text-earth-400">/ {{ s.price.unit }}</span>
                 </p>
                 <!-- Compact button, not the full AddToCartButton widget —
                      that's a stepper+button combo built for the spacious
                      product detail page; it overflows a card this narrow. -->
                 <button
-                  v-if="pricesStore.priceMap[p.slug]"
+                  v-if="s.price"
                   type="button"
                   class="btn-primary mt-auto w-full justify-center !py-1.5 !text-xs"
-                  @click="handleQuickAdd(p)"
+                  @click="handleQuickAdd(s.product)"
                 >
-                  {{ justAddedSlug === p.slug ? "Added ✓" : "Add to Cart" }}
+                  {{ justAddedSlug === s.product.slug ? "Added ✓" : "Add to Cart" }}
                 </button>
               </div>
             </div>
@@ -175,10 +170,20 @@ onMounted(() => {
 
 // Up to 3 local products (real add-to-cart works for these) that aren't
 // already in the cart — simple "not in cart" suggestion, not a real
-// recommendation engine.
+// recommendation engine. Price is resolved here, once, into a plain field
+// (`price`) rather than looked up repeatedly via priceMap[slug] in the
+// template — bracket-indexing an object type doesn't narrow across a
+// template v-if the way a plain property does, which is what was causing
+// the "Object is possibly undefined" build errors.
 const suggestions = computed(() => {
   const inCart = new Set(cart.items.map((i) => i.product_slug));
-  return products.filter((p) => p.type === "local" && !inCart.has(p.slug)).slice(0, 3);
+  return products
+    .filter((p) => p.type === "local" && !inCart.has(p.slug))
+    .slice(0, 3)
+    .map((p) => ({
+      product: p,
+      price: pricesStore.priceMap[p.slug] ?? null,
+    }));
 });
 
 function handleQuickAdd(p: Product) {
