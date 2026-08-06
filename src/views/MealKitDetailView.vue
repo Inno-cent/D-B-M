@@ -277,6 +277,7 @@ const total = computed(() => {
 function handleAddToCart() {
   if (!kit.value) return;
   const size = kit.value.sizes[activeSizeIndex.value];
+  if (!size) return; // shouldn't happen (activeSizeIndex is always a valid sizes index), but guards the type
   const selectedAddOns = kit.value.addOns.filter((a) => (addOnQty.value[a.id] || 0) > 0);
 
   const addOnsLabel = selectedAddOns

@@ -11,7 +11,7 @@
           Everything you need to cook amazing meals
         </h1>
         <p class="text-forest-700 italic text-lg md:text-xl font-medium mb-4">
-          We deliver across Lagos
+          We deliver across Nigeria
         </p>
         <p class="text-earth-600 text-base md:text-lg leading-relaxed mb-8 max-w-md">
           Fresh ingredients. Great quality. Affordable prices. Delivered fast to your

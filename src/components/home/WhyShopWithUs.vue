@@ -47,17 +47,17 @@
             <span class="ml-2 text-xs text-earth-500 font-medium">Verified Purchase</span>
           </div>
           <p class="text-earth-700 text-sm leading-relaxed mb-4">
-            {{ testimonials[active].quote }}
+            {{ current.quote }}
           </p>
           <div class="flex items-center gap-3">
             <img
-              :src="testimonials[active].avatar"
-              :alt="testimonials[active].name"
+              :src="current.avatar"
+              :alt="current.name"
               class="w-9 h-9 rounded-full object-cover"
             />
             <div class="text-sm leading-tight">
-              <p class="font-semibold text-earth-900">{{ testimonials[active].name }}</p>
-              <p class="text-earth-500 text-xs">{{ testimonials[active].location }}</p>
+              <p class="font-semibold text-earth-900">{{ current.name }}</p>
+              <p class="text-earth-500 text-xs">{{ current.location }}</p>
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const points = [
   "Carefully sourced from trusted suppliers",
@@ -144,4 +144,11 @@ function next() {
 function prev() {
   active.value = (active.value - 1 + testimonials.length) % testimonials.length;
 }
+
+// Non-null assertion is safe: active is always kept in [0, testimonials.length)
+// by next()/prev()'s modulo arithmetic and the dot buttons (which only ever
+// set it to a v-for index that already exists). TS's noUncheckedIndexedAccess
+// can't know that invariant, so a plain array-index would type as
+// `Testimonial | undefined` even though it never actually is at runtime.
+const current = computed(() => testimonials[active.value]!);
 </script>
