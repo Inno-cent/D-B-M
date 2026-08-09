@@ -100,6 +100,15 @@ export const usePricesStore = defineStore('prices', () => {
   }
 
   return {
-   
+    prices,
+    loading,
+    error,
+    priceMap,
+    formatNgn,
+    fetchPrices,
+    fetchPriceBySlug,
+    updatePrice,
+    setAvailability,
+    fetchHistory,
   }
 })
