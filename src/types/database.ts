@@ -59,6 +59,7 @@ export interface ProductPrice {
   price_ngn: number
   unit: string
   min_qty: number
+  image_url: string | null
   is_available: boolean
   updated_by: string | null
   last_updated: string

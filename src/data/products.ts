@@ -17,7 +17,6 @@ import greenpeas from '@/assets/greenpeas.jpg'
 import okra from '@/assets/okra.jpg'
 import tomato from '@/assets/tomato.jpg'
 import corn from '@/assets/corn.jpg'
-import rice from '@/assets/rice.jpg'
 
 // ================================================================
 // DATA MODEL CHANGE (this revision):
@@ -39,6 +38,11 @@ import rice from '@/assets/rice.jpg'
 // ProductsView's sidebar filter and ShopByCategorySection need one
 // small update to match this: `product.category === activeSlug`
 // becomes `product.categories.includes(activeSlug)`.
+//
+// This revision also REMOVES the standalone bulk-wholesale "Rice"
+// listing (50kg, min. 100 bags) — retail rice is now just Parboiled
+// Rice and Basmati Rice below. Nothing else in the catalog carries a
+// bulk-wholesale rice SKU at this time.
 // ================================================================
 
 export interface ProductVariant {
@@ -75,28 +79,6 @@ export interface Product {
 }
 
 export const products: Product[] = [
-  {
-    name: 'Rice',
-    slug: 'rice',
-    icon: '🌾',
-    image: rice,
-    type: 'local',
-    categories: ['staples-grains'],
-    family: 'rice',
-    detail: '50kg bags · Min. 100 bags · Local supply · Bulk wholesale',
-    tagline: 'Wholesale rice supply for Nigerian businesses and distributors.',
-    description:
-      'Quality parboiled and long-grain rice in 50kg bulk bags for wholesale distribution across Nigeria. Sourced from local mills and processors with consistent quality and competitive pricing. For smaller branded retail packs, see Parboiled Rice and Basmati Rice.',
-    specs: [
-      { key: 'Origin', value: 'Local Nigerian Mills' },
-      { key: 'Type', value: 'Parboiled / Long Grain' },
-      { key: 'Packaging', value: '50kg bags' },
-      { key: 'Min. Order', value: '100 bags' },
-      { key: 'Delivery', value: 'Lagos, Abuja, Kano' },
-      { key: 'Availability', value: 'Year-round' },
-    ],
-    applications: ['Retail Distribution', 'Food Service', 'Hospitality', 'FMCG'],
-  },
   {
     name: 'Palm Oil',
     slug: 'palm-oil',
@@ -587,7 +569,7 @@ export const products: Product[] = [
     detail: 'Branded parboiled rice · 5kg – 50kg · Multiple brands',
     tagline: 'Branded parboiled rice in the sizes Nigerian households and traders buy most.',
     description:
-      'Parboiled rice from the leading Nigerian and imported brands, in retail and semi-wholesale pack sizes. Choose a brand and size below. For bulk 50kg wholesale sacks, see the main Rice listing.',
+      'Parboiled rice from the leading Nigerian and imported brands, in retail and semi-wholesale pack sizes. Choose a brand and size below.',
     specs: [
       { key: 'Form', value: 'Parboiled, milled' },
       { key: 'Sizes available', value: '5kg, 50kg' },
