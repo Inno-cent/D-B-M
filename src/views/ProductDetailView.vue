@@ -58,6 +58,35 @@
 
           <!-- Local: price + purchase -->
           <div v-if="product.type === 'local'" class="mb-6">
+            <!-- NEW: Brand & size picker — only rendered when the product
+                 has `variants`. Selecting one changes which slug pricing,
+                 Add to Cart, and Buy Now all operate on (see `activeSlug`
+                 below) — the original single-SKU products have no
+                 variants, so this block simply doesn't render for them
+                 and everything behaves exactly as before. -->
+            <div v-if="product.variants?.length" class="mb-5">
+              <h3 class="font-bold text-xs uppercase tracking-widest text-earth-500 mb-2">
+                Choose Brand & Size
+              </h3>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="v in product.variants"
+                  :key="v.slug"
+                  type="button"
+                  :class="[
+                    'px-3 py-2 rounded-lg text-xs font-semibold border-2 transition-all duration-150 text-left',
+                    selectedVariantSlug === v.slug
+                      ? 'bg-forest-700 text-white border-forest-700'
+                      : 'bg-white text-earth-700 border-earth-200 hover:border-forest-400',
+                  ]"
+                  @click="selectedVariantSlug = v.slug"
+                >
+                  {{ v.brand }}
+                  <span class="block font-normal opacity-80">{{ v.size }}</span>
+                </button>
+              </div>
+            </div>
+
             <div v-if="pricesStore.loading && !price" class="text-sm text-earth-400">
               Loading current price…
             </div>
@@ -82,9 +111,13 @@
               </p>
 
               <div class="flex flex-col sm:flex-row gap-3">
+                <!-- CHANGED: slug/name now come from activeSlug/activeName
+                     (the selected variant when one exists, else the
+                     product's own slug/name — unchanged behavior for
+                     non-variant products). -->
                 <AddToCartButton
-                  :slug="product.slug"
-                  :name="product.name"
+                  :slug="activeSlug"
+                  :name="activeName"
                   :image="product.image"
                   :unit="price.unit"
                   :min-qty="price.min_qty"
@@ -129,6 +162,26 @@
           <p class="text-earth-600 leading-relaxed mb-6 text-sm">
             {{ product.description }}
           </p>
+
+          <!-- NEW: "Also available as" — cross-links related forms of the
+               same conceptual product via the `family` field (e.g. fresh
+               Tomato <-> Tomato Paste — Sachet <-> Tomato Paste — Pouch &
+               Tin). Only renders when other family members exist. -->
+          <div v-if="familyProducts.length" class="mb-6">
+            <h3 class="font-bold text-xs uppercase tracking-widest text-earth-500 mb-3">
+              Also Available As
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              <RouterLink
+                v-for="fp in familyProducts"
+                :key="fp.slug"
+                :to="`/products/${fp.slug}`"
+                class="px-3 py-2 rounded-lg text-xs font-semibold border-2 border-earth-200 bg-white text-earth-700 hover:border-forest-400 hover:text-forest-700 transition-all"
+              >
+                {{ fp.name }}
+              </RouterLink>
+            </div>
+          </div>
 
           <!-- Specs -->
           <h3 class="font-bold text-xs uppercase tracking-widest text-earth-500 mb-3">
@@ -193,7 +246,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { products } from "../data/products";
 import { useReveal } from "../composables/useReveal";
@@ -211,6 +264,8 @@ const cart = useCartStore();
 
 const product = computed(() => products.find((p) => p.slug === route.params.slug));
 
+// CHANGED: p.type === product.value?.type is unaffected by the
+// categories[] change (type is untouched) — left exactly as it was.
 const relatedProducts = computed(() =>
   products
     .filter((p) => p.slug !== route.params.slug)
@@ -218,8 +273,50 @@ const relatedProducts = computed(() =>
     .slice(0, 5)
 );
 
+// NEW: other products sharing the same `family` (e.g. fresh Tomato links
+// to Tomato Paste — Sachet and Tomato Paste — Pouch & Tin, and back).
+const familyProducts = computed(() => {
+  if (!product.value?.family) return [];
+  return products.filter(
+    (p) => p.family === product.value!.family && p.slug !== product.value!.slug
+  );
+});
+
+// NEW: which variant (brand + size) is currently selected, for products
+// that have `variants`. Defaults to the first variant, and resets
+// whenever the product itself changes (navigating between detail pages).
+const selectedVariantSlug = ref<string | null>(null);
+watch(
+  product,
+  (p) => {
+    selectedVariantSlug.value = p?.variants?.[0]?.slug ?? null;
+  },
+  { immediate: true }
+);
+
+const selectedVariant = computed(
+  () => product.value?.variants?.find((v) => v.slug === selectedVariantSlug.value) ?? null
+);
+
+// NEW: the slug/name that pricing, Add to Cart, and Buy Now all actually
+// operate on — the selected variant's when the product has variants,
+// otherwise the product's own slug/name (unchanged behavior for the
+// original single-SKU products, which have no variants and so always
+// fall through to this else branch).
+const activeSlug = computed(
+  () => selectedVariant.value?.slug ?? product.value?.slug ?? ""
+);
+const activeName = computed(() => {
+  if (!product.value) return "";
+  return selectedVariant.value
+    ? `${product.value.name} — ${selectedVariant.value.brand} (${selectedVariant.value.size})`
+    : product.value.name;
+});
+
+// CHANGED: keyed off activeSlug instead of product.value.slug, so a
+// variant-product's price reflects whichever brand+size is selected.
 const price = computed(() =>
-  product.value ? pricesStore.priceMap[product.value.slug] ?? null : null
+  activeSlug.value ? pricesStore.priceMap[activeSlug.value] ?? null : null
 );
 
 const fetchIfLocal = () => {
@@ -242,12 +339,15 @@ const formatRelativeTime = (iso: string) => {
   return `${days}d ago`;
 };
 
-// Confirmed against the real cart store (stores/cart.ts).
+// CHANGED: uses activeSlug/activeName (selected variant, when present)
+// instead of product.value.slug/name directly. Confirmed against the
+// real cart store (stores/cart.ts) — same shape as before, just
+// different source values.
 function handleBuyNow() {
   if (!product.value || !price.value) return;
   cart.addItem({
-    product_slug: product.value.slug,
-    product_name: product.value.name,
+    product_slug: activeSlug.value,
+    product_name: activeName.value,
     image: product.value.image,
     unit: price.value.unit,
     min_qty: price.value.min_qty,

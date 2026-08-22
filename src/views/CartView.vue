@@ -86,16 +86,16 @@
             <div class="grid sm:grid-cols-3 gap-4">
               <div
                 v-for="s in suggestions"
-                :key="s.product.slug"
+                :key="s.slug"
                 class="border-2 border-earth-200 rounded-xl p-3 bg-white flex flex-col"
               >
                 <img
                   :src="s.product.image"
-                  :alt="s.product.name"
+                  :alt="s.name"
                   class="w-full h-20 object-cover rounded-lg mb-2"
                 />
                 <p class="text-xs font-semibold text-earth-900 mb-1 line-clamp-1">
-                  {{ s.product.name }}
+                  {{ s.name }}
                 </p>
                 <p v-if="s.price" class="text-xs font-bold text-forest-700 mb-2">
                   {{ cart.formatNgn(s.price.price_ngn) }}
@@ -108,9 +108,9 @@
                   v-if="s.price"
                   type="button"
                   class="btn-primary mt-auto w-full justify-center !py-1.5 !text-xs"
-                  @click="handleQuickAdd(s.product)"
+                  @click="handleQuickAdd(s)"
                 >
-                  {{ justAddedSlug === s.product.slug ? "Added ✓" : "Add to Cart" }}
+                  {{ justAddedSlug === s.slug ? "Added ✓" : "Add to Cart" }}
                 </button>
               </div>
             </div>
@@ -158,7 +158,6 @@ import { computed, onMounted, ref } from "vue";
 import { useCartStore } from "../stores/cart";
 import { usePricesStore } from "../stores/prices";
 import { products } from "../data/products";
-import type { Product } from "../data/products";
 
 const cart = useCartStore();
 const pricesStore = usePricesStore();
@@ -168,36 +167,48 @@ onMounted(() => {
   if (pricesStore.prices.length === 0) pricesStore.fetchPrices();
 });
 
-// Up to 3 local products (real add-to-cart works for these) that aren't
-// already in the cart — simple "not in cart" suggestion, not a real
-// recommendation engine. Price is resolved here, once, into a plain field
-// (`price`) rather than looked up repeatedly via priceMap[slug] in the
-// template — bracket-indexing an object type doesn't narrow across a
-// template v-if the way a plain property does, which is what was causing
-// the "Object is possibly undefined" build errors.
+// CHANGED: products with `variants` have no price at their own top-level
+// slug anymore (pricing lives per brand+size variant) — quick-adding by
+// product.slug would silently show no price for all 22 new branded
+// products. Fixed by resolving each suggestion to its *first* variant
+// (same default the product detail page opens on) when one exists, and
+// falling through to the product's own slug otherwise — unchanged
+// behavior for the original single-SKU products, which have no variants.
+// This card is a compact quick-add, not a picker, so it can only ever
+// offer one option; the full picker lives on the product detail page.
 const suggestions = computed(() => {
   const inCart = new Set(cart.items.map((i) => i.product_slug));
   return products
-    .filter((p) => p.type === "local" && !inCart.has(p.slug))
-    .slice(0, 3)
-    .map((p) => ({
-      product: p,
-      price: pricesStore.priceMap[p.slug] ?? null,
-    }));
+    .filter((p) => p.type === "local")
+    .map((p) => {
+      const variant = p.variants?.[0] ?? null;
+      const slug = variant?.slug ?? p.slug;
+      const name = variant ? `${p.name} — ${variant.brand} (${variant.size})` : p.name;
+      return {
+        product: p,
+        slug,
+        name,
+        price: pricesStore.priceMap[slug] ?? null,
+      };
+    })
+    .filter((s) => !inCart.has(s.slug))
+    .slice(0, 3);
 });
 
-function handleQuickAdd(p: Product) {
-  const price = pricesStore.priceMap[p.slug];
-  if (!price) return;
+// CHANGED: takes the whole suggestion entry (slug/name/price already
+// resolved above) instead of just a Product, since a variant product's
+// cartable slug/name differ from its own.
+function handleQuickAdd(s: typeof suggestions.value[number]) {
+  if (!s.price) return;
   cart.addItem({
-    product_slug: p.slug,
-    product_name: p.name,
-    image: p.image,
-    unit: price.unit,
-    min_qty: price.min_qty,
-    price_ngn: price.price_ngn,
+    product_slug: s.slug,
+    product_name: s.name,
+    image: s.product.image,
+    unit: s.price.unit,
+    min_qty: s.price.min_qty,
+    price_ngn: s.price.price_ngn,
   });
-  justAddedSlug.value = p.slug;
+  justAddedSlug.value = s.slug;
   setTimeout(() => {
     justAddedSlug.value = null;
   }, 1800);

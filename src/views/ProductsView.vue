@@ -248,10 +248,15 @@ const tabs = [
   },
 ];
 
+// CHANGED: product.category (single string) -> product.categories
+// (string[]) — a product can now sit on more than one shelf (e.g. Tomato
+// Paste — Sachet is both 'pantry-essentials' and 'spices-seasonings'), so
+// counts and filtering both check membership with .includes() instead of
+// equality.
 const categoriesWithCounts = computed(() =>
   categories.map((c) => ({
     ...c,
-    count: products.filter((p) => p.category === c.slug).length,
+    count: products.filter((p) => p.categories.includes(c.slug)).length,
   }))
 );
 
@@ -268,7 +273,8 @@ const filtered = computed(() => {
     filter.value === "all" ? products : products.filter((p) => p.type === filter.value);
 
   if (selectedCategory.value) {
-    list = list.filter((p) => p.category === selectedCategory.value);
+    // CHANGED: .includes() instead of === for the same multi-category reason as above.
+    list = list.filter((p) => p.categories.includes(selectedCategory.value as string));
   }
 
   if (search.value.trim()) {
@@ -286,6 +292,11 @@ const filtered = computed(() => {
 
 // Price sort only affects local products with a fetched price — export
 // items (no numeric price) keep catalogue order and sort to the end.
+// NOTE: products with `variants` have no price at their own top-level
+// slug (pricing lives on each variant's slug), so they naturally sort to
+// the end here too, same as export items — same fallback, no special
+// case needed. This is fine for a catalogue-wide sort; the accurate
+// per-variant price still shows correctly on the detail page.
 const sorted = computed(() => {
   const list = [...filtered.value];
   if (sort.value === "name") {
