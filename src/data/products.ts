@@ -18,6 +18,8 @@ import okra from '@/assets/okra.jpg'
 import tomato from '@/assets/tomato.jpg'
 import corn from '@/assets/corn.jpg'
 
+import { getProductImageUrl } from '@/lib/supabase'
+
 // ================================================================
 // DATA MODEL CHANGE (this revision):
 //   category: string  ->  categories: string[]
@@ -83,7 +85,7 @@ export const products: Product[] = [
     name: 'Palm Oil',
     slug: 'palm-oil',
     icon: '🫒',
-    image: palmOilImg,
+     image: getProductImageUrl('palm-oil', 'png'),
     type: 'local',
     categories: ['oils-fats'],
     detail: 'Min. 1,000 litres · South South',
