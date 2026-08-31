@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import essentialGroceries from "@/assets/images/essential-groceries.png";
+import essentialGroceries from "@/assets/essential-groceries.png";
 
 /* ================================================================
    PREVIOUS SLIDESHOW
