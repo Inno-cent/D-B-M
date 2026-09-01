@@ -58,6 +58,22 @@ import { getProductImageUrl } from '@/lib/supabase'
 //     showed a real photo on load via `displayImage` defaulting to the
 //     first variant — this fixes the other places that still read
 //     `product.image` directly.
+//
+// NEW this revision:
+//   - No more `type: 'export'` products. Ginger, Cocoa Beans, Groundnut,
+//     and Shea Butter (the last remaining export/quote-only items)
+//     switch to `type: 'local'`, same as everything else in the
+//     catalog. `'export'` is no longer used anywhere in products.ts,
+//     but the `'export' | 'local'` union on `Product.type` is left in
+//     place in case a future product needs it. The `export-commodities`
+//     category tag is removed from all four (kept for Groundnut/Shea
+//     Butter's other category, dropped entirely for Ginger since
+//     'spices-seasonings' already covers it). Cocoa Beans had no
+//     non-export category, so it now joins `legumes-nuts`. The
+//     `export-commodities` category itself is removed from
+//     categories.ts — see that file. Their real per-tonne/per-kg
+//     prices still need seeding (see the paired SQL) — placeholder
+//     ₦1,000 convention, same as the other pending variants.
 // ================================================================
 
 export interface ProductVariant {
@@ -106,7 +122,7 @@ export const products: Product[] = [
     icon: '🫒',
     // NOTE: reported as not displaying — check the exact filename/case
     // of the uploaded file in the Storage bucket against 'palm-oil.png'.
-    image: getProductImageUrl('palm-oil', 'png'),
+    image: getProductImageUrl('PO600', 'png'),
     type: 'local',
     categories: ['oils-fats'],
     detail: 'Red palm oil · Multiple litre sizes · South South',
@@ -418,26 +434,26 @@ export const products: Product[] = [
     ],
     applications: ['Household', 'Food Service', 'Retail'],
   },
-  {
-    name: 'Dried Chili Pepper',
-    slug: 'dried-chili-pepper',
-    icon: '🌶️',
-    image: getProductImageUrl('driedchili', 'jpg'),
-    type: 'local',
-    categories: ['spices-seasonings'],
-    detail: 'Dried · Sold per piece',
-    tagline: 'Sun-dried chili peppers, sold individually.',
-    description: 'Premium dried chili peppers with long shelf life, sold per piece.',
-    specs: [
-      { key: 'Origin', value: 'Kaduna, Kano' },
-      { key: 'Type', value: 'Sun Dried' },
-      { key: 'Packaging', value: 'Sold loose' },
-      { key: 'Min. Order', value: '1 piece' },
-      { key: 'Availability', value: 'Year-round' },
-      { key: 'Moisture', value: 'Max 12%' },
-    ],
-    applications: ['Household', 'Retail', 'Food Processing'],
-  },
+  // {
+  //   name: 'Dried Chili Pepper',
+  //   slug: 'dried-chili-pepper',
+  //   icon: '🌶️',
+  //   image: getProductImageUrl('driedchili', 'jpg'),
+  //   type: 'local',
+  //   categories: ['spices-seasonings'],
+  //   detail: 'Dried · Sold per piece',
+  //   tagline: 'Sun-dried chili peppers, sold individually.',
+  //   description: 'Premium dried chili peppers with long shelf life, sold per piece.',
+  //   specs: [
+  //     { key: 'Origin', value: 'Kaduna, Kano' },
+  //     { key: 'Type', value: 'Sun Dried' },
+  //     { key: 'Packaging', value: 'Sold loose' },
+  //     { key: 'Min. Order', value: '1 piece' },
+  //     { key: 'Availability', value: 'Year-round' },
+  //     { key: 'Moisture', value: 'Max 12%' },
+  //   ],
+  //   applications: ['Household', 'Retail', 'Food Processing'],
+  // },
   {
     name: 'Spring Onions',
     slug: 'spring-onions',
@@ -487,13 +503,15 @@ export const products: Product[] = [
     // not a real function, would throw at build/runtime. Corrected to
     // the same `getProductImageUrl` helper every other product uses.
     image: getProductImageUrl('ginger', 'png'),
-    type: 'export',
-    categories: ['spices-seasonings', 'export-commodities'],
+    // CHANGED: was 'export' (quote-only) — now directly purchasable,
+    // same as every other local product.
+    type: 'local',
+    categories: ['spices-seasonings'],
     family: 'ginger',
     detail: 'Dried/Split · Min. 5 MT · Kaduna, Nasarawa',
-    tagline: 'Premium Nigerian ginger for export markets.',
+    tagline: 'Premium Nigerian ginger, in bulk bag sizes.',
     description:
-      'Nigeria is one of the world\u2019s top ginger producers. Split, dried ginger sourced from Kaduna and Nasarawa for spice manufacturers and export buyers. For the retail powdered form, see Ginger Powder.',
+      'Nigeria is one of the world\u2019s top ginger producers. Split, dried ginger sourced from Kaduna and Nasarawa for spice manufacturers and bulk buyers. For the retail powdered form, see Ginger Powder.',
     specs: [
       { key: 'Origin', value: 'Kaduna, Nasarawa' },
       { key: 'Type', value: 'Dried / Split' },
@@ -509,12 +527,14 @@ export const products: Product[] = [
     slug: 'cocoa-beans',
     icon: '🍫',
     image: getProductImageUrl('cocoa', 'png'),
-    type: 'export',
-    categories: ['export-commodities'],
+    // CHANGED: was 'export' (quote-only) — now directly purchasable,
+    // same as every other local product.
+    type: 'local',
+    categories: ['legumes-nuts'],
     detail: 'Grade 1 · Min. 10 MT · Ondo, Cross River',
-    tagline: 'Fermented, sun-dried cocoa beans for international buyers.',
+    tagline: 'Fermented, sun-dried cocoa beans in bulk bag sizes.',
     description:
-      'Grade 1 fermented and sun-dried cocoa beans sourced from Ondo, Cross River, and Osun — Nigeria\u2019s leading cocoa belt. Supplied to chocolate manufacturers and export buyers.',
+      'Grade 1 fermented and sun-dried cocoa beans sourced from Ondo, Cross River, and Osun — Nigeria\u2019s leading cocoa belt. Supplied to chocolate manufacturers and bulk buyers.',
     specs: [
       { key: 'Origin', value: 'Ondo, Cross River, Osun' },
       { key: 'Grade', value: 'Grade 1' },
@@ -530,12 +550,14 @@ export const products: Product[] = [
     slug: 'groundnut',
     icon: '🥜',
     image: getProductImageUrl('groundnut', 'png'),
-    type: 'export',
-    categories: ['legumes-nuts', 'export-commodities'],
+    // CHANGED: was 'export' (quote-only) — now directly purchasable,
+    // same as every other local product.
+    type: 'local',
+    categories: ['legumes-nuts'],
     detail: 'Raw/Shelled · Min. 10 MT · Kano, Jigawa',
-    tagline: 'Quality Nigerian groundnuts for export and processing.',
+    tagline: 'Quality Nigerian groundnuts, in bulk bag sizes.',
     description:
-      'Raw and shelled groundnuts sourced from Kano and Jigawa, historically one of Nigeria\u2019s largest export crops. Supplied for oil extraction, confectionery, and export.',
+      'Raw and shelled groundnuts sourced from Kano and Jigawa, historically one of Nigeria\u2019s largest export crops. Supplied for oil extraction, confectionery, and bulk food processing.',
     specs: [
       { key: 'Origin', value: 'Kano, Jigawa' },
       { key: 'Type', value: 'Raw / Shelled' },
@@ -581,12 +603,14 @@ export const products: Product[] = [
     slug: 'shea-butter',
     icon: '✨',
     image: getProductImageUrl('shea-butter', 'png'),
-    type: 'export',
-    categories: ['oils-fats', 'export-commodities'],
+    // CHANGED: was 'export' (quote-only) — now directly purchasable,
+    // same as every other local product.
+    type: 'local',
+    categories: ['oils-fats'],
     detail: 'Raw/Refined · Min. 1,000kg · Niger, Kwara',
-    tagline: 'Raw and refined shea butter for cosmetic and food export markets.',
+    tagline: 'Raw and refined shea butter for cosmetic and food-grade buyers.',
     description:
-      'Raw and refined shea butter sourced from Niger and Kwara states, hand-processed by women\u2019s cooperatives. Supplied to cosmetic manufacturers and food-grade fat buyers internationally.',
+      'Raw and refined shea butter sourced from Niger and Kwara states, hand-processed by women\u2019s cooperatives. Supplied to cosmetic manufacturers and food-grade fat buyers.',
     specs: [
       { key: 'Origin', value: 'Niger, Kwara' },
       { key: 'Grade', value: 'Raw / Refined' },

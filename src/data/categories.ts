@@ -4,23 +4,6 @@ export interface Category {
   image: string
 }
 
-// African/Nigerian grocery taxonomy. This is the shared source of truth —
-// ShopByCategorySection reads from here, and once each product in
-// data/products.ts has a matching slug in its `categories` array,
-// ProductsView's sidebar can filter against these same values instead of
-// just type (export/local).
-//
-// NOTE — data model change: products.ts now uses `categories: string[]`
-// (a product can belong to more than one shelf) instead of a single
-// `category: string`. This file itself is unaffected — it's still a flat
-// list of shelves — but the filter logic that reads it needs to check
-// `product.categories.includes(activeSlug)` instead of
-// `product.category === activeSlug`.
-//
-// Three new categories added below (dairy, canned-goods,
-// pantry-essentials) to accommodate the branded grocery catalog import —
-// their images are placehold.co dummies pending real category photography,
-// same convention used for the new product images in products.ts.
 export const categories: Category[] = [
   {
     slug: 'staples-grains',
@@ -76,11 +59,6 @@ export const categories: Category[] = [
     slug: 'pantry-essentials',
     label: 'Pantry Essentials',
     image: 'https://placehold.co/200x200/f5f0e6/6b5637?text=Pantry',
-  },
-  {
-    slug: 'export-commodities',
-    label: 'Export Commodities',
-    image: 'https://images.unsplash.com/photo-1587049633312-d628ae50a8ae?w=200&q=80&fit=crop',
   },
   {
     slug: 'others',
