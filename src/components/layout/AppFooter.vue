@@ -4,14 +4,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
         <div class="lg:col-span-2">
           <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-              <span class="text-forest-700 font-bold text-sm">OG</span>
-            </div>
-            <div>
-              <span class="text-white font-bold block leading-none text-base"
-                >ORENAG</span
-              >
-            </div>
+            <img :src="orenagLogo" alt="ORENAG" class="w-48 h-auto object-contain" />
           </div>
           <p class="text-sm text-forest-400 leading-relaxed max-w-xs mb-6">
             Fresh groceries and meal kits delivered across Lagos, plus verified
@@ -85,6 +78,7 @@
 </template>
 
 <script setup lang="ts">
+import orenagLogo from "@/assets/orenag-logo-footer.png";
 // About/Contact intentionally appear here AND in the header nav —
 // that's a deliberate duplication (common footer pattern), not an
 // oversight left over from the redesign.
