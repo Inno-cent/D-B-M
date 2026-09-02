@@ -477,7 +477,7 @@ export const products: Product[] = [
   {
     name: 'corn',
     slug: 'corn',
-    icon: '🧅',
+    icon: '🌽',
     image: getProductImageUrl('corn', 'jpg'),
     type: 'local',
     categories: ['fresh-produce'],
@@ -499,6 +499,7 @@ export const products: Product[] = [
   {
     name: 'Ginger',
     slug: 'ginger',
+    icon: '🫚',
     // FIXED (earlier revision): was `GingergetProductImageUrl(...)` —
     // not a real function, would throw at build/runtime. Corrected to
     // the same `getProductImageUrl` helper every other product uses.
