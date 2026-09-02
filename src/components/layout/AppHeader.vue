@@ -1,3 +1,4 @@
+```vue
 <template>
   <!-- Main header -->
   <header
@@ -57,6 +58,7 @@
             aria-label="Login or sign up"
             class="w-9 h-9 flex items-center justify-center rounded-full text-earth-700 hover:bg-earth-50 transition-all duration-200"
           >
+            <!-- Profile icon -->
             <svg
               class="w-[20px] h-[20px]"
               fill="none"
@@ -79,6 +81,7 @@
             :aria-label="`Dashboard — ${auth.firstName || 'Account'}`"
             class="w-9 h-9 flex items-center justify-center rounded-full text-earth-700 hover:bg-earth-50 transition-all duration-200"
           >
+            <!-- Profile icon -->
             <svg
               class="w-[20px] h-[20px]"
               fill="none"
@@ -195,33 +198,45 @@
       <!-- ======================================================= -->
       <!-- DESKTOP RIGHT SIDE -->
       <!-- ======================================================= -->
-      <div class="flex items-center gap-1.5 flex-shrink-0">
+      <div class="flex items-center gap-2 flex-shrink-0">
         <!-- Logged in -->
         <template v-if="isLoggedIn">
-          <!-- Dashboard -->
+          <!-- ================================================= -->
+          <!-- PROFILE / DASHBOARD -->
+          <!-- ================================================= -->
           <RouterLink
             to="/dashboard"
-            class="flex items-center gap-1.5 text-earth-700 text-sm font-medium py-2 px-3 rounded-full hover:bg-earth-50 transition-all duration-200"
             :aria-label="`Dashboard — ${auth.firstName || 'Account'}`"
+            class="group flex items-center gap-2 text-earth-700 text-sm font-medium py-1.5 px-2 rounded-full hover:bg-earth-50 transition-all duration-200"
           >
-            <svg
-              class="w-[18px] h-[18px]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <!-- Stylish profile icon -->
+            <span
+              class="w-9 h-9 flex items-center justify-center rounded-full border border-earth-200 bg-earth-50 text-earth-700 group-hover:border-forest-300 group-hover:bg-forest-50 group-hover:text-forest-700 transition-all duration-200"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.8"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7-7h14a7 7 0 00-7-7z"
-              />
-            </svg>
+              <svg
+                class="w-[19px] h-[19px]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="12" cy="12" r="9" stroke-width="1.6" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  d="M8.5 17.5a4.5 4.5 0 017 0M15 9a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </span>
 
-            <span>{{ auth.firstName || "Account" }}</span>
+            <span class="max-w-[100px] truncate">
+              {{ auth.firstName || "Account" }}
+            </span>
           </RouterLink>
 
-          <!-- Sign Out -->
+          <!-- ================================================= -->
+          <!-- SIGN OUT -->
+          <!-- ================================================= -->
           <button
             @click="handleSignOut"
             class="text-earth-500 text-sm font-medium py-2 px-3 rounded-full hover:bg-earth-50 hover:text-earth-800 transition-all duration-200"
@@ -234,34 +249,45 @@
         <RouterLink
           v-else
           to="/login"
-          class="flex items-center gap-1.5 text-earth-700 text-sm font-medium py-2 px-3 rounded-full hover:bg-earth-50 transition-all duration-200"
+          aria-label="Login or sign up"
+          class="group flex items-center gap-2 text-earth-700 text-sm font-medium py-1.5 px-2 rounded-full hover:bg-earth-50 transition-all duration-200"
         >
-          <svg
-            class="w-[18px] h-[18px]"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+          <!-- Stylish profile icon -->
+          <span
+            class="w-9 h-9 flex items-center justify-center rounded-full border border-earth-200 bg-earth-50 text-earth-700 group-hover:border-forest-300 group-hover:bg-forest-50 group-hover:text-forest-700 transition-all duration-200"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.8"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
+            <svg
+              class="w-[19px] h-[19px]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="9" stroke-width="1.6" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.6"
+                d="M8.5 17.5a4.5 4.5 0 017 0M15 9a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </span>
 
-          Login / Sign Up
+          <span>Login / Sign Up</span>
         </RouterLink>
 
-        <!-- Cart -->
+        <!-- ================================================= -->
+        <!-- CART -->
+        <!-- ================================================= -->
         <button
           @click="cartOpen = true"
           aria-label="Open cart"
-          class="relative flex items-center gap-1.5 text-earth-700 text-sm font-medium py-2 px-3 rounded-full hover:bg-earth-50 transition-all duration-200"
+          class="relative flex items-center gap-2 text-earth-700 text-sm font-medium py-1.5 px-2 rounded-full hover:bg-earth-50 transition-all duration-200"
         >
-          <span class="relative">
+          <span
+            class="relative w-9 h-9 flex items-center justify-center rounded-full border border-earth-200 bg-earth-50 text-earth-700"
+          >
             <svg
-              class="w-[18px] h-[18px]"
+              class="w-[19px] h-[19px]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -276,7 +302,7 @@
 
             <span
               v-if="cart.itemCount > 0"
-              class="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-1 bg-forest-700 text-white rounded-full text-[9px] font-bold flex items-center justify-center leading-none"
+              class="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 bg-forest-700 text-white rounded-full text-[9px] font-bold flex items-center justify-center leading-none"
             >
               {{ cart.itemCount }}
             </span>
@@ -385,72 +411,71 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-
 import { useRouter, useRoute } from "vue-router";
-
 import { useAuthStore } from "../../stores/auth";
 import { useCartStore } from "../../stores/cart";
-
 import CartDrawer from "../ui/CartDrawer.vue";
 
-/*
-|--------------------------------------------------------------------------
-| Logo
-|--------------------------------------------------------------------------
-| Make sure this file exists at:
-|
-| src/assets/logo-main.png
-|
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Logo
+ * |--------------------------------------------------------------------------
+ * |
+ * | Make sure this file exists at:
+ * |
+ * | src/assets/logo-main.png
+ * |
+ * |--------------------------------------------------------------------------
+ */
 import logoUrl from "@/assets/logo-main.png";
 
-/*
-|--------------------------------------------------------------------------
-| Stores
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Stores
+ * |--------------------------------------------------------------------------
+ */
 const auth = useAuthStore();
 const cart = useCartStore();
 
-/*
-|--------------------------------------------------------------------------
-| Router
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Router
+ * |--------------------------------------------------------------------------
+ */
 const router = useRouter();
 const route = useRoute();
 
-/*
-|--------------------------------------------------------------------------
-| Authentication
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Authentication
+ * |--------------------------------------------------------------------------
+ */
 const isLoggedIn = computed(() => auth.isLoggedIn);
 
-/*
-|--------------------------------------------------------------------------
-| Header state
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Header state
+ * |--------------------------------------------------------------------------
+ */
 const scrolled = ref(false);
 const mobileOpen = ref(false);
 const cartOpen = ref(false);
 const searchQuery = ref("");
 
-/*
-|--------------------------------------------------------------------------
-| Handle scroll
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Handle scroll
+ * |--------------------------------------------------------------------------
+ */
 const handleScroll = () => {
   scrolled.value = window.scrollY > 20;
 };
 
-/*
-|--------------------------------------------------------------------------
-| Lifecycle
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Lifecycle
+ * |--------------------------------------------------------------------------
+ */
 onMounted(() => {
   window.addEventListener("scroll", handleScroll, {
     passive: true,
@@ -463,11 +488,11 @@ onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Close mobile menu when route changes
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Close mobile menu when route changes
+ * |--------------------------------------------------------------------------
+ */
 watch(
   () => route.path,
   () => {
@@ -475,28 +500,26 @@ watch(
   }
 );
 
-/*
-|--------------------------------------------------------------------------
-| Sign out
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Sign out
+ * |--------------------------------------------------------------------------
+ */
 const handleSignOut = async () => {
   try {
     await auth.signOut();
-
     mobileOpen.value = false;
-
     router.push("/");
   } catch (e) {
     console.error("Sign out failed:", e);
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| Navigation links
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Navigation links
+ * |--------------------------------------------------------------------------
+ */
 const navLinks = [
   {
     label: "Shop Groceries",
@@ -525,11 +548,11 @@ const navLinks = [
   },
 ];
 
-/*
-|--------------------------------------------------------------------------
-| Search
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Search
+ * |--------------------------------------------------------------------------
+ */
 function handleSearch() {
   const query = searchQuery.value.trim();
 
@@ -549,11 +572,12 @@ function handleSearch() {
 </script>
 
 <style scoped>
-/*
-|--------------------------------------------------------------------------
-| Mobile menu animation
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Mobile menu animation
+ * |--------------------------------------------------------------------------
+ */
+
 .mobile-menu-enter-active,
 .mobile-menu-leave-active {
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -565,15 +589,16 @@ function handleSearch() {
   transform: translateY(-8px);
 }
 
-/*
-|--------------------------------------------------------------------------
-| Logo rendering
-|--------------------------------------------------------------------------
-|
-| Ensures the transparent PNG keeps its proportions and does not
-| stretch or distort inside the header.
-|--------------------------------------------------------------------------
-*/
+/**
+ * |--------------------------------------------------------------------------
+ * | Logo rendering
+ * |--------------------------------------------------------------------------
+ *
+ * | Ensures the transparent PNG keeps its proportions and does not
+ * | stretch or distort inside the header.
+ * |--------------------------------------------------------------------------
+ */
+
 img {
   display: block;
 }
