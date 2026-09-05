@@ -10,33 +10,52 @@
     <!-- ========================================================= -->
     <!-- MOBILE / TABLET (< lg) -->
     <!-- ========================================================= -->
+
     <div class="lg:hidden px-4 pt-3 pb-3">
       <!-- Top row: hamburger — logo — account/cart -->
       <div class="relative flex items-center justify-between gap-2">
-        <!-- Hamburger -->
+        <!-- ===================================================== -->
+        <!-- HAMBURGER MENU -->
+        <!-- ===================================================== -->
+
         <button
           @click="mobileOpen = !mobileOpen"
           aria-label="Toggle menu"
           :aria-expanded="mobileOpen"
-          class="w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-full text-earth-700 hover:bg-earth-50 transition-all duration-200 flex-shrink-0"
+          class="relative w-9 h-9 flex items-center justify-center rounded-full text-earth-700 hover:bg-earth-50 transition-all duration-200 flex-shrink-0"
         >
-          <span
-            :class="[
-              'block w-4 h-[1.5px] bg-current transition-all duration-300',
-              mobileOpen ? 'rotate-45 translate-y-[3px]' : '',
-            ]"
-          />
-          <span
-            :class="[
-              'block w-4 h-[1.5px] bg-current transition-all duration-300',
-              mobileOpen ? '-rotate-45 -translate-y-[3px]' : '',
-            ]"
-          />
+          <!-- Centered hamburger container -->
+          <span class="relative block w-5 h-5">
+            <!-- Top bar -->
+            <span
+              :class="[
+                'absolute left-0 top-1/2 w-5 h-[1.5px] bg-current transition-all duration-300 ease-in-out origin-center',
+                mobileOpen ? 'rotate-45' : '-translate-y-[5px]',
+              ]"
+            ></span>
+
+            <!-- Middle bar -->
+            <span
+              :class="[
+                'absolute left-0 top-1/2 w-5 h-[1.5px] bg-current transition-all duration-300 ease-in-out origin-center',
+                mobileOpen ? 'opacity-0 scale-0' : 'opacity-100 scale-100',
+              ]"
+            ></span>
+
+            <!-- Bottom bar -->
+            <span
+              :class="[
+                'absolute left-0 top-1/2 w-5 h-[1.5px] bg-current transition-all duration-300 ease-in-out origin-center',
+                mobileOpen ? '-rotate-45' : 'translate-y-[5px]',
+              ]"
+            ></span>
+          </span>
         </button>
 
         <!-- ===================================================== -->
         <!-- LOGO -->
         <!-- ===================================================== -->
+
         <RouterLink
           to="/"
           class="absolute left-1/2 -translate-x-1/2 flex items-center group"
@@ -49,7 +68,10 @@
           />
         </RouterLink>
 
-        <!-- Right side -->
+        <!-- ===================================================== -->
+        <!-- RIGHT SIDE -->
+        <!-- ===================================================== -->
+
         <div class="flex items-center gap-1 flex-shrink-0">
           <!-- Logged out -->
           <RouterLink
@@ -69,7 +91,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="1.8"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-5 7h14a7 7 0 00-7-7z"
               />
             </svg>
           </RouterLink>
@@ -92,7 +114,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="1.8"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-5 7h14a7 7 0 00-7-7z"
               />
             </svg>
           </RouterLink>
@@ -127,9 +149,10 @@
         </div>
       </div>
 
-      <!-- ===================================================== -->
+      <!-- ========================================================= -->
       <!-- MOBILE SEARCH -->
-      <!-- ===================================================== -->
+      <!-- ========================================================= -->
+
       <form class="flex mt-3" @submit.prevent="handleSearch">
         <div
           class="flex w-full rounded-xl border-2 border-earth-200 overflow-hidden focus-within:border-forest-400 transition-colors"
@@ -154,12 +177,14 @@
     <!-- ========================================================= -->
     <!-- DESKTOP (lg+) -->
     <!-- ========================================================= -->
+
     <div
       class="hidden lg:flex max-w-7xl mx-auto px-6 md:px-10 py-3.5 items-center gap-4 md:gap-8"
     >
       <!-- ======================================================= -->
       <!-- DESKTOP LOGO -->
       <!-- ======================================================= -->
+
       <RouterLink
         to="/"
         class="flex items-center group flex-shrink-0"
@@ -175,6 +200,7 @@
       <!-- ======================================================= -->
       <!-- DESKTOP SEARCH -->
       <!-- ======================================================= -->
+
       <form class="flex flex-1 max-w-xl" @submit.prevent="handleSearch">
         <div
           class="flex w-full rounded-xl border-2 border-earth-200 overflow-hidden focus-within:border-forest-400 transition-colors"
@@ -198,12 +224,14 @@
       <!-- ======================================================= -->
       <!-- DESKTOP RIGHT SIDE -->
       <!-- ======================================================= -->
+
       <div class="flex items-center gap-2 flex-shrink-0">
         <!-- Logged in -->
         <template v-if="isLoggedIn">
           <!-- ================================================= -->
           <!-- PROFILE / DASHBOARD -->
           <!-- ================================================= -->
+
           <RouterLink
             to="/dashboard"
             :aria-label="`Dashboard — ${auth.firstName || 'Account'}`"
@@ -220,6 +248,7 @@
                 viewBox="0 0 24 24"
               >
                 <circle cx="12" cy="12" r="9" stroke-width="1.6" />
+
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -237,6 +266,7 @@
           <!-- ================================================= -->
           <!-- SIGN OUT -->
           <!-- ================================================= -->
+
           <button
             @click="handleSignOut"
             class="text-earth-500 text-sm font-medium py-2 px-3 rounded-full hover:bg-earth-50 hover:text-earth-800 transition-all duration-200"
@@ -263,6 +293,7 @@
               viewBox="0 0 24 24"
             >
               <circle cx="12" cy="12" r="9" stroke-width="1.6" />
+
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -272,12 +303,13 @@
             </svg>
           </span>
 
-          <span>Login / Sign Up</span>
+          <span> Login / Sign Up </span>
         </RouterLink>
 
         <!-- ================================================= -->
         <!-- CART -->
         <!-- ================================================= -->
+
         <button
           @click="cartOpen = true"
           aria-label="Open cart"
@@ -308,7 +340,7 @@
             </span>
           </span>
 
-          <span>Cart</span>
+          <span> Cart </span>
         </button>
       </div>
     </div>
@@ -316,6 +348,7 @@
     <!-- ========================================================= -->
     <!-- SECONDARY NAVIGATION - DESKTOP -->
     <!-- ========================================================= -->
+
     <nav class="hidden lg:flex items-center gap-1 border-t border-earth-100">
       <div class="max-w-7xl mx-auto px-6 md:px-10 w-full flex items-center gap-1">
         <RouterLink
@@ -340,6 +373,7 @@
     <!-- ========================================================= -->
     <!-- MOBILE MENU -->
     <!-- ========================================================= -->
+
     <Transition name="mobile-menu">
       <div
         v-if="mobileOpen"
@@ -401,32 +435,39 @@
   <!-- =========================================================== -->
   <!-- HEADER SPACER -->
   <!-- =========================================================== -->
+
   <div class="h-[124px] lg:h-[136px]" />
 
   <!-- =========================================================== -->
   <!-- CART DRAWER -->
   <!-- =========================================================== -->
+
   <CartDrawer v-model="cartOpen" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+
 import { useRouter, useRoute } from "vue-router";
+
 import { useAuthStore } from "../../stores/auth";
+
 import { useCartStore } from "../../stores/cart";
+
 import CartDrawer from "../ui/CartDrawer.vue";
 
 /**
  * |--------------------------------------------------------------------------
  * | Logo
  * |--------------------------------------------------------------------------
- * |
- * | Make sure this file exists at:
- * |
- * | src/assets/logo-main.png
- * |
+ *
+ * Make sure this file exists at:
+ *
+ * src/assets/logo-main.png
+ *
  * |--------------------------------------------------------------------------
  */
+
 import logoUrl from "@/assets/logo-main.png";
 
 /**
@@ -434,6 +475,7 @@ import logoUrl from "@/assets/logo-main.png";
  * | Stores
  * |--------------------------------------------------------------------------
  */
+
 const auth = useAuthStore();
 const cart = useCartStore();
 
@@ -442,6 +484,7 @@ const cart = useCartStore();
  * | Router
  * |--------------------------------------------------------------------------
  */
+
 const router = useRouter();
 const route = useRoute();
 
@@ -450,6 +493,7 @@ const route = useRoute();
  * | Authentication
  * |--------------------------------------------------------------------------
  */
+
 const isLoggedIn = computed(() => auth.isLoggedIn);
 
 /**
@@ -457,6 +501,7 @@ const isLoggedIn = computed(() => auth.isLoggedIn);
  * | Header state
  * |--------------------------------------------------------------------------
  */
+
 const scrolled = ref(false);
 const mobileOpen = ref(false);
 const cartOpen = ref(false);
@@ -467,6 +512,7 @@ const searchQuery = ref("");
  * | Handle scroll
  * |--------------------------------------------------------------------------
  */
+
 const handleScroll = () => {
   scrolled.value = window.scrollY > 20;
 };
@@ -476,6 +522,7 @@ const handleScroll = () => {
  * | Lifecycle
  * |--------------------------------------------------------------------------
  */
+
 onMounted(() => {
   window.addEventListener("scroll", handleScroll, {
     passive: true,
@@ -493,6 +540,7 @@ onUnmounted(() => {
  * | Close mobile menu when route changes
  * |--------------------------------------------------------------------------
  */
+
 watch(
   () => route.path,
   () => {
@@ -505,10 +553,13 @@ watch(
  * | Sign out
  * |--------------------------------------------------------------------------
  */
+
 const handleSignOut = async () => {
   try {
     await auth.signOut();
+
     mobileOpen.value = false;
+
     router.push("/");
   } catch (e) {
     console.error("Sign out failed:", e);
@@ -520,28 +571,34 @@ const handleSignOut = async () => {
  * | Navigation links
  * |--------------------------------------------------------------------------
  */
+
 const navLinks = [
   {
     label: "Shop Groceries",
     path: "/products",
   },
+
   {
     label: "Meal Kits",
     path: "/meal-kits",
     badge: "New",
   },
+
   {
     label: "Deals",
     path: "/deals",
   },
+
   {
     label: "Recipes",
     path: "/recipes",
   },
+
   {
     label: "About Us",
     path: "/about",
   },
+
   {
     label: "Contact Us",
     path: "/contact",
@@ -553,6 +610,7 @@ const navLinks = [
  * | Search
  * |--------------------------------------------------------------------------
  */
+
 function handleSearch() {
   const query = searchQuery.value.trim();
 
@@ -562,6 +620,7 @@ function handleSearch() {
 
   router.push({
     path: "/products",
+
     query: {
       q: query,
     },
@@ -586,6 +645,7 @@ function handleSearch() {
 .mobile-menu-enter-from,
 .mobile-menu-leave-to {
   opacity: 0;
+
   transform: translateY(-8px);
 }
 
@@ -594,8 +654,9 @@ function handleSearch() {
  * | Logo rendering
  * |--------------------------------------------------------------------------
  *
- * | Ensures the transparent PNG keeps its proportions and does not
- * | stretch or distort inside the header.
+ * Ensures the transparent PNG keeps its proportions and does not
+ * stretch or distort inside the header.
+ *
  * |--------------------------------------------------------------------------
  */
 
@@ -603,3 +664,4 @@ img {
   display: block;
 }
 </style>
+```
