@@ -19,6 +19,7 @@
     "@supabase/supabase-js": "^2.103.0",
     "@tailwindcss/vite": "^4.2.2",
     "@vueuse/core": "^14.2.1",
+    "@vueuse/head": "^2.0.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.30",
     "vue-router": "^5.0.3",
@@ -45,6 +46,7 @@
     "tailwindcss": "^4.2.2",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
+    "vite-plugin-prerender": "^1.0.8",
     "vite-plugin-vue-devtools": "^8.0.7",
     "vue-tsc": "^3.2.5"
   },
