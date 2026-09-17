@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Auth flows — nothing to index, and indexing a reset/callback link
+# with a live token in the query string would be actively harmful.
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /auth/
+
+# Logged-in / per-user pages
+Disallow: /dashboard
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders
+Disallow: /orders/
+
+# Admin
+Disallow: /admin/
+
+Sitemap: https://orenag.com/sitemap.xml

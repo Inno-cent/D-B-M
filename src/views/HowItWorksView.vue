@@ -199,9 +199,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useReveal } from "../composables/useReveal";
+import { useSeo } from "../composables/useSeo";
 
 const { observe } = useReveal();
 onMounted(() => observe());
+
+useSeo({
+  title: "How It Works",
+  description:
+    "Buy local produce today at live pricing, or request a quote for export commodities sourced to order — two transparent paths, end to end.",
+  path: "/how-it-works",
+});
 
 const openFaq = ref<number | null>(null);
 

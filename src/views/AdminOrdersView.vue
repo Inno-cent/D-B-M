@@ -103,8 +103,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useOrdersStore } from "../stores/orders";
+import { useSeo } from "../composables/useSeo";
 
 const ordersStore = useOrdersStore();
+
+useSeo({
+  title: "Manage Orders",
+  path: "/admin/orders",
+  noindex: true,
+});
 
 onMounted(() => {
   ordersStore.fetchAllOrders();

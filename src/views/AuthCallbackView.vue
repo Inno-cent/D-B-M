@@ -55,6 +55,13 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../lib/supabase'
+import { useSeo } from '../composables/useSeo'
+
+useSeo({
+  title: 'Signing You In',
+  path: '/auth/callback',
+  noindex: true,
+})
 
 const router     = useRouter()
 const processing = ref(true)

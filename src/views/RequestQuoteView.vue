@@ -380,10 +380,18 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useReveal } from "../composables/useReveal";
 import { useAuthStore } from "../stores/auth";
 import { useQuoteStore } from "../stores/quotes";
+import { useSeo } from "../composables/useSeo";
 
 const { observe } = useReveal();
 const auth = useAuthStore();
 const quoteStore = useQuoteStore();
+
+useSeo({
+  title: "Request a Quote",
+  description:
+    "Request pricing and availability for export commodities sourced to order from Nigeria. We respond within 24 hours.",
+  path: "/request-quote",
+});
 
 const submitted = ref(false);
 const submittedRef = ref("");

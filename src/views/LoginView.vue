@@ -208,10 +208,17 @@
 import { ref, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
+import { useSeo } from "../composables/useSeo";
 
 const auth = useAuthStore();
 const router = useRouter();
 const route = useRoute();
+
+useSeo({
+  title: "Log In",
+  path: "/login",
+  noindex: true,
+});
 const loading = ref(false);
 const error = ref("");
 const showPassword = ref(false);

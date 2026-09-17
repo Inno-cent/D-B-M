@@ -13,7 +13,7 @@
         <h1 class="text-4xl md:text-5xl font-bold tracking-tight leading-tight capitalize text-earth-900">
           {{ title }}
         </h1>
-        <p class="text-earth-500 text-sm mt-4">DualMarket Brokerage · Market Insights</p>
+        <p class="text-earth-500 text-sm mt-4">OrenAg · Market Insights</p>
       </div>
     </div>
 
@@ -43,7 +43,28 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useSeo, SITE_URL } from '../composables/useSeo'
 
 const route = useRoute()
 const title = computed(() => String(route.params.slug).replace(/-/g, ' '))
+
+// noindex: every post currently renders "Full article coming soon" —
+// there's no real body content yet, so indexing these now would put a
+// batch of near-duplicate thin pages in front of Google. Flip
+// noindex off (and this becomes a real BlogPosting page) once actual
+// article content replaces the placeholder above.
+useSeo(() => ({
+  title: title.value.replace(/\b\w/g, (c) => c.toUpperCase()),
+  description: `Read our market insights on ${title.value} — Nigerian commodity export and wholesale trade analysis from OrenAg.`,
+  path: route.fullPath,
+  type: 'article',
+  noindex: true,
+  jsonLd: {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title.value,
+    url: `${SITE_URL}${route.fullPath}`,
+    publisher: { '@type': 'Organization', name: 'OrenAg' },
+  },
+}))
 </script>

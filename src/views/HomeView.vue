@@ -54,7 +54,15 @@ import ShopByCategorySection from "../components/home/ShopByCategorySection.vue"
 import WhyShopWithUs from "../components/home/WhyShopWithUs.vue";
 import BottomFeatureStrip from "../components/home/BottomFeatureStrip .vue";
 import { useReveal } from "../composables/useReveal";
+import { useSeo } from "../composables/useSeo";
 
 const { observe } = useReveal();
 onMounted(() => observe());
+
+useSeo({
+  title: "Orenag — Verified Nigerian Commodity & Wholesale Suppliers",
+  description:
+    "Shop wholesale groceries and meal kits, or source export commodities like cocoa, cashew, and shea butter in bulk from verified Nigerian suppliers.",
+  path: "/",
+});
 </script>

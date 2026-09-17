@@ -152,9 +152,17 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useReveal } from '../composables/useReveal'
+import { useSeo } from '../composables/useSeo'
 
 const { observe } = useReveal()
 onMounted(() => observe())
+
+useSeo({
+  title: 'Supplier Network',
+  description:
+    'Every OrenAg supplier is vetted, verified, and held to strict quality standards — farmer cooperatives, processors, and commodity aggregators across Nigeria.',
+  path: '/supplier-network',
+})
 
 const stats = [
   { value: '50+',  label: 'Verified Suppliers' },

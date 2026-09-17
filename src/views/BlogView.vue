@@ -102,6 +102,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useReveal } from '../composables/useReveal'
+import { useSeo, SITE_URL } from '../composables/useSeo'
 
 const { observe } = useReveal()
 onMounted(() => observe())
@@ -139,4 +140,29 @@ const posts = [
 const filteredPosts = computed(() =>
   activeCategory.value === 'all' ? posts : posts.filter(p => p.category === activeCategory.value)
 )
+
+useSeo({
+  title: 'Market Insights',
+  description:
+    'Analysis on Nigerian commodity exports, trade education, and wholesale market dynamics.',
+  path: '/blog',
+  jsonLd: {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'OrenAg Market Insights',
+    url: `${SITE_URL}/blog`,
+    blogPost: [
+      {
+        '@type': 'BlogPosting',
+        headline: "How to import sesame seeds from Nigeria: A complete buyer's guide",
+        url: `${SITE_URL}/blog/importing-sesame-seeds-nigeria`,
+      },
+      ...posts.map((p) => ({
+        '@type': 'BlogPosting',
+        headline: p.title,
+        url: `${SITE_URL}/blog/${p.slug}`,
+      })),
+    ],
+  },
+})
 </script>

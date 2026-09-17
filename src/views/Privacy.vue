@@ -224,9 +224,16 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useReveal } from '../composables/useReveal'
+import { useSeo } from '../composables/useSeo'
 
 const { observe } = useReveal()
 onMounted(() => observe())
+
+useSeo({
+  title: 'Privacy Policy',
+  description: "How OrenAg collects, uses, and protects your data.",
+  path: '/privacy',
+})
 </script>
 
 <style scoped>

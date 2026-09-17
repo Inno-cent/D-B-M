@@ -224,12 +224,19 @@ import { useOrdersStore, type PriceMismatch } from '../stores/orders'
 import { useAuthStore } from '../stores/auth'
 import { usePaystack } from '../composables/usePaystack'
 import type { PaymentMethod } from '../types/database'
+import { useSeo } from '../composables/useSeo'
 
 const router = useRouter()
 const cart     = useCartStore()
 const delivery = useDeliveryStore()
 const ordersStore = useOrdersStore()
 const auth     = useAuthStore()
+
+useSeo({
+  title: 'Checkout',
+  path: '/checkout',
+  noindex: true,
+})
 const { openPaystackPopup, isConfigured } = usePaystack()
 
 onMounted(() => {

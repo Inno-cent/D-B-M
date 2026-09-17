@@ -11,3 +11,16 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useSeo } from "../composables/useSeo";
+
+// noindex: this is a "coming soon" placeholder with no real content yet.
+// Remove noindex once actual deals are live here.
+useSeo({
+  title: "Deals",
+  description: "This week's best offers on wholesale groceries — coming soon.",
+  path: "/deals",
+  noindex: true,
+});
+</script>

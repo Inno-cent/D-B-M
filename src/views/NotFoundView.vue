@@ -14,3 +14,22 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useRoute } from "vue-router";
+import { useSeo } from "../composables/useSeo";
+
+const route = useRoute();
+
+// Note: this only sets a noindex *meta tag* — it can't make the server
+// actually respond with a real HTTP 404 status code, since this is a
+// client-rendered SPA route match, not a server error. If SEO-grade
+// crawlers dinging you for "soft 404s" becomes a problem, that needs a
+// server/edge rule (e.g. a Vercel rewrite that 404s specific known-bad
+// paths), not something fixable from inside this component.
+useSeo({
+  title: "Page Not Found",
+  path: route.fullPath,
+  noindex: true,
+});
+</script>
