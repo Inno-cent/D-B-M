@@ -18,47 +18,78 @@ import { allPrerenderRoutes } from './scripts/static-routes.mjs'
 const require = createRequire(import.meta.url)
 const Prerender = require('vite-plugin-prerender')
 
+// vite-plugin-prerender depends on a VERY old, unmaintained
+// @prerenderer/renderer-puppeteer@0.2.0, which in turn bundles
+// Puppeteer 1.20.0 (from 2019) and its own long-stale Chromium build.
+// That old Chromium binary is dynamically linked against system
+// libraries (libnss3, libatk, etc.) that Vercel's minimal build
+// container doesn't ship, so it fails to launch there with
+// "Unable to start Puppeteer" even though it works fine on a normal
+// dev machine. @sparticuz/chromium ships a Chromium build compiled
+// specifically for serverless/CI containers like Vercel's and AWS
+// Lambda's, with no missing-library issues — we hand its binary to
+// the same old Puppeteer client instead of letting it use its own.
+// Only kicks in when VERCEL is set (i.e. an actual Vercel build), so
+// local dev keeps using Puppeteer's own bundled Chromium as before.
+async function getPrerenderLaunchOverrides() {
+  if (!process.env.VERCEL) return {}
+  const { default: chromium } = await import('@sparticuz/chromium')
+  return {
+    executablePath: await chromium.executablePath(),
+    args: chromium.args,
+  }
+}
+
 // https://vite.dev/config/
-export default defineConfig(({ command }) => ({
-  plugins: [
-    vue(),
-    vueDevTools(),
-    tailwindcss(),
-    // Prerendering only matters for the production build — running it
-    // in `vite dev` would spin up a headless Chromium on every save.
-    // vite-plugin-prerender renders each route in a real browser after
-    // `vite build` finishes and writes the resulting HTML (with the
-    // useHead()-generated title/meta/canonical/JSON-LD already baked
-    // in) to dist/<route>/index.html, so crawlers that don't execute
-    // JS still see full per-page SEO tags.
-    //
-    // Only static + known dynamic-by-slug routes are listed (see
-    // scripts/static-routes.mjs) — routes gated by auth
-    // (dashboard/checkout/orders/admin) or that are inherently
-    // per-user (cart) are deliberately left out since there's nothing
-    // useful to prerender for a logged-out crawler there.
-    command === 'build' &&
-      Prerender({
-        staticDir: fileURLToPath(new URL('./dist', import.meta.url)),
-        routes: allPrerenderRoutes(),
-        renderer: new Prerender.PuppeteerRenderer({
-          renderAfterDocumentEvent: 'app-rendered',
-          maxConcurrentRoutes: 4,
-          headless: true,
+export default defineConfig(async ({ command }) => {
+  const prerenderLaunchOverrides =
+    command === 'build' ? await getPrerenderLaunchOverrides() : {}
+
+  return {
+    plugins: [
+      vue(),
+      vueDevTools(),
+      tailwindcss(),
+      // Prerendering only matters for the production build — running it
+      // in `vite dev` would spin up a headless Chromium on every save.
+      // vite-plugin-prerender renders each route in a real browser after
+      // `vite build` finishes and writes the resulting HTML (with the
+      // useHead()-generated title/meta/canonical/JSON-LD already baked
+      // in) to dist/<route>/index.html, so crawlers that don't execute
+      // JS still see full per-page SEO tags.
+      //
+      // Only static + known dynamic-by-slug routes are listed (see
+      // scripts/static-routes.mjs) — routes gated by auth
+      // (dashboard/checkout/orders/admin) or that are inherently
+      // per-user (cart) are deliberately left out since there's nothing
+      // useful to prerender for a logged-out crawler there.
+      command === 'build' &&
+        Prerender({
+          staticDir: fileURLToPath(new URL('./dist', import.meta.url)),
+          routes: allPrerenderRoutes(),
+          renderer: new Prerender.PuppeteerRenderer({
+            renderAfterDocumentEvent: 'app-rendered',
+            maxConcurrentRoutes: 4,
+            headless: true,
+            // Spread AFTER headless so executablePath/args (when on
+            // Vercel) take effect; this old renderer passes every one
+            // of these options straight through to puppeteer.launch().
+            ...prerenderLaunchOverrides,
+          }),
         }),
-      }),
-  ].filter(Boolean),
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
+    ].filter(Boolean),
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-  },
-}))
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+        },
+      },
+    },
+  }
+})
