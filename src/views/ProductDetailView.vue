@@ -261,6 +261,7 @@ import { useReveal } from "../composables/useReveal";
 import { usePricesStore } from "../stores/prices";
 import { useCartStore } from "../stores/cart";
 import AddToCartButton from "../components/products/AddToCartButton.vue";
+import { useSeo, SITE_URL } from "../composables/useSeo";
 
 const { observe } = useReveal();
 onMounted(() => observe());
@@ -345,6 +346,46 @@ const fetchIfLocal = () => {
 
 onMounted(fetchIfLocal);
 watch(() => route.params.slug, fetchIfLocal);
+
+useSeo(() => {
+  const p = product.value;
+  if (!p) {
+    // Slug didn't match anything — keep this out of the index rather
+    // than let a dead product URL get crawled and ranked.
+    return { title: "Product not found", path: route.fullPath, noindex: true };
+  }
+
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: p.name,
+    description: p.description || p.tagline,
+    image: p.image,
+    url: `${SITE_URL}/products/${p.slug}`,
+    ...(p.type === "local" && price.value
+      ? {
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "NGN",
+            price: price.value.price_ngn,
+            availability: price.value.is_available
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+            url: `${SITE_URL}/products/${p.slug}`,
+          },
+        }
+      : {}),
+  };
+
+  return {
+    title: p.name,
+    description: p.description || p.tagline,
+    path: `/products/${p.slug}`,
+    image: p.image,
+    type: "product",
+    jsonLd,
+  };
+});
 
 const formatRelativeTime = (iso: string) => {
   const diffMs = Date.now() - new Date(iso).getTime();

@@ -69,9 +69,17 @@
 import { onMounted } from "vue";
 import { useReveal } from "../composables/useReveal";
 import { products } from "../data/products";
+import { useSeo } from "../composables/useSeo";
 
 const { observe } = useReveal();
 onMounted(() => observe());
+
+useSeo({
+  title: "About Us",
+  description:
+    "OrenAg connects buyers with Nigerian local produce at today's price, and export commodities sourced to order through verified supplier relationships.",
+  path: "/about",
+});
 
 // Local/export/total counts are now computed from the real catalogue
 // instead of hardcoded, so this page can't silently go stale the way the

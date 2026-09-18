@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/generate-sitemap.mjs",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
@@ -19,12 +20,14 @@
     "@supabase/supabase-js": "^2.103.0",
     "@tailwindcss/vite": "^4.2.2",
     "@vueuse/core": "^14.2.1",
+    "@vueuse/head": "^2.0.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.30",
     "vue-router": "^5.0.3",
     "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
+    "@sparticuz/chromium": "^153.0.0",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.12.2",
     "@vercel/node": "^5.8.26",
@@ -45,6 +48,7 @@
     "tailwindcss": "^4.2.2",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
+    "vite-plugin-prerender": "^1.0.8",
     "vite-plugin-vue-devtools": "^8.0.7",
     "vue-tsc": "^3.2.5"
   },

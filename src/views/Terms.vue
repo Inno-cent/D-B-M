@@ -457,9 +457,16 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useReveal } from "../composables/useReveal";
+import { useSeo } from "../composables/useSeo";
 
 const { observe } = useReveal();
 onMounted(() => observe());
+
+useSeo({
+  title: "Terms of Service",
+  description: "OrenAg's terms of service for buyers and suppliers using the platform.",
+  path: "/terms",
+});
 </script>
 
 <style scoped>

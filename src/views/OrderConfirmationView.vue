@@ -126,9 +126,16 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useOrdersStore } from "../stores/orders";
 import type { Order, OrderItem } from "../types/database";
+import { useSeo } from "../composables/useSeo";
 
 const route = useRoute();
 const ordersStore = useOrdersStore();
+
+useSeo({
+  title: "Order Confirmation",
+  path: route.fullPath,
+  noindex: true,
+});
 
 const order = ref<Order | null>(null);
 const items = ref<OrderItem[]>([]);

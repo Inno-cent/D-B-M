@@ -372,8 +372,15 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
 import { useAuthStore } from "../stores/auth";
+import { useSeo } from "../composables/useSeo";
 
 const auth = useAuthStore();
+
+useSeo({
+  title: "Create an Account",
+  path: "/signup",
+  noindex: true,
+});
 const loading = ref(false);
 const error = ref("");
 const success = ref(false);

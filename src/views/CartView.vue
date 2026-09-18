@@ -158,10 +158,19 @@ import { computed, onMounted, ref } from "vue";
 import { useCartStore } from "../stores/cart";
 import { usePricesStore } from "../stores/prices";
 import { products } from "../data/products";
+import { useSeo } from "../composables/useSeo";
 
 const cart = useCartStore();
 const pricesStore = usePricesStore();
 const justAddedSlug = ref<string | null>(null);
+
+// noindex: cart contents are per-user and transient — nothing here is
+// meant to be crawled or ranked.
+useSeo({
+  title: "Your Cart",
+  path: "/cart",
+  noindex: true,
+});
 
 onMounted(() => {
   if (pricesStore.prices.length === 0) pricesStore.fetchPrices();

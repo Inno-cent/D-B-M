@@ -298,10 +298,17 @@ import { ref, computed, reactive, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useQuoteStore } from '../stores/quotes'
+import { useSeo } from '../composables/useSeo'
 
 const auth       = useAuthStore()
 const quoteStore = useQuoteStore()
 const router     = useRouter()
+
+useSeo({
+  title: 'Dashboard',
+  path: '/dashboard',
+  noindex: true,
+})
 
 const profile = computed(() => auth.profile)
 const user    = computed(() => auth.user)

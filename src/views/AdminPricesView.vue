@@ -119,8 +119,15 @@
 import { ref, reactive, onMounted } from "vue";
 import { usePricesStore } from "../stores/prices";
 import type { ProductPrice, PriceHistory } from "../types/database";
+import { useSeo } from "../composables/useSeo";
 
 const pricesStore = usePricesStore();
+
+useSeo({
+  title: "Manage Prices",
+  path: "/admin/prices",
+  noindex: true,
+});
 
 interface EditableRow extends ProductPrice {
   draftPrice: number;

@@ -34,7 +34,21 @@ import { onMounted } from "vue";
 import MealKitCard from "../components/meal-kits/MealKitCard.vue";
 import { mealKits } from "../data/mealKits";
 import { useReveal } from "../composables/useReveal";
+import { useSeo } from "../composables/useSeo";
 
 const { observe } = useReveal();
 onMounted(() => observe());
+
+useSeo({
+  title: "Shop Meal Kits",
+  description:
+    "Complete ingredient kits for your favourite Nigerian meals — jollof rice, egusi soup, fried rice, and more. Choose your family size and cook with ease.",
+  path: "/meal-kits",
+  jsonLd: {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Shop Meal Kits — OrenAg",
+    url: "https://orenag.com/meal-kits",
+  },
+});
 </script>

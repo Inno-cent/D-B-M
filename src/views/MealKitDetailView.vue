@@ -184,6 +184,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { mealKits } from '../data/mealKits'
 import { useCartStore } from '../stores/cart'
 import { useReveal } from '../composables/useReveal'
+import { useSeo, SITE_URL } from '../composables/useSeo'
 
 const route = useRoute()
 const router = useRouter()
@@ -205,6 +206,47 @@ watch(kit, (newKit) => {
   showAllIngredients.value = false
   qty.value = 1
   addOnQty.value = {}
+})
+
+useSeo(() => {
+  const k = kit.value
+  if (!k) {
+    return { title: 'Meal kit not found', path: route.fullPath, noindex: true }
+  }
+
+  const lowestPrice = Math.min(...k.sizes.map((s) => s.priceNgn))
+
+  return {
+    title: k.name,
+    description: k.description || k.tagline,
+    path: `/meal-kits/${k.slug}`,
+    image: k.image,
+    type: 'product',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: k.name,
+      description: k.description || k.tagline,
+      image: k.image,
+      url: `${SITE_URL}/meal-kits/${k.slug}`,
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'NGN',
+        price: lowestPrice,
+        availability: 'https://schema.org/InStock',
+        url: `${SITE_URL}/meal-kits/${k.slug}`,
+      },
+      ...(k.reviewCount > 0
+        ? {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: k.rating,
+              reviewCount: k.reviewCount,
+            },
+          }
+        : {}),
+    },
+  }
 })
 
 const visibleIngredients = computed(() => {

@@ -49,12 +49,19 @@
 import { onMounted } from "vue";
 import { useOrdersStore } from "../stores/orders";
 import { useAuthStore } from "../stores/auth";
+import { useSeo } from "../composables/useSeo";
 
 // Fixed against the real orders.ts (I'd only guessed at its shape before):
 // the store exposes `orders`, not `myOrders`, and fetchMyOrders requires
 // the user's id as an argument.
 const ordersStore = useOrdersStore();
 const auth = useAuthStore();
+
+useSeo({
+  title: "Your Orders",
+  path: "/orders",
+  noindex: true,
+});
 
 onMounted(() => {
   if (auth.user) ordersStore.fetchMyOrders(auth.user.id);

@@ -181,6 +181,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { supabase } from '../lib/supabase'
+import { useSeo } from '../composables/useSeo'
 
 const auth            = useAuthStore()
 const password        = ref('')
@@ -190,6 +191,12 @@ const error           = ref('')
 const success         = ref(false)
 const invalidToken    = ref(false)
 const showPassword    = ref(false)
+
+useSeo({
+  title: 'Reset Password',
+  path: '/auth/reset-password',
+  noindex: true,
+})
 
 // Supabase sends the user to this page with a hash containing
 // the access_token and type=recovery. We need to set the session

@@ -118,9 +118,32 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useReveal } from '../composables/useReveal'
+import { useSeo } from '../composables/useSeo'
 
 const { observe } = useReveal()
 onMounted(() => observe())
+
+useSeo({
+  title: 'Contact Us',
+  description: 'Get in touch with OrenAg — we respond within 24 hours on business days.',
+  path: '/contact',
+  jsonLd: {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    url: 'https://orenag.com/contact',
+    mainEntity: {
+      '@type': 'Organization',
+      name: 'OrenAg',
+      email: 'hello@orenag.com',
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer service',
+        email: 'hello@orenag.com',
+        areaServed: 'NG',
+      },
+    },
+  },
+})
 
 const submitted = ref(false)
 const form = reactive({ name: '', email: '', company: '', subject: '', message: '' })
@@ -131,7 +154,7 @@ const submit = () => {
 }
 
 const contactInfo = [
-  { icon: '📧', label: 'Email',         value: 'hello@dualmarket.com',  sub: 'Best for detailed enquiries' },
+  { icon: '📧', label: 'Email',         value: 'hello@orenag.com',      sub: 'Best for detailed enquiries' },
   { icon: '💬', label: 'WhatsApp',      value: 'Available on request',  sub: 'For time-sensitive sourcing needs' },
   { icon: '📍', label: 'Location',      value: 'Lagos, Nigeria',        sub: 'Operating across all geopolitical zones' },
   { icon: '⏱️', label: 'Response Time', value: 'Within 24 hours',      sub: 'Monday to Friday, business days' },

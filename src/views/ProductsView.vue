@@ -201,6 +201,7 @@ import { products } from "../data/products";
 import { categories } from "../data/categories";
 import { useReveal } from "../composables/useReveal";
 import { usePricesStore } from "../stores/prices";
+import { useSeo } from "../composables/useSeo";
 
 const { observe } = useReveal();
 onMounted(() => observe());
@@ -227,6 +228,33 @@ function setCategory(slug: string | null) {
     query: { ...route.query, category: slug ?? undefined },
   });
 }
+
+// Canonical always points at the bare listing page — category/search
+// query strings are filters on the same page, not distinct content, so
+// we don't want Google indexing every ?category=&q= combination as a
+// separate URL. Title still reflects the active category for a nicer
+// browser-tab/SERP title when someone lands on a filtered link directly.
+const activeCategoryLabel = computed(
+  () => categories.find((c) => c.slug === selectedCategory.value)?.label ?? null,
+);
+
+useSeo(() => ({
+  title: activeCategoryLabel.value
+    ? `${activeCategoryLabel.value} — Shop Groceries`
+    : "Shop Groceries & Wholesale Products",
+  description: activeCategoryLabel.value
+    ? `Browse ${activeCategoryLabel.value.toLowerCase()} available for wholesale and retail order from verified Nigerian suppliers.`
+    : "Browse wholesale and retail groceries — staples, fresh produce, oils, spices, dairy, and more — sourced from verified Nigerian suppliers.",
+  path: "/products",
+  jsonLd: {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: activeCategoryLabel.value
+      ? `${activeCategoryLabel.value} — OrenAg`
+      : "Shop Groceries & Wholesale Products — OrenAg",
+    url: "https://orenag.com/products",
+  },
+}));
 
 // ?q= from the header search bar still needs a local ref since it's
 // editable inline on this page (not just a one-way link in).
