@@ -169,10 +169,23 @@ router.beforeEach(async (to) => {
 
   if (auth.loading) {
     await new Promise<void>((resolve) => {
+      // Safety net: if auth init ever hangs (e.g. a stalled network
+      // call in a constrained build/CI environment) this guard used to
+      // be able to wait forever, which would also block
+      // router.isReady() in main.ts forever — and during a
+      // vite-plugin-prerender build, that means the page never fires
+      // 'app-rendered' and the whole build eventually times out.
+      // Falling through after 5s means navigation proceeds treating
+      // the user as logged-out, which is the safe default.
+      const timeout = setTimeout(() => {
+        stop()
+        resolve()
+      }, 5000)
       const stop = watch(
         () => auth.loading,
         (val) => {
           if (!val) {
+            clearTimeout(timeout)
             stop()
             resolve()
           }

@@ -14,6 +14,12 @@ export interface CartItem {
 }
 
 const loadFromStorage = (): CartItem[] => {
+  // Critical for the vite-ssg switch: useCartStore() is instantiated
+  // server-side too, since AppHeader.vue and ProductCard.vue (both
+  // rendered on nearly every route) call it — and localStorage doesn't
+  // exist in Node. Without this guard, every single prerendered page
+  // would throw "localStorage is not defined" and fail the SSG build.
+  if (typeof localStorage === 'undefined') return []
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
@@ -25,6 +31,7 @@ const loadFromStorage = (): CartItem[] => {
 }
 
 const saveToStorage = (items: CartItem[]) => {
+  if (typeof localStorage === 'undefined') return
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
   } catch {
