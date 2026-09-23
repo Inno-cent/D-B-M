@@ -8,7 +8,7 @@
     "prebuild": "node scripts/generate-sitemap.mjs",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
-    "build-only": "vite build",
+    "build-only": "vite-ssg build",
     "type-check": "vue-tsc --build",
     "lint": "run-s lint:*",
     "lint:oxlint": "oxlint . --fix",
@@ -27,7 +27,6 @@
     "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
-    "@sparticuz/chromium": "^153.0.0",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.12.2",
     "@vercel/node": "^5.8.26",
@@ -48,7 +47,7 @@
     "tailwindcss": "^4.2.2",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-prerender": "^1.0.8",
+    "vite-ssg": "^28.3.0",
     "vite-plugin-vue-devtools": "^8.0.7",
     "vue-tsc": "^3.2.5"
   },

@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 import AppHeader from "./components/layout/AppHeader.vue";
 import AppFooter from "./components/layout/AppFooter.vue";
@@ -39,13 +39,12 @@ import { useAuthStore } from "./stores/auth";
 
 const route = useRoute();
 
+// auth.init() is called once in main.ts (client-side only, before the
+// router resolves navigation) — not here. Calling it again on mount
+// would register a second supabase.auth.onAuthStateChange listener.
 const auth = useAuthStore();
 const authLoading = computed(() => auth.loading);
 const isAuthPage = computed(() => route.meta.layout === "auth");
-
-onMounted(() => {
-  auth.init();
-});
 </script>
 
 <style>
