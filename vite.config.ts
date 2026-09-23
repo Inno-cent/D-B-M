@@ -71,9 +71,21 @@ export default defineConfig(async ({ command }) => {
             renderAfterDocumentEvent: 'app-rendered',
             maxConcurrentRoutes: 4,
             headless: true,
-            // Spread AFTER headless so executablePath/args (when on
-            // Vercel) take effect; this old renderer passes every one
-            // of these options straight through to puppeteer.launch().
+            // FIX: this old renderer has no default timeout for
+            // renderAfterDocumentEvent, so if the 'app-rendered' signal
+            // is ever missed (e.g. the Puppeteer 1.20.0 <-> modern
+            // Chromium CDP version skew when running on Vercel with
+            // @sparticuz/chromium), the page just hangs forever and
+            // stalls the whole maxConcurrentRoutes:4 queue behind it —
+            // which is what was silently eating the full 45-minute
+            // Vercel build cap. Capping each route at 30s turns that
+            // into a loud "route X failed after timeout" per route
+            // instead of one silent full-build death.
+            timeout: 30000,
+            // Spread AFTER headless/timeout so executablePath/args
+            // (when on Vercel) take effect; this old renderer passes
+            // every one of these options straight through to
+            // puppeteer.launch().
             ...prerenderLaunchOverrides,
           }),
         }),
