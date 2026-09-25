@@ -309,7 +309,7 @@ const faqs = [
     tag: "export",
     q: "What is the minimum order quantity?",
     a:
-      "Minimum order quantities vary by product. For sesame seeds it is typically 25 metric tonnes. For local wholesale goods like rice it can be as low as 100 bags.",
+      "Minimum order quantities vary by product. For sesame seeds it is typically 25 metric tonnes. For local Product goods like rice it can be as low as 100 bags.",
   },
   {
     tag: "export",

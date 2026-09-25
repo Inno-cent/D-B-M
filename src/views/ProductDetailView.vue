@@ -62,7 +62,7 @@
                 : 'bg-earth-50 text-earth-700 border border-earth-200',
             ]"
           >
-            {{ product.type === "export" ? "✈ Export Commodity" : "🏪 Local Wholesale" }}
+            {{ product.type === "export" ? "✈ Export Commodity" : "🏪 Local Product" }}
           </span>
 
           <h1 class="text-3xl font-bold text-earth-900 mb-2">{{ product.name }}</h1>

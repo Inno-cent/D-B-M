@@ -135,7 +135,7 @@
                   <optgroup label="Export Commodities">
                     <option v-for="p in exportProducts" :key="p">{{ p }}</option>
                   </optgroup>
-                  <optgroup label="Local Wholesale">
+                  <optgroup label="Local Product">
                     <option v-for="p in localProducts" :key="p">{{ p }}</option>
                   </optgroup>
                   <option value="Other">Other (specify in notes)</option>
