@@ -1,23 +1,33 @@
 <template>
   <div
-    class="group flex flex-col bg-white rounded-2xl overflow-hidden border-2 border-earth-100 hover:border-forest-300 hover:shadow-lg transition-all duration-300"
+    class="group flex flex-col bg-white rounded-2xl overflow-hidden
+           border border-earth-100 shadow-sm
+           hover:shadow-xl hover:shadow-earth-200/60
+           hover:-translate-y-1 transition-all duration-300"
   >
-    <!-- Image + name link to detail page -->
+    <!-- Image (links to detail page) -->
     <RouterLink :to="`/products/${product.slug}`" class="block">
-      <div class="relative h-40 overflow-hidden bg-parchment">
+      <div
+        class="relative flex items-center justify-center
+               bg-white product-image-bg min-h-[200px] p-4"
+      >
         <img
           :src="product.image"
           :alt="product.name"
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          class="max-h-48 w-auto object-contain
+                 group-hover:scale-105 transition-transform duration-500
+                 drop-shadow-sm"
           loading="lazy"
           @error="handleImgError"
         />
+
         <span
           :class="[
-            'absolute top-3 left-3 text-xs px-2.5 py-1 rounded-full font-semibold border',
+            'absolute top-3 left-3 text-xs px-2.5 py-1 rounded-full',
+            'font-semibold border backdrop-blur-sm',
             product.type === 'export'
-              ? 'bg-forest-600/90 text-white border-forest-500 backdrop-blur-sm'
-              : 'bg-earth-800/80 text-white border-earth-700 backdrop-blur-sm',
+              ? 'bg-forest-600/90 text-white border-forest-500'
+              : 'bg-earth-800/80 text-white border-earth-700',
           ]"
         >
           {{ product.type === "export" ? "✈ Export" : "🏪 Local" }}
@@ -25,15 +35,17 @@
       </div>
     </RouterLink>
 
-    <div class="flex flex-col flex-1 p-4">
+    <!-- Content -->
+    <div class="flex flex-col flex-1 p-4 border-t border-earth-100">
       <RouterLink :to="`/products/${product.slug}`">
         <h3
-          class="font-bold text-sm text-earth-900 mb-1 group-hover:text-forest-700 transition-colors duration-200 line-clamp-1"
+          class="font-bold text-sm text-earth-900 mb-1 leading-snug
+                 group-hover:text-forest-700 transition-colors duration-200 line-clamp-1"
         >
           {{ product.name }}
         </h3>
       </RouterLink>
-      <p class="text-xs text-earth-500 leading-relaxed mb-3 line-clamp-2 flex-1">
+      <p class="text-xs text-earth-400 leading-relaxed mb-3 line-clamp-2 flex-1">
         {{ product.detail }}
       </p>
 
@@ -46,18 +58,14 @@
           Loading price…
         </span>
 
-        <!-- FIXED: products with `variants` (Palm Oil, Vegetable Oil, Rice,
-             Garri, Soyabeans, Maize, Milk, Sugar, Salt, Tomato Paste, etc.)
-             have no product_prices row at their own top-level slug —
-             pricing lives on each variant's slug instead
-             ('palm-oil--1l', not 'palm-oil'). Looking up
-             priceMap[product.slug] for these always returned null, which
-             is why every variant product showed "Price unavailable" on
-             the grid even though real prices existed. Below, `price` now
-             resolves to the cheapest available variant's price for
-             display, and the button routes to the detail page instead of
-             quick-adding — a grid card can't safely add a specific
-             brand/size to the cart without the shopper picking one. -->
+        <!-- Variant products (Palm Oil, Rice, Garri, Milk, Sugar, Salt,
+             Tomato Paste, etc.) have no product_prices row at their own
+             top-level slug — pricing lives on each variant's slug
+             instead ('palm-oil--1l', not 'palm-oil'). `price` below
+             resolves to the cheapest available variant for display, and
+             the CTA routes to the detail page instead of quick-adding —
+             a grid card can't safely add a specific brand/size to the
+             cart without the shopper picking one. -->
         <template v-else-if="price">
           <p class="text-sm font-bold text-forest-700 mb-2">
             <span v-if="hasVariants" class="text-xs font-normal text-earth-500"
@@ -67,8 +75,6 @@
             <span class="text-xs font-normal text-earth-400">/ {{ price.unit }}</span>
           </p>
 
-          <!-- Variant products: send to the detail page to pick a
-               brand/size — quick-add can't guess which variant. -->
           <RouterLink
             v-if="hasVariants"
             :to="`/products/${product.slug}`"
@@ -78,10 +84,9 @@
           </RouterLink>
 
           <!-- Single-SKU local products: quick add-to-cart as before.
-               Compact single button, not the full AddToCartButton widget —
-               that component is a stepper + button combo (~280px+) built
-               for the spacious product detail page and overflows a grid
-               card. Adjust quantity from the cart page instead. -->
+               Compact single button, not the full AddToCartButton widget
+               (that's a stepper+button combo built for the detail page
+               and overflows a grid card). -->
           <button
             v-else
             type="button"
@@ -131,13 +136,10 @@ const hasVariants = computed(
   () => !!props.product.variants && props.product.variants.length > 0
 );
 
-// FIXED: was `pricesStore.priceMap[props.product.slug] ?? null` — always
-// null for variant products since their own slug is never priced. Now:
-// variant products resolve to the cheapest available variant's price
+// Variant products resolve to the cheapest available variant's price
 // (falls back to the cheapest variant overall if none are marked
-// available, so the card still shows a "From" price rather than
-// silently going blank); single-SKU products look up their own slug
-// exactly as before.
+// available, so the card still shows a "From" price rather than going
+// blank); single-SKU products look up their own slug directly.
 const price = computed(() => {
   if (hasVariants.value) {
     const variantPrices = props.product
@@ -172,7 +174,14 @@ function handleQuickAdd() {
 
 const handleImgError = (e: Event) => {
   const img = e.target as HTMLImageElement;
-  img.src =
-    "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=600&q=80&fit=crop";
+  img.src = "https://placehold.co/400x400/f5f0e6/8f7a5e?text=NIL";
 };
 </script>
+
+<style scoped>
+.product-image-bg {
+  background-color: #ffffff;
+  background-image: radial-gradient(circle, #e8e2d8 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+</style>
