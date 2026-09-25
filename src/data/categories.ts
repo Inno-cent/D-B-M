@@ -1,3 +1,5 @@
+import { getProductImageUrl } from '@/lib/supabase'
+
 export interface Category {
   slug: string
   label: string
@@ -48,17 +50,20 @@ export const categories: Category[] = [
   {
     slug: 'dairy',
     label: 'Dairy',
-    image: 'https://placehold.co/200x200/f5f0e6/6b5637?text=Dairy',
+    // Peak Full Cream Instant Milk Powder
+    image: getProductImageUrl('ChatGPT Image Sep 11, 2026, 07_33_25 PM', 'png'),
   },
   {
     slug: 'canned-goods',
     label: 'Canned Goods',
-    image: 'https://placehold.co/200x200/f5f0e6/6b5637?text=Canned+Goods',
+    // Exeter Premium Corned Beef can
+    image: getProductImageUrl('ChatGPT Image Sep 11, 2026, 07_32_06 PM_2', 'png'),
   },
   {
     slug: 'pantry-essentials',
     label: 'Pantry Essentials',
-    image: 'https://placehold.co/200x200/f5f0e6/6b5637?text=Pantry',
+    // Dangote Refined Granulated White Sugar (1kg)
+    image: getProductImageUrl('ChatGPT Image Sep 11, 2026, 07_35_36 PM', 'png'),
   },
   {
     slug: 'others',

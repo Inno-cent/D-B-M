@@ -18,18 +18,20 @@
         <!-- Image -->
         <div data-reveal>
           <div
-            class="rounded-2xl overflow-hidden border-2 border-earth-100 h-80 md:h-[420px] mb-4"
+            class="relative flex items-center justify-center rounded-2xl overflow-hidden border-2 border-earth-100 product-image-bg h-80 md:h-[420px] mb-4 p-6 md:p-10"
           >
-            <!-- CHANGED: was :src="product.image" — now :src="displayImage",
-                 which swaps to the selected variant's own photo when one
-                 exists (see `displayImage` computed below). Falls back to
-                 product.image for non-variant products and for variants
-                 that don't have a photo yet, so behavior is unchanged for
-                 everything that isn't a photographed variant. -->
+            <!-- CHANGED: was w-full h-full object-cover, which cropped
+                 portrait product photos hard to fill this wide/short box
+                 (chopping the top off tall packaging shots). Now
+                 object-contain on a padded, dot-pattern background — same
+                 treatment as ProductCard — so the whole package/photo is
+                 always visible, never cropped. displayImage still swaps
+                 to the selected variant's own photo when one exists, and
+                 falls back to product.image otherwise. -->
             <img
               :src="displayImage"
               :alt="activeName || product.name"
-              class="w-full h-full object-cover"
+              class="max-w-full max-h-full object-contain drop-shadow-sm"
             />
           </div>
 
@@ -39,9 +41,13 @@
               v-for="p in relatedProducts.slice(0, 5)"
               :key="p.slug"
               :to="`/products/${p.slug}`"
-              class="w-14 h-14 rounded-lg overflow-hidden border-2 border-earth-100 hover:border-forest-400 transition-colors flex-shrink-0"
+              class="w-14 h-14 rounded-lg overflow-hidden border-2 border-earth-100 hover:border-forest-400 transition-colors flex-shrink-0 product-image-bg flex items-center justify-center p-1.5"
             >
-              <img :src="p.image" :alt="p.name" class="w-full h-full object-cover" />
+              <img
+                :src="p.image"
+                :alt="p.name"
+                class="max-w-full max-h-full object-contain"
+              />
             </RouterLink>
           </div>
         </div>
@@ -322,7 +328,7 @@ const activeName = computed(() => {
     : product.value.name;
 });
 
-// NEW: the image actually shown on the detail page. Uses the selected
+// The image actually shown on the detail page. Uses the selected
 // variant's own photo when it has one; otherwise falls back to the
 // parent product's placeholder image — same fallback for non-variant
 // products (selectedVariant is always null for those) and for variants
@@ -422,3 +428,11 @@ const trustBadges = [
   { icon: "📄", label: "Fully Documented", sub: "Export docs handled" },
 ];
 </script>
+
+<style scoped>
+.product-image-bg {
+  background-color: #ffffff;
+  background-image: radial-gradient(circle, #e8e2d8 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+</style>

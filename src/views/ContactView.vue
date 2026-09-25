@@ -125,7 +125,7 @@ onMounted(() => observe())
 
 useSeo({
   title: 'Contact Us',
-  description: 'Get in touch with OrenAg — we respond within 24 hours on business days.',
+  description: 'Get in touch with Orena Global — we respond within 24 hours on business days.',
   path: '/contact',
   jsonLd: {
     '@context': 'https://schema.org',
@@ -133,7 +133,7 @@ useSeo({
     url: 'https://orenag.com/contact',
     mainEntity: {
       '@type': 'Organization',
-      name: 'OrenAg',
+      name: 'Orena Global',
       email: 'hello@orenag.com',
       contactPoint: {
         '@type': 'ContactPoint',
