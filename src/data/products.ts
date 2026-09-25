@@ -1094,13 +1094,6 @@ export const products: Product[] = [
     applications: ['Retail Distribution', 'Household', 'Food Service'],
     variants: [
       {
-        // No new image — keeps existing photo.
-        slug: 'corned-beef--exeter-round--200g',
-        brand: 'Exeter Corned Beef (Round Can)',
-        size: '200g',
-        image: getProductImageUrl('IMG_7246', 'PNG'),
-      },
-      {
         slug: 'corned-beef--exeter-tapered--340g',
         brand: 'Exeter Corned Beef (Tapered Can)',
         size: '340g',
@@ -1344,9 +1337,9 @@ export const products: Product[] = [
       //   image: getProductImageUrl('ChatGPT Image Sep 16, 2026, 06_55_46 PM_2', 'png'),
       // },
       {
-        slug: 'pepper-powder--gino--3-sachet-strip',
+        slug: 'pepper-powder--gino--gino sachet',
         brand: 'Gino Herbs & Spices Red Hot Pepper Powder',
-        size: '3-Sachet Strip',
+        size: 'sachet',
         image: getProductImageUrl('ChatGPT Image Sep 16, 2026, 06_55_57 PM', 'png'),
       },
       {
