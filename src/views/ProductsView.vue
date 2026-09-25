@@ -270,7 +270,7 @@ const tabs = [
     count: products.filter((p) => p.type === "export").length,
   },
   {
-    label: "Local Wholesale",
+    label: "Local Product",
     value: "local",
     count: products.filter((p) => p.type === "local").length,
   },
