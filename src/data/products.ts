@@ -1078,7 +1078,7 @@ export const products: Product[] = [
     name: 'Corned Beef',
     slug: 'corned-beef',
     icon: '🥫',
-    image: getProductImageUrl('ChatGPT Image Sep 11, 2026, 07_32_06 PM_2', 'png'),
+    image: getProductImageUrl('ChatGPT Image Sep 11, 2026, 07_32_06 PM', 'png'),
     type: 'local',
     categories: ['canned-goods'],
     family: 'corned-beef',
@@ -1094,10 +1094,17 @@ export const products: Product[] = [
     applications: ['Retail Distribution', 'Household', 'Food Service'],
     variants: [
       {
+        // No new image — keeps existing photo.
+        slug: 'corned-beef--exeter-round--200g',
+        brand: 'Exeter Corned Beef (Round Can)',
+        size: '200g',
+        image: getProductImageUrl('IMG_7246', 'PNG'),
+      },
+      {
         slug: 'corned-beef--exeter-tapered--340g',
         brand: 'Exeter Corned Beef (Tapered Can)',
         size: '340g',
-        image: getProductImageUrl('ChatGPT Image Sep 11, 2026, 07_32_06 PM_2', 'png'),
+        image: getProductImageUrl('ChatGPT Image Sep 11, 2026, 07_32_06 PM', 'png'),
       },
       {
         // No new image — keeps existing photo.
@@ -1239,7 +1246,7 @@ export const products: Product[] = [
     name: 'Curry Powder',
     slug: 'curry-powder',
     icon: '🧂',
-    image: getProductImageUrl('ChatGPT Image Sep 15, 2026, 07_25_13 PM_2', 'png'),
+    image: getProductImageUrl('ChatGPT Image Sep 15, 2026, 07_25_13 PM', 'png'),
     type: 'local',
     categories: ['spices-seasonings'],
     family: 'curry-powder',
@@ -1257,19 +1264,19 @@ export const products: Product[] = [
         slug: 'curry-powder--gino--sachet',
         brand: 'Gino Herbs & Spices Curry Powder',
         size: 'Sachet Pack',
-        image: getProductImageUrl('ChatGPT Image Sep 15, 2026, 07_25_13 PM_2', 'png'),
+        image: getProductImageUrl('ChatGPT Image Sep 15, 2026, 07_25_13 PM', 'png'),
       },
       {
         slug: 'curry-powder--sonia--pack',
         brand: 'Sonia Curry Powder (Buy 10 Get 1 Free Pack)',
         size: 'Pack',
-        image: getProductImageUrl('ChatGPT Image Sep 15, 2026, 07_25_53 PM_2', 'png'),
+        image: getProductImageUrl('ChatGPT Image Sep 15, 2026, 07_25_53 PM', 'png'),
       },
       {
         slug: 'curry-powder--tiger--sachet',
         brand: 'Tiger Curry Powder',
         size: 'Standard Sachet',
-        image: getProductImageUrl('ChatGPT Image Sep 15, 2026, 07_26_59 PM_2', 'png'),
+        image: getProductImageUrl('ChatGPT Image Sep 15, 2026, 07_26_59 PM', 'png'),
       },
     ],
   },
