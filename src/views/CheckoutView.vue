@@ -89,7 +89,7 @@
                 >
                 <select v-model="form.state" class="input-field">
                   <option value="" disabled>Select state...</option>
-                  <option v-for="s in delivery.allStates" :key="s" :value="s">
+                  <option v-for="s in NIGERIAN_STATES" :key="s" :value="s">
                     {{ s }}
                   </option>
                 </select>
@@ -97,27 +97,50 @@
               <div>
                 <label
                   class="block text-xs font-semibold mb-1.5 text-earth-600 uppercase tracking-wider"
-                  >Delivery Zone Fee</label
+                  >Delivery Fee</label
                 >
                 <div
                   class="input-field flex items-center"
-                  :class="
-                    resolvedZone ? 'text-earth-900 font-semibold' : 'text-earth-400'
-                  "
+                  :class="deliveryFeeReady ? 'text-earth-900 font-semibold' : 'text-earth-400'"
                 >
-                  <span v-if="!form.state">Select state first</span>
-                  <span v-else-if="!resolvedZone"
-                    >No delivery zone found for this state</span
-                  >
-                  <span v-else-if="resolvedZone.fee_ngn === null"
-                    >Quoted separately — contact us</span
-                  >
-                  <span v-else
-                    >{{ delivery.formatNgn(resolvedZone.fee_ngn) }} ·
-                    {{ resolvedZone.days_estimate }}</span
-                  >
+                  <span v-if="quoteLoading">Getting quote…</span>
+                  <span v-else-if="activeQuote">{{
+                    cart.formatNgn(activeQuote.fee_ngn)
+                  }}</span>
+                  <span v-else>Enter address, then get quote</span>
                 </div>
               </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                @click="fetchQuote"
+                :disabled="quoteLoading"
+                class="btn-primary px-5 py-2.5 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{ activeQuote ? "Refresh delivery quote" : "Get delivery quote" }}
+              </button>
+              <p v-if="quoteError" class="text-sm text-red-600 font-medium">{{ quoteError }}</p>
+              <p v-else-if="quoteNotice" class="text-xs text-earth-500">{{ quoteNotice }}</p>
+            </div>
+
+            <!-- Travo branding — required by Travo's developer terms whenever
+                 a quote price is shown. -->
+            <div v-if="activeQuote" class="mt-4 flex items-center gap-2 text-xs text-earth-500">
+              <span>Delivery quote by</span>
+              <a href="https://travo.ng" target="_blank" rel="noopener">
+                <img
+                  src="https://services.travo.ng/wp-content/uploads/2025/04/blog-logo.png"
+                  alt="Travo"
+                  class="h-5 inline-block"
+                />
+              </a>
+              <a href="https://travo.ng" target="_blank" rel="noopener" class="underline">travo.ng</a>
+              <span>·</span>
+              <a href="https://services.travo.ng" target="_blank" rel="noopener" class="underline"
+                >services.travo.ng</a
+              >
             </div>
           </div>
 
@@ -184,11 +207,7 @@
               <div class="flex justify-between text-earth-600">
                 <span>Delivery</span>
                 <span class="font-semibold text-earth-900">
-                  {{
-                    resolvedZone?.fee_ngn != null
-                      ? delivery.formatNgn(resolvedZone.fee_ngn)
-                      : "—"
-                  }}
+                  {{ deliveryFeeReady ? cart.formatNgn(deliveryFeeNgn) : "—" }}
                 </span>
               </div>
             </div>
@@ -216,19 +235,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
-import { useDeliveryStore } from '../stores/delivery'
 import { useOrdersStore, type PriceMismatch } from '../stores/orders'
 import { useAuthStore } from '../stores/auth'
 import { usePaystack } from '../composables/usePaystack'
 import type { PaymentMethod } from '../types/database'
 import { useSeo } from '../composables/useSeo'
+import { getTravoQuote, type TravoQuote } from '../services/travoService'
+import { estimateCartWeightKg } from '../utils/cartWeight'
 
 const router = useRouter()
 const cart     = useCartStore()
-const delivery = useDeliveryStore()
 const ordersStore = useOrdersStore()
 const auth     = useAuthStore()
 
@@ -238,10 +257,6 @@ useSeo({
   noindex: true,
 })
 const { openPaystackPopup, isConfigured } = usePaystack()
-
-onMounted(() => {
-  if (delivery.zones.length === 0) delivery.fetchZones()
-})
 
 const form = ref({
   fullName:      auth.profile?.full_name ?? '',
@@ -257,12 +272,74 @@ const paymentMethods: { label: string; value: PaymentMethod }[] = [
   { label: 'USSD',          value: 'ussd' },
 ]
 
-const resolvedZone = computed(() =>
-  form.value.state ? delivery.zoneForState(form.value.state) : null
+const NIGERIAN_STATES = [
+  'Abia','Abuja','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue','Borno',
+  'Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu','Gombe','Imo','Jigawa','Kaduna',
+  'Kano','Katsina','Kebbi','Kogi','Kwara','Lagos','Nasarawa','Niger','Ogun','Ondo','Osun',
+  'Oyo','Plateau','Rivers','Sokoto','Taraba','Yobe','Zamfara',
+]
+
+// ── Travo delivery quote ─────────────────────────────────────────
+// The quote (in naira) is added straight onto what the customer pays via
+// Paystack. Travo itself is NOT paid from here — you settle each quote with
+// Travo separately by bank transfer, using order.travo_quote_id as the
+// payment reference.
+const quote = ref<TravoQuote | null>(null)
+const quoteLoading = ref(false)
+const quoteNotice = ref('')
+const quoteError = ref('')
+const quotedFor = ref('')
+
+const quoteKey = () =>
+  [form.value.address.trim(), form.value.state, estimateCartWeightKg(cart.items)].join('|')
+
+// A quote is only valid for the exact address/state/weight it was fetched for.
+const activeQuote = computed(() =>
+  quote.value && quotedFor.value === quoteKey() ? quote.value : null,
 )
 
-const deliveryFeeNgn = computed(() => resolvedZone.value?.fee_ngn ?? 0)
+// No quote = no checkout. There is no fallback fee.
+const deliveryFeeNgn = computed(() => activeQuote.value?.fee_ngn ?? 0)
+const deliveryFeeReady = computed(() => !!activeQuote.value)
 const totalNgn = computed(() => cart.subtotalNgn + deliveryFeeNgn.value)
+
+// Editing the address/state (or the cart) invalidates the old quote.
+watch(
+  () => [form.value.address, form.value.state, cart.items.length, cart.itemCount],
+  () => {
+    quoteError.value = ''
+    quoteNotice.value = ''
+  },
+)
+
+const fetchQuote = async () => {
+  formError.value = ''
+  if (form.value.address.trim().length < 8 || !form.value.state) {
+    formError.value = 'Enter your full delivery address and state first.'
+    return
+  }
+  quoteLoading.value = true
+  quoteNotice.value = ''
+  quoteError.value = ''
+  try {
+    const key = quoteKey()
+    quote.value = await getTravoQuote({
+      address: form.value.address.trim(),
+      state: form.value.state,
+      weightKg: estimateCartWeightKg(cart.items),
+    })
+    quotedFor.value = key
+    if (quote.value.approximate_location) {
+      quoteNotice.value = 'We could not pin your exact street, so this is an estimate for your area.'
+    }
+  } catch (e) {
+    quote.value = null
+    quoteError.value =
+      e instanceof Error ? e.message : 'Could not get a delivery quote. Please try again.'
+  } finally {
+    quoteLoading.value = false
+  }
+}
 
 // ── Price re-check ───────────────────────────────────────────────
 const priceMismatches = ref<PriceMismatch[]>([])
@@ -283,10 +360,7 @@ const validate = (): string | null => {
   if (!form.value.phone.trim())     return 'Phone number is required.'
   if (!form.value.address.trim())   return 'Delivery address is required.'
   if (!form.value.state)            return 'Please select a delivery state.'
-  if (!resolvedZone.value)          return 'No delivery zone is configured for this state yet.'
-  if (resolvedZone.value.fee_ngn === null) {
-    return 'This zone is quoted separately — please contact us to complete this order.'
-  }
+  if (!deliveryFeeReady.value)      return 'Please get your delivery quote before paying.'
   return null
 }
 
@@ -317,8 +391,9 @@ const handlePay = async () => {
       phone:           form.value.phone,
       deliveryAddress: form.value.address,
       state:           form.value.state,
-      deliveryZone:    resolvedZone.value!.zone_name,
-      deliveryFeeNgn:  resolvedZone.value!.fee_ngn!,
+      deliveryFeeNgn:  deliveryFeeNgn.value,
+      travoQuoteId:    activeQuote.value!.quote_id,
+      travoRequestId:  activeQuote.value!.request_id,
       paymentMethod:   form.value.paymentMethod,
     })
 
@@ -336,7 +411,7 @@ const handlePay = async () => {
         email:     auth.user!.email!,
         amountNgn: order.total_ngn,
         ref:       order.ref,
-        metadata:  { order_id: order.id, order_ref: order.ref },
+        metadata:  { order_id: order.id, order_ref: order.ref, travo_quote_id: order.travo_quote_id },
       },
       () => {
         // onSuccess — Paystack's popup confirmed the charge went through.

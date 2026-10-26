@@ -109,6 +109,8 @@ export interface Order {
   state: string
   delivery_zone: string | null
   delivery_fee_ngn: number
+  travo_quote_id: string | null
+  travo_request_id: string | null
   subtotal_ngn: number
   total_ngn: number
   payment_method: PaymentMethod | null

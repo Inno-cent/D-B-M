@@ -28,7 +28,7 @@ import { computed, unref, type MaybeRef } from 'vue'
 // ── Site-wide constants ──────────────────────────────────────────
 // NOTE: social links are placeholders — swap in the real profile URLs
 // once they exist. Remove any that never will.
-export const SITE_NAME = 'OrenAg'
+export const SITE_NAME = 'Orena Global'
 export const SITE_URL = 'https://orenag.com'
 export const DEFAULT_DESCRIPTION =
   'OrenAg connects international buyers and Nigerian businesses with verified suppliers of agricultural commodities, wholesale groceries, and meal kits.'
