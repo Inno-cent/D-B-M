@@ -121,17 +121,18 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { products } from '../../data/products'
+import { useCatalogStore } from '../../stores/catalog'
 import { usePricesStore } from '../../stores/prices'
 
 const pricesStore = usePricesStore()
+const catalog = useCatalogStore()
 
 onMounted(() => {
   if (pricesStore.prices.length === 0) pricesStore.fetchPrices()
 })
 
-const localProducts  = computed(() => products.filter(p => p.type === 'local').slice(0, 8))
-const exportProducts = computed(() => products.filter(p => p.type === 'export').slice(0, 6))
+const localProducts  = computed(() => catalog.products.filter(p => p.type === 'local').slice(0, 8))
+const exportProducts = computed(() => catalog.products.filter(p => p.type === 'export').slice(0, 6))
 
 const priceFor = (slug: string) => pricesStore.priceMap[slug] ?? null
 </script>

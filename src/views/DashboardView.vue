@@ -24,6 +24,15 @@
           <div class="flex items-center gap-3">
             <RouterLink
               v-if="auth.isAdmin"
+              to="/admin/products"
+              class="text-xs font-semibold text-forest-200 border border-forest-600
+                     rounded-lg px-3 py-2 hover:bg-forest-700 hover:text-white
+                     transition-all duration-200"
+            >
+              Manage Products
+            </RouterLink>
+            <RouterLink
+              v-if="auth.isAdmin"
               to="/admin/prices"
               class="text-xs font-semibold text-forest-200 border border-forest-600
                      rounded-lg px-3 py-2 hover:bg-forest-700 hover:text-white

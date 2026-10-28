@@ -66,12 +66,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { useReveal } from "../composables/useReveal";
-import { products } from "../data/products";
+import { useCatalogStore } from "../stores/catalog";
 import { useSeo } from "../composables/useSeo";
 
 const { observe } = useReveal();
+const catalog = useCatalogStore();
 onMounted(() => observe());
 
 useSeo({
@@ -86,13 +87,13 @@ useSeo({
 // old "8 Local Products" figure had (actual count was 18). Supplier count
 // and countries served are marketing claims with no backing data source —
 // left as-is; update manually if those numbers change.
-const stats = [
+const stats = computed(() => [
   {
-    value: String(products.filter((p) => p.type === "local").length),
+    value: String(catalog.products.filter((p) => p.type === "local").length),
     label: "Local Products, Live Priced",
   },
   { value: "50+", label: "Verified Suppliers" },
   { value: "18", label: "Countries Served (Export)" },
-  { value: String(products.length), label: "Commodities Total" },
-];
+  { value: String(catalog.products.length), label: "Commodities Total" },
+]);
 </script>

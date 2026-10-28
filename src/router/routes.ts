@@ -125,6 +125,31 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../views/AdminPricesView.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
   },
+  // Catalog management. '/admin/products/new' must stay above ':slug'.
+  {
+    path: '/admin/products',
+    name: 'admin-products',
+    component: () => import('../views/AdminProductsView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/products/new',
+    name: 'admin-product-new',
+    component: () => import('../views/AdminProductEditView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/products/:slug',
+    name: 'admin-product-edit',
+    component: () => import('../views/AdminProductEditView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/categories',
+    name: 'admin-categories',
+    component: () => import('../views/AdminCategoriesView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
   {
     path: '/admin/orders',
     name: 'admin-orders',
