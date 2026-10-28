@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAdminCatalogStore } from '../../stores/adminCatalog'
+import { useAdminCatalogStore } from '../../../stores/adminCatalog'
 
 const props = defineProps<{
   modelValue: string | null

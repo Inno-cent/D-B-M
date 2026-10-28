@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
-import { useAdminCatalogStore } from '../../stores/adminCatalog'
+import { useAdminCatalogStore } from '../../../stores/adminCatalog'
 
 const admin = useAdminCatalogStore()
 const busy = ref(false)

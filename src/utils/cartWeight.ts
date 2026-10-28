@@ -1,10 +1,4 @@
-// NEW FILE — src/utils/cartWeight.ts
-//
-// Travo prices parcels by weight band, but cart items carry no weight.
-// Variant slugs encode the pack size ("maize--20kg", "palm-oil--5l"), so we
-// read the weight from there, then from `unit`. Litres count as 1 kg each.
-// Anything we can't parse falls back to DEFAULT_ITEM_KG per unit — adjust
-// that (or add a real `weight_kg` column to product_prices) if it's off.
+
 
 import type { CartItem } from '../stores/cart'
 
@@ -12,8 +6,11 @@ const DEFAULT_ITEM_KG = 1
 
 const parseWeightKg = (text: string): number | null => {
   const m = text.toLowerCase().match(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|ltr|litre|litres)\b/)
-  if (!m) return null
+
+  if (!m || !m[1] || !m[2]) return null
+
   const n = parseFloat(m[1])
+
   switch (m[2]) {
     case 'kg':
     case 'l':
@@ -21,9 +18,11 @@ const parseWeightKg = (text: string): number | null => {
     case 'litre':
     case 'litres':
       return n
+
     case 'g':
     case 'ml':
       return n / 1000
+
     default:
       return null
   }
