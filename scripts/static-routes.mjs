@@ -1,39 +1,76 @@
-// Plain-JS route list shared by vite.config.ts (prerendering) and
-// scripts/generate-sitemap.mjs (sitemap.xml). Deliberately NOT importing
-// from src/data/*.ts here: those files import image assets, which only
-// resolve inside Vite's own module graph — importing them from a plain
-// Node script (or from vite.config.ts's own bundling step) would break.
-// So the product/meal-kit/blog slugs below are copied out by hand.
-// If you add/remove a product, meal kit, or blog post, update the
-// matching array here too.
+// Route list shared by vite.config.ts (prerendering) and
+// scripts/generate-sitemap.mjs (sitemap.xml).
+//
+// CHANGED: product slugs are no longer copied here by hand — they are
+// fetched from Supabase (published products only) every time you build, so
+// adding/hiding a product in the admin and republishing is all it takes.
+// Meal-kit and blog slugs are still hand-maintained below.
+//
+// This file stays plain JS and deliberately does NOT import from src/ (those
+// files import image assets that only resolve inside Vite's module graph).
 
-// Top-level product slugs from src/data/products.ts (`products[].slug`
-// only — NOT the nested `variants[].slug` values, since variants aren't
-// separate routes, just price/cart line items on the parent's page).
-export const PRODUCT_SLUGS = [
-  'palm-oil', 'maize', 'beans', 'onions', 'cassava', 'garri', 'wheat',
-  'okra', 'tomato', 'chili-pepper', 'green-peas', 'carrot', 'fresh-pepper',
-  'green-pepper', 'spring-onions', 'corn', 'ginger', 'cocoa-beans',
-  'groundnut', 'soyabeans', 'shea-butter', 'rice-parboiled', 'rice-basmati',
-  'semovita', 'semolina', 'spaghetti', 'milk-powder', 'milk-evaporated',
-  'sugar', 'salt', 'tomato-paste-sachet', 'tomato-paste-tin', 'corned-beef',
-  'vegetable-oil', 'curry-powder', 'thyme', 'pepper-powder',
-  'ginger-powder', 'garlic-powder', 'seasoning-cubes',
-  'chicken-seasoning-powder', 'coconut-milk-cream', 'canned-vegetables',
-]
+import dotenv from 'dotenv'
 
-// From src/data/mealKits.ts
+// Same variables the app itself uses. On Vercel they come from the project
+// environment; locally we read .env.local / .env.
+if (!process.env.VITE_SUPABASE_URL) {
+  dotenv.config({ path: '.env.local', quiet: true })
+  dotenv.config({ path: '.env', quiet: true })
+}
+
+let cached = null
+
+/**
+ * Published products straight from Supabase's REST API (anon key — the
+ * "published only" row-level-security policy applies, so hidden products can
+ * never leak into the sitemap or the prerender list).
+ * Fails the build loudly rather than silently shipping a site with no products.
+ * @returns {Promise<{ slug: string, updated_at: string | null }[]>}
+ */
+export function fetchPublishedProducts() {
+  if (cached) return cached
+  cached = (async () => {
+    const url = process.env.VITE_SUPABASE_URL
+    const key = process.env.VITE_SUPABASE_ANON_KEY
+    if (!url || !key) {
+      throw new Error(
+        'static-routes: VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are not set, ' +
+          'so product pages cannot be listed. Set them in .env.local (local) or in ' +
+          'the Vercel project environment variables (deploys).',
+      )
+    }
+    const res = await fetch(
+      `${url}/rest/v1/products?select=slug,updated_at&is_published=eq.true&order=sort_order.asc`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+    )
+    if (!res.ok) {
+      throw new Error(`static-routes: Supabase returned ${res.status} ${await res.text()}`)
+    }
+    const rows = await res.json()
+    if (!Array.isArray(rows) || rows.length === 0) {
+      throw new Error(
+        'static-routes: Supabase returned 0 published products. Run supabase/catalog_seed.sql ' +
+          'or publish at least one product before building.',
+      )
+    }
+    return rows
+  })()
+  return cached
+}
+
+/** @returns {Promise<string[]>} */
+export async function fetchProductSlugs() {
+  return (await fetchPublishedProducts()).map((r) => r.slug)
+}
+
+// From src/data/mealKits.ts (meal kits are still static — update by hand)
 export const MEAL_KIT_SLUGS = [
   'jollof-rice-kit', 'egusi-soup-kit', 'fried-rice-kit', 'pepper-soup-kit',
   'efo-riro-kit',
 ]
 
 // From the `posts` array hardcoded in src/views/BlogView.vue, plus the
-// featured post linked from the hero. NOTE: BlogPostView.vue currently
-// has no real content store of its own — it derives a title from the
-// slug — so these pages exist as routes but are thin. Move this list to
-// a real data file (or Supabase) once blog content is fleshed out, and
-// generate this array from that source instead.
+// featured post linked from the hero.
 export const BLOG_SLUGS = [
   'importing-sesame-seeds-nigeria',
   'hibiscus-export-standards',
@@ -44,9 +81,8 @@ export const BLOG_SLUGS = [
   'maize-sourcing-nigeria',
 ]
 
-// Static (non-dynamic) routes worth prerendering/listing in the
-// sitemap. Excludes auth, dashboard, checkout, orders, admin, cart,
-// and not-found — those are either gated, per-user, or noindexed.
+// Static (non-dynamic) routes worth prerendering/listing in the sitemap.
+// Excludes auth, dashboard, checkout, orders, admin, cart, not-found.
 export const STATIC_ROUTES = [
   { path: '/', priority: 1.0, changefreq: 'daily' },
   { path: '/products', priority: 0.9, changefreq: 'daily' },
@@ -63,10 +99,12 @@ export const STATIC_ROUTES = [
   { path: '/privacy', priority: 0.3, changefreq: 'yearly' },
 ]
 
-export function allPrerenderRoutes() {
+/** @returns {Promise<string[]>} */
+export async function allPrerenderRoutes() {
+  const productSlugs = await fetchProductSlugs()
   return [
     ...STATIC_ROUTES.map((r) => r.path),
-    ...PRODUCT_SLUGS.map((s) => `/products/${s}`),
+    ...productSlugs.map((s) => `/products/${s}`),
     ...MEAL_KIT_SLUGS.map((s) => `/meal-kits/${s}`),
     ...BLOG_SLUGS.map((s) => `/blog/${s}`),
   ]

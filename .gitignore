@@ -47,3 +47,6 @@ __screenshots__/
 
 .vercel
 .env*.local
+
+.vercel
+.env*

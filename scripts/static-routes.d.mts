@@ -1,4 +1,10 @@
-export const PRODUCT_SLUGS: string[]
+export interface PublishedProductRow {
+  slug: string
+  updated_at: string | null
+}
+
+export function fetchPublishedProducts(): Promise<PublishedProductRow[]>
+export function fetchProductSlugs(): Promise<string[]>
 
 export const MEAL_KIT_SLUGS: string[]
 
@@ -19,4 +25,4 @@ export interface StaticRoute {
 
 export const STATIC_ROUTES: StaticRoute[]
 
-export function allPrerenderRoutes(): string[]
+export function allPrerenderRoutes(): Promise<string[]>

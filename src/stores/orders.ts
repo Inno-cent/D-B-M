@@ -49,8 +49,9 @@ export const useOrdersStore = defineStore('orders', () => {
     phone: string
     deliveryAddress: string
     state: string
-    deliveryZone: string | null
     deliveryFeeNgn: number
+    travoQuoteId: string
+    travoRequestId: string | null
     paymentMethod: PaymentMethod
   }): Promise<Order> => {
     const auth = useAuthStore()
@@ -67,8 +68,9 @@ export const useOrdersStore = defineStore('orders', () => {
         phone: params.phone,
         delivery_address: params.deliveryAddress,
         state: params.state,
-        delivery_zone: params.deliveryZone,
         delivery_fee_ngn: params.deliveryFeeNgn,
+        travo_quote_id: params.travoQuoteId,
+        travo_request_id: params.travoRequestId,
         subtotal_ngn: subtotalNgn,
         total_ngn: totalNgn,
         payment_method: params.paymentMethod,

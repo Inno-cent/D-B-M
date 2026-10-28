@@ -262,7 +262,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { products } from "../data/products";
+import { useCatalogStore } from "../stores/catalog";
 import { useReveal } from "../composables/useReveal";
 import { usePricesStore } from "../stores/prices";
 import { useCartStore } from "../stores/cart";
@@ -276,13 +276,16 @@ const route = useRoute();
 const router = useRouter();
 const pricesStore = usePricesStore();
 const cart = useCartStore();
+const catalog = useCatalogStore();
 
-const product = computed(() => products.find((p) => p.slug === route.params.slug));
+const product = computed(() =>
+  catalog.products.find((p) => p.slug === route.params.slug)
+);
 
 // p.type === product.value?.type is unaffected by the categories[]
 // change (type is untouched) — left exactly as it was.
 const relatedProducts = computed(() =>
-  products
+  catalog.products
     .filter((p) => p.slug !== route.params.slug)
     .filter((p) => p.type === product.value?.type)
     .slice(0, 5)
@@ -292,7 +295,7 @@ const relatedProducts = computed(() =>
 // Tomato Paste — Sachet and Tomato Paste — Pouch & Tin, and back).
 const familyProducts = computed(() => {
   if (!product.value?.family) return [];
-  return products.filter(
+  return catalog.products.filter(
     (p) => p.family === product.value!.family && p.slug !== product.value!.slug
   );
 });

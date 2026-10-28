@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import ProductCard from './ProductCard.vue'
-import type { Product } from '../../data/products'
+import type { Product } from '../../stores/catalog'
 
 defineProps<{
   products: Product[]

@@ -32,8 +32,12 @@
 </template>
 
 <script setup lang="ts">
-// Sourced from data/categories.ts — the shared taxonomy. This section just
-// links out to /products?category=<slug>; the actual category filtering
+// Sourced from the catalog store (Supabase `categories` table). This section
+// just links out to /products?category=<slug>; the actual category filtering
 // (product.categories.includes(slug)) lives in ProductsView.vue.
-import { categories } from "../../data/categories";
+import { computed } from "vue";
+import { useCatalogStore } from "../../stores/catalog";
+
+const catalog = useCatalogStore();
+const categories = computed(() => catalog.categories);
 </script>

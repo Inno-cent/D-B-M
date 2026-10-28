@@ -197,8 +197,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ProductCard from "../components/products/ProductCard.vue";
-import { products } from "../data/products";
-import { categories } from "../data/categories";
+import { useCatalogStore } from "../stores/catalog";
 import { useReveal } from "../composables/useReveal";
 import { usePricesStore } from "../stores/prices";
 import { useSeo } from "../composables/useSeo";
@@ -209,6 +208,9 @@ onMounted(() => observe());
 const route = useRoute();
 const router = useRouter();
 const pricesStore = usePricesStore();
+const catalog = useCatalogStore();
+const products = computed(() => catalog.products);
+const categories = computed(() => catalog.categories);
 
 const filter = ref("all");
 const search = ref("");
@@ -235,7 +237,7 @@ function setCategory(slug: string | null) {
 // separate URL. Title still reflects the active category for a nicer
 // browser-tab/SERP title when someone lands on a filtered link directly.
 const activeCategoryLabel = computed(
-  () => categories.find((c) => c.slug === selectedCategory.value)?.label ?? null,
+  () => categories.value.find((c) => c.slug === selectedCategory.value)?.label ?? null,
 );
 
 useSeo(() => ({
@@ -262,19 +264,19 @@ onMounted(() => {
   if (typeof route.query.q === "string") search.value = route.query.q;
 });
 
-const tabs = [
-  { label: "All Products", value: "all", count: products.length },
+const tabs = computed(() => [
+  { label: "All Products", value: "all", count: products.value.length },
   {
     label: "Export",
     value: "export",
-    count: products.filter((p) => p.type === "export").length,
+    count: products.value.filter((p) => p.type === "export").length,
   },
   {
     label: "Local Product",
     value: "local",
-    count: products.filter((p) => p.type === "local").length,
+    count: products.value.filter((p) => p.type === "local").length,
   },
-];
+]);
 
 // CHANGED: product.category (single string) -> product.categories
 // (string[]) — a product can now sit on more than one shelf (e.g. Tomato
@@ -282,23 +284,25 @@ const tabs = [
 // counts and filtering both check membership with .includes() instead of
 // equality.
 const categoriesWithCounts = computed(() =>
-  categories.map((c) => ({
+  categories.value.map((c) => ({
     ...c,
-    count: products.filter((p) => p.categories.includes(c.slug)).length,
+    count: products.value.filter((p) => p.categories.includes(c.slug)).length,
   }))
 );
 
 const activeTabLabel = computed(() => {
   const catLabel = selectedCategory.value
-    ? categories.find((c) => c.slug === selectedCategory.value)?.label
+    ? categories.value.find((c) => c.slug === selectedCategory.value)?.label
     : null;
-  const typeLabel = tabs.find((t) => t.value === filter.value)?.label ?? "All Products";
+  const typeLabel = tabs.value.find((t) => t.value === filter.value)?.label ?? "All Products";
   return catLabel ?? typeLabel;
 });
 
 const filtered = computed(() => {
   let list =
-    filter.value === "all" ? products : products.filter((p) => p.type === filter.value);
+    filter.value === "all"
+      ? products.value
+      : products.value.filter((p) => p.type === filter.value);
 
   if (selectedCategory.value) {
     // CHANGED: .includes() instead of === for the same multi-category reason as above.

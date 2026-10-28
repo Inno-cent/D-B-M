@@ -157,11 +157,12 @@
 import { computed, onMounted, ref } from "vue";
 import { useCartStore } from "../stores/cart";
 import { usePricesStore } from "../stores/prices";
-import { products } from "../data/products";
+import { useCatalogStore } from "../stores/catalog";
 import { useSeo } from "../composables/useSeo";
 
 const cart = useCartStore();
 const pricesStore = usePricesStore();
+const catalog = useCatalogStore();
 const justAddedSlug = ref<string | null>(null);
 
 // noindex: cart contents are per-user and transient — nothing here is
@@ -187,7 +188,7 @@ onMounted(() => {
 // offer one option; the full picker lives on the product detail page.
 const suggestions = computed(() => {
   const inCart = new Set(cart.items.map((i) => i.product_slug));
-  return products
+  return catalog.products
     .filter((p) => p.type === "local")
     .map((p) => {
       const variant = p.variants?.[0] ?? null;

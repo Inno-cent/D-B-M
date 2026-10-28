@@ -114,7 +114,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import type { Product } from "../../data/products";
+import type { Product } from "../../stores/catalog";
 import { usePricesStore } from "../../stores/prices";
 import { useCartStore } from "../../stores/cart";
 

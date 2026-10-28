@@ -1,35 +1,33 @@
-// Generates public/sitemap.xml from scripts/static-routes.mjs.
+// Generates public/sitemap.xml. Runs automatically before every build
+// ("prebuild" in package.json).
 //
-// Run manually with `node scripts/generate-sitemap.mjs`, or wire it
-// into package.json, e.g.:
-//   "prebuild": "node scripts/generate-sitemap.mjs"
-// so the sitemap regenerates every time you run `npm run build`.
-//
-// Re-run this whenever PRODUCT_SLUGS / MEAL_KIT_SLUGS / BLOG_SLUGS in
-// static-routes.mjs change (or better: once product/meal-kit/blog data
-// moves to Supabase, replace the imports below with real DB queries).
+// CHANGED: product URLs now come from Supabase (published products only,
+// with each product's real last-modified date) instead of a hand-copied list.
 
 import { writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import {
   STATIC_ROUTES,
-  PRODUCT_SLUGS,
   MEAL_KIT_SLUGS,
   BLOG_SLUGS,
+  fetchPublishedProducts,
 } from './static-routes.mjs'
 
 const SITE_URL = 'https://orenag.com'
 const today = new Date().toISOString().slice(0, 10)
 
-/** @typedef {{ path: string, priority: number, changefreq: string }} SitemapEntry */
+const products = await fetchPublishedProducts()
+
+/** @typedef {{ path: string, priority: number, changefreq: string, lastmod?: string }} SitemapEntry */
 
 /** @type {SitemapEntry[]} */
 const entries = [
   ...STATIC_ROUTES,
-  ...PRODUCT_SLUGS.map((slug) => ({
-    path: `/products/${slug}`,
+  ...products.map((p) => ({
+    path: `/products/${p.slug}`,
     priority: 0.8,
     changefreq: 'weekly',
+    lastmod: p.updated_at ? p.updated_at.slice(0, 10) : undefined,
   })),
   ...MEAL_KIT_SLUGS.map((slug) => ({
     path: `/meal-kits/${slug}`,
@@ -47,7 +45,7 @@ const urlset = entries
   .map(
     (e) => `  <url>
     <loc>${SITE_URL}${e.path}</loc>
-    <lastmod>${today}</lastmod>
+    <lastmod>${e.lastmod ?? today}</lastmod>
     <changefreq>${e.changefreq}</changefreq>
     <priority>${e.priority.toFixed(1)}</priority>
   </url>`,
